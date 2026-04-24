@@ -4,205 +4,1058 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bolão da Copa</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;700&display=swap');
-        :root { --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; --muted: #666666; --danger: #dc3545; --accent: #009b3a; }
-        * { box-sizing: border-box; font-family: 'Product Sans', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.1; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center; font-weight: 700; color: var(--accent); }
-        header { display: none; background: #009b3a; color: #ffffff; height: 60px; align-items: center; position: sticky; top: 0; z-index: 1000; padding: 0 15px; }
-        header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; font-weight: 800; flex: 1; text-align: center; }
-        .menu-btn { background: transparent; border: none; color: white; font-size: 1.8rem; cursor: pointer; position: absolute; right: 15px; }
-        nav { display: none; flex-direction: column; width: auto; min-width: 160px; background: #007a2e; position: absolute; top: 60px; right: 0; z-index: 999; border-bottom-left-radius: 8px; }
+        @font-face { font-family: 'Aptos'; src: local('Aptos'), local('Segoe UI'), sans-serif; }
+        :root {
+            --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
+            --muted: #666666; --danger: #dc3545; --accent: #000000;
+        }
+        * { box-sizing: border-box; font-family: 'Aptos', sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+        
+        /* CABEÇALHO COM TÍTULO CENTRALIZADO E MENU ALINHADO */
+        header { 
+            display: none; background: #009b3a; color: #ffffff; 
+            padding: 12px 15px; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .header-spacer { width: 30px; }
+        header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; flex: 1; text-align: center; }
+        .menu-btn { background: transparent; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 0; outline: none; touch-action: manipulation; width: 30px; text-align: right; }
+        
+        nav { 
+            display: none; flex-direction: column; width: auto; min-width: 180px; background: #007a2e; 
+            position: absolute; top: 100%; right: 0; z-index: 999; box-shadow: -2px 4px 6px rgba(0,0,0,0.2); border-bottom-left-radius: 8px;
+        }
         nav.aberto { display: flex; }
-        nav button { background: transparent; border: none; color: white; text-align: left; padding: 15px 20px; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .container { max-width: 950px; margin: 15px auto; padding: 0 15px; }
+        nav button { 
+            background: transparent; border: none; color: white; text-align: left; 
+            padding: 15px 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; outline: none; touch-action: manipulation;
+        }
+        nav button.ativo { background: #005c23; font-weight: 800; border-left: 4px solid white; }
+        
+        .container { max-width: 950px; margin: 30px auto; padding: 0 15px; }
         .pagina { display: none; }
-        h2 { font-weight: 700; text-transform: uppercase; font-size: 1.1rem; border-bottom: 2px solid var(--text); padding-bottom: 5px; margin-bottom: 15px; }
-        .submenu-select { width: 100%; height: 42px; font-size: 0.9rem; font-weight: bold; border: 2px solid var(--accent); background: white; margin-bottom: 15px; border-radius: 6px; }
-        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--light); gap: 5px; }
-        .jogo-meta { width: 85px; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
-        .equipe { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; }
-        .palpite-area { display: flex; align-items: center; gap: 4px; }
-        .ipt-gol { width: 40px; height: 40px; text-align: center; font-size: 1.1rem; font-weight: 700; border: 1px solid var(--border); border-radius: 4px; }
-        .tabela-classificacao td:first-child { position: sticky; left: 0; background: #fff; z-index: 10; border-right: 2px solid var(--border); }
-        .btn { background: var(--accent); color: white; border: none; padding: 14px; text-transform: uppercase; font-weight: 700; cursor: pointer; width: 100%; border-radius:6px; }
-        @media (max-width: 650px) { .jogo-linha { flex-wrap: wrap; justify-content: center; } .jogo-meta { width: 100%; text-align: center; } }
+        h2 { font-weight: 600; text-transform: uppercase; font-size: 1.2rem; border-bottom: 1px solid var(--text); padding-bottom: 8px; margin-bottom: 20px; }
+        
+        .tabs-nav { display: flex; gap: 5px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap;}
+        .tab-btn { background: transparent; border: none; outline: none; padding: 12px 15px; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
+        .tab-btn.ativo { color: var(--text); border-color: var(--text); }
+        .tab-content { display: none; } .tab-content.ativo { display: block; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+        input[type="text"], input[type="password"], input[type="file"], input[type="number"], input[type="tel"], select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); font-size: 1rem; outline: none; background: transparent; transition: 0.2s; border-radius:4px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--text); }
+        .ipt-combo { width: 100%; height: 42px; font-size: 0.9rem; border: 1px solid var(--border); padding: 2px 5px; line-height: 1.2; text-align: center; }
+        
+        .btn { background: var(--bg); color: var(--text); border: 1px solid var(--text); padding: 14px; text-transform: uppercase; font-weight: 600; cursor: pointer; width: 100%; letter-spacing: 1px; border-radius:4px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
+        .btn-danger { background: var(--danger); color: white; border: none; }
+        
+        @media (hover: hover) {
+            nav button:hover { background: #008a33; }
+            .btn:hover { background: var(--text); color: var(--bg); }
+            .btn-danger:hover { background: #b02a37; }
+        }
+
+        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 30px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text);}
+        
+        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--light); gap: 10px; }
+        .jogo-meta { width: 100px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; line-height: 1.3; flex-shrink:0; }
+        .equipe { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 500; }
+        .eq-esq { justify-content: flex-end; text-align: right; }
+        .eq-dir { justify-content: flex-start; text-align: left; }
+        .flag { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; background-color: var(--light); display: block; flex-shrink: 0; }
+        .palpite-area { display: flex; align-items: center; justify-content: center; gap: 6px; width: 110px; flex-shrink:0; }
+        .ipt-gol { width: 44px; height: 44px; text-align: center; border: 1px solid var(--border); font-size: 1.1rem; font-weight: 600; outline: none; padding: 0; background: var(--bg); border-radius:6px; }
+        .pts-badge { width: 60px; font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; flex-shrink:0; }
+        
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; }
+        table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed; margin-bottom: 0; }
+        th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); font-weight: 600; background: var(--light); }
+        .t-left { text-align: left; padding-left: 10px; }
+        .col-num { width: 45px; } 
+        .col-eq { width: 170px; }
+        
+        /* FONTE REDUZIDA PARA REGRAS EM MOBILE */
+        #pag-regras table { min-width: 100%; font-size: 0.75rem; }
+        #pag-regras th, #pag-regras td { padding: 6px 4px; }
+        
+        .grid-cfg { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        @media (max-width: 650px) { 
+            .grid-cfg { grid-template-columns: 1fr; } 
+            .jogo-linha { flex-wrap: wrap; position: relative; padding: 15px 0; justify-content: center; }
+            .jogo-meta { width: 100%; text-align: center; margin-bottom: 10px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 5px; }
+            .pts-badge { width: 100%; text-align: center; margin-top: 10px; background: #e8f5e9; padding: 5px; border-radius: 4px; }
+            .equipe { width: 35%; flex-direction: column; text-align: center !important; justify-content: flex-start; gap: 4px; font-size: 0.8rem; align-items: center !important; }
+            .eq-esq { flex-direction: column-reverse; } 
+            .palpite-area { width: 30%; justify-content: center; }
+            .ipt-combo { font-size: 0.75rem; padding: 5px; }
+            .flag { width: 30px; height: 30px; }
+        }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay">Conectando ao Cebolão...</div>
-
 <header id="cabecalho-principal">
-    <div style="width:40px"></div>
+    <div class="header-spacer"></div>
     <h1>Bolão da Copa</h1>
     <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
     <nav id="menu-principal">
-        <button onclick="nav('pag-resultados')">Resultados</button>
-        <button onclick="nav('pag-palpites')">Palpites</button>
-        <button onclick="nav('pag-ligas')">Ligas</button>
-        <button onclick="nav('pag-regras')">Regras</button>
-        <button id="nav-gestao" style="display:none" onclick="nav('pag-gestao')">Gestão</button>
-        <button onclick="logout()">Sair</button>
+        <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
+        <button type="button" id="nav-palpites" onclick="nav('pag-palpites')">Palpites</button>
+        <button type="button" id="nav-ligas" onclick="nav('pag-ligas')">Ligas</button>
+        <button type="button" id="nav-ranking" onclick="nav('pag-ranking')">Pontuações</button>
+        <button type="button" id="nav-regras" onclick="nav('pag-regras')">Regras</button>
+        <button type="button" id="nav-gestao" onclick="nav('pag-gestao')" style="display:none;">Gestão</button>
+        <button type="button" id="nav-logout" onclick="logout()">Sair da Conta</button>
     </nav>
 </header>
 
 <div class="container">
+    
     <section id="pag-auth" class="pagina">
-        <div style="max-width: 340px; margin: 40px auto; text-align: center;">
-            <h1 style="font-weight:800; color:#009b3a; margin-bottom:30px;">BOLÃO DA COPA</h1>
-            <div class="tabs-nav" style="display:flex; gap:10px; margin-bottom:20px">
-                <button id="tab-log-btn" class="tab-btn ativo" onclick="switchAuth('login')">Entrar</button>
-                <button id="tab-reg-btn" class="tab-btn" onclick="switchAuth('reg')">Registro</button>
+        <div style="max-width: 350px; margin: 0 auto; padding-top: 30px; text-align: center;">
+            <h1 style="text-align:center; font-weight:800; letter-spacing:2px; margin-bottom:30px; margin-top: 0;">BOLÃO DA COPA</h1>
+            <div class="tabs-nav">
+                <button type="button" id="tab-login-btn" class="tab-btn ativo" onclick="switchTabAuth('aba-login')">Login</button>
+                <button type="button" id="tab-reg-btn" class="tab-btn" onclick="switchTabAuth('aba-reg')">Registo</button>
             </div>
-            <input type="text" id="auth-nome" placeholder="USUÁRIO" style="margin-bottom:10px; width:100%; padding:12px">
-            <input type="password" id="auth-senha" placeholder="SENHA (4 DÍGITOS)" maxlength="4" style="margin-bottom:20px; width:100%; padding:12px">
-            <button class="btn" id="btn-auth-action" onclick="execAuth()">Entrar</button>
+            <div id="aba-login" class="tab-content ativa" style="display:block; text-align: left;">
+                <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="log-nome"></div>
+                <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="log-senha" maxlength="4" pattern="\d*"></div>
+                <button type="button" class="btn" onclick="login()">Entrar</button>
+            </div>
+            <div id="aba-reg" class="tab-content" style="display:none; text-align: left;">
+                <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="reg-nome"></div>
+                <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="reg-senha" maxlength="4" pattern="\d*"></div>
+                <button type="button" class="btn" onclick="registrar()">Salvar Registo</button>
+            </div>
         </div>
     </section>
 
     <section id="pag-resultados" class="pagina">
         <h2>Resultados</h2>
-        <select class="submenu-select" onchange="switchSub('res', this.value)">
-            <option value="grp">Fase de Grupos</option>
-            <option value="cls">Classificação</option>
-            <option value="elm">Mata-Mata</option>
-        </select>
-        <div id="res-content"></div>
+        <div class="tabs-nav">
+            <button type="button" id="btn-res-grp" class="tab-btn ativo" onclick="switchTabRes('res-grp')">Fase de Grupos</button>
+            <button type="button" id="btn-res-cls" class="tab-btn" onclick="switchTabRes('res-cls')">Classificação</button>
+            <button type="button" id="btn-res-elm" class="tab-btn" onclick="switchTabRes('res-elm')">Fases Eliminatórias</button>
+        </div>
+        <div id="res-grp" class="tab-content" style="display:block;"></div>
+        <div id="res-cls" class="tab-content" style="display:none;"><div id="res-cls-tbl"></div></div>
+        <div id="res-elm" class="tab-content" style="display:none;"></div>
     </section>
 
     <section id="pag-palpites" class="pagina">
-        <h2>Palpites</h2>
-        <select class="submenu-select" onchange="switchSub('pal', this.value)">
-            <option value="grp">Fase de Grupos</option>
-            <option value="cls">Classificação</option>
-            <option value="elm">Mata-Mata</option>
-        </select>
-        <div id="pal-content"></div>
+        <h2>Palpites <span id="lbl-apostador" style="color:var(--muted); font-size: 0.9rem;"></span></h2>
+        <div id="pal-conteudo">
+            <div class="tabs-nav">
+                <button type="button" id="btn-pal-grp" class="tab-btn ativo" onclick="switchTabPal('pal-grp')">Fase de Grupos</button>
+                <button type="button" id="btn-pal-cls" class="tab-btn" onclick="switchTabPal('pal-cls')">Classificação</button>
+                <button type="button" id="btn-pal-elm" class="tab-btn" onclick="switchTabPal('pal-elm')">Fases Eliminatórias</button>
+            </div>
+            <div id="pal-grp" class="tab-content" style="display:block;"></div>
+            <div id="pal-cls" class="tab-content" style="display:none;"><div id="pal-cls-tbl"></div></div>
+            <div id="pal-elm" class="tab-content" style="display:none;"></div>
+        </div>
     </section>
 
     <section id="pag-ligas" class="pagina">
         <h2>Ligas</h2>
-        <select class="submenu-select" onchange="switchSub('liga', this.value)">
-            <option value="rank">Pontuações</option>
-            <option value="config">Criar / Entrar em Liga</option>
-        </select>
-        <div id="liga-content"></div>
-    </section>
-
-    <section id="pag-regras" class="pagina">
-        <h2>Regras</h2>
-        <div class="table-wrapper"><table><thead><tr><th class="t-left">Critério</th><th>Pts</th></tr></thead><tbody id="tb-regras"></tbody></table></div>
+        <div class="grid-cfg">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px;">
+                <h3 style="margin-top:0;">Criar Nova Liga</h3>
+                <div class="form-group"><label>Nome da Liga</label><input type="text" id="nova-liga-nome"></div>
+                <div class="form-group"><label>Senha da Liga</label><input type="password" id="nova-liga-senha"></div>
+                <button type="button" class="btn" onclick="criarLiga()">Criar e Entrar</button>
+            </div>
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px;">
+                <h3 style="margin-top:0;">Entrar em uma Liga</h3>
+                <div class="form-group"><label>Nome da Liga</label><input type="text" id="entrar-liga-nome"></div>
+                <div class="form-group"><label>Senha da Liga</label><input type="password" id="entrar-liga-senha"></div>
+                <button type="button" class="btn" onclick="entrarLiga()">Entrar na Liga</button>
+            </div>
+        </div>
+        <div style="margin-top:20px; padding: 15px; background:var(--light); border-radius:4px;">
+            <h3 style="margin-top:0;">Minhas Ligas</h3>
+            <ul id="lista-minhas-ligas" style="padding-left: 20px; margin-bottom:0;"></ul>
+        </div>
     </section>
 
     <section id="pag-gestao" class="pagina">
-        <h2>Gestão Master</h2>
-        <select class="submenu-select" onchange="switchSub('adm', this.value)">
-            <option value="users">Usuários</option>
-            <option value="pts">Editar Pontuações</option>
-            <option value="pals">Bloqueios</option>
-        </select>
-        <div id="adm-content"></div>
+        <h2>Gestão do Sistema</h2>
+        <div class="tabs-nav" id="nav-gestao-tabs">
+            <button type="button" id="btn-adm-users" class="tab-btn ativo" onclick="switchTabAdm('adm-users')">Usuários</button>
+            <button type="button" id="btn-adm-pts" class="tab-btn" onclick="switchTabAdm('adm-pts')">Tabela de Pontos</button>
+            <button type="button" id="btn-adm-sys" class="tab-btn" onclick="switchTabAdm('adm-sys')">Sincronização</button>
+        </div>
+        <div id="adm-users" class="tab-content ativo" style="display:block;"><div class="table-wrapper"><table><tbody id="tb-users"></tbody></table></div></div>
+        <div id="adm-pts" class="tab-content" style="display:none;">
+            <div class="grid-cfg">
+                <div class="form-group"><label>Vencedor ou Empate (Grupos)</label><input type="tel" id="cfg-pt-v"></div>
+                <div class="form-group"><label>Diferença correta de gols (Grupos) - Extra</label><input type="tel" id="cfg-pt-d"></div>
+                <div class="form-group"><label>Placar exato (Fase de Grupos) - Extra</label><input type="tel" id="cfg-pt-p"></div>
+                <div class="form-group"><label>Equipe classificada para a Rodada de 32</label><input type="tel" id="cfg-pt-r32"></div>
+                <div class="form-group"><label>Equipe classificada para as Oitavas de Final</label><input type="tel" id="cfg-pt-r16"></div>
+                <div class="form-group"><label>Equipe classificada para as Quartas de Final</label><input type="tel" id="cfg-pt-r8"></div>
+                <div class="form-group"><label>Equipe classificada para a Semifinal</label><input type="tel" id="cfg-pt-r4"></div>
+                <div class="form-group"><label>Equipe classificada para a Final</label><input type="tel" id="cfg-pt-r2"></div>
+                <div class="form-group"><label>3º Lugar</label><input type="tel" id="cfg-pt-t3"></div>
+                <div class="form-group"><label>Campeão</label><input type="tel" id="cfg-pt-w"></div>
+            </div>
+            <button type="button" class="btn" onclick="salvarConfigPontos()">Salvar Regras de Pontos</button>
+        </div>
+        <div id="adm-sys" class="tab-content" style="display:none;">
+            <div class="grid-cfg" style="margin-bottom: 20px;">
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Exportar Dados</h3>
+                    <p style="font-size:0.75rem; color:var(--muted);">Gere o código para transferir a base de dados para o telemóvel ou servidor.</p>
+                    <button type="button" class="btn" onclick="exportarDados()">Gerar Código</button>
+                    <textarea id="txt-export" style="width:100%; height:80px; margin-top:10px; font-size:0.7rem; color:var(--muted);" readonly placeholder="O código aparecerá aqui..."></textarea>
+                </div>
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Importar Dados</h3>
+                    <p style="font-size:0.75rem; color:var(--muted);">Cole aqui o código gerado no outro aparelho para sincronizar.</p>
+                    <textarea id="txt-import" style="width:100%; height:80px; margin-bottom:10px; font-size:0.7rem;" placeholder="Cole o código aqui..."></textarea>
+                    <button type="button" class="btn" onclick="importarDados()">Sincronizar</button>
+                </div>
+            </div>
+            <div style="padding: 20px; background: #fff5f5; text-align: center; border: 1px dashed var(--danger); border-radius: 4px; margin-bottom: 20px;">
+                <label style="color:var(--danger);">Limpeza Geral</label>
+                <button type="button" class="btn btn-danger" onclick="limparDados()">Apagar Todos os Dados do Sistema</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="pag-regras" class="pagina">
+        <h2>Regras de Pontuação</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th class="t-left">Critério de Acerto</th><th class="col-num">Pts</th></tr></thead>
+                <tbody>
+                    <tr><td class="t-left">Vencedor ou Empate (Grupos)</td><td class="col-num" id="lbl-pt-v"></td></tr>
+                    <tr><td class="t-left">Diferença de gols (Grupos)</td><td class="col-num" id="lbl-pt-d"></td></tr>
+                    <tr><td class="t-left">Placar exato (Grupos)</td><td class="col-num" id="lbl-pt-p"></td></tr>
+                    <tr><td class="t-left">Classificada para Rodada de 32</td><td class="col-num" id="lbl-pt-r32"></td></tr>
+                    <tr><td class="t-left">Classificada para Oitavas</td><td class="col-num" id="lbl-pt-r16"></td></tr>
+                    <tr><td class="t-left">Classificada para Quartas</td><td class="col-num" id="lbl-pt-r8"></td></tr>
+                    <tr><td class="t-left">Classificada para Semifinal</td><td class="col-num" id="lbl-pt-r4"></td></tr>
+                    <tr><td class="t-left">Classificada para Final</td><td class="col-num" id="lbl-pt-r2"></td></tr>
+                    <tr><td class="t-left">3º Lugar</td><td class="col-num" id="lbl-pt-t3"></td></tr>
+                    <tr><td class="t-left">Campeão</td><td class="col-num" id="lbl-pt-w"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="pag-ranking" class="pagina">
+        <h2>Pontuações das Ligas</h2>
+        <div style="max-width:450px; margin: 0 auto 20px;">
+            <label>Selecione a Liga</label>
+            <select id="sel-liga-pont" onchange="renderPontuacoes(); renderRnkJogo();" style="font-weight:bold; padding:12px; border-radius:4px;"></select>
+        </div>
+        <div class="tabs-nav">
+            <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
+            <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Último Jogo</button>
+        </div>
+        <div id="rnk-geral" class="tab-content" style="display:block;">
+            <div class="table-wrapper">
+                <table><thead><tr><th class="t-left">Pos</th><th class="t-left">Apostador</th><th>Rodada</th><th>Total</th></tr></thead><tbody id="tb-ranking"></tbody></table>
+            </div>
+        </div>
+        <div id="rnk-jogo" class="tab-content" style="display:none;">
+            <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px;"></select></div>
+            <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
+            <div class="table-wrapper">
+                <table><thead><tr><th class="t-left">Apostador</th><th style="width:120px;">Palpite</th><th class="col-num">Pts</th></tr></thead><tbody id="tb-ranking-jogo"></tbody></table>
+            </div>
+        </div>
     </section>
 </div>
 
 <script>
-// CONFIGURAÇÃO SUPABASE
-const S_URL = 'https://hhlufnllvjdpliggoysy.supabase.co';
-const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhobHVmbmxsdmpkcGxpZ2dveXN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njk3MDM3OSwiZXhwIjoyMDkyNTQ2Mzc5fQ.9wQV2Q5P5frVV51a9n-ADpMZBUZoD1BhqoezZ7JhbRQ';
-const client = supabase.createClient(S_URL, S_KEY);
+window.onerror = function(msg, url, line) {
+    console.error("Erro na linha " + line + ": " + msg);
+};
 
-var db = { u: [], j: [], p: {}, r: {}, pts: {}, l: [] };
+function safeGet(key) {
+    try { return window.localStorage ? window.localStorage.getItem(key) : null; } 
+    catch(e) { return null; }
+}
+function safeSet(key, val) {
+    try { if(window.localStorage) window.localStorage.setItem(key, val); } 
+    catch(e) {}
+}
+
+var SCHEDULE_CSV = [
+{id:1, d:'11/Jun', c:'Cidade do México'},{id:2, d:'12/Jun', c:'Guadalajara'},{id:3, d:'12/Jun', c:'Toronto'},{id:4, d:'13/Jun', c:'Los Angeles'},
+{id:5, d:'13/Jun', c:'São Francisco'},{id:6, d:'13/Jun', c:'Nova Jersey'},{id:7, d:'14/Jun', c:'Boston'},{id:8, d:'14/Jun', c:'Vancouver'},
+{id:9, d:'14/Jun', c:'Houston'},{id:10, d:'14/Jun', c:'Dallas'},{id:11, d:'15/Jun', c:'Filadélfia'},{id:12, d:'15/Jun', c:'Monterrey'},
+{id:13, d:'15/Jun', c:'Atlanta'},{id:14, d:'15/Jun', c:'Seattle'},{id:15, d:'15/Jun', c:'Miami'},{id:16, d:'16/Jun', c:'Los Angeles'},
+{id:17, d:'16/Jun', c:'Nova Jersey'},{id:18, d:'16/Jun', c:'Boston'},{id:19, d:'17/Jun', c:'Kansas City'},{id:20, d:'17/Jun', c:'São Francisco'},
+{id:21, d:'17/Jun', c:'Houston'},{id:22, d:'17/Jun', c:'Dallas'},{id:23, d:'18/Jun', c:'Toronto'},{id:24, d:'18/Jun', c:'Monterrey'},
+{id:25, d:'18/Jun', c:'Atlanta'},{id:26, d:'18/Jun', c:'Los Angeles'},{id:27, d:'18/Jun', c:'Vancouver'},{id:28, d:'19/Jun', c:'Guadalajara'},
+{id:29, d:'19/Jun', c:'Seattle'},{id:30, d:'19/Jun', c:'Boston'},{id:31, d:'20/Jun', c:'Filadélfia'},{id:32, d:'20/Jun', c:'São Francisco'},
+{id:33, d:'20/Jun', c:'Houston'},{id:34, d:'20/Jun', c:'Toronto'},{id:35, d:'21/Jun', c:'Kansas City'},{id:36, d:'21/Jun', c:'Monterrey'},
+{id:37, d:'21/Jun', c:'Atlanta'},{id:38, d:'21/Jun', c:'Los Angeles'},{id:39, d:'21/Jun', c:'Miami'},{id:40, d:'22/Jun', c:'Vancouver'},
+{id:41, d:'22/Jun', c:'A definir'},{id:42, d:'22/Jun', c:'A definir'},{id:43, d:'22/Jun', c:'A definir'},{id:44, d:'23/Jun', c:'A definir'},
+{id:45, d:'23/Jun', c:'A definir'},{id:46, d:'23/Jun', c:'A definir'},{id:47, d:'23/Jun', c:'A definir'},{id:48, d:'24/Jun', c:'A definir'},
+{id:49, d:'24/Jun', c:'A definir'},{id:50, d:'24/Jun', c:'A definir'},{id:51, d:'24/Jun', c:'A definir'},{id:52, d:'24/Jun', c:'A definir'},
+{id:53, d:'25/Jun', c:'A definir'},{id:54, d:'25/Jun', c:'A definir'},{id:55, d:'25/Jun', c:'A definir'},{id:56, d:'25/Jun', c:'A definir'},
+{id:57, d:'25/Jun', c:'A definir'},{id:58, d:'26/Jun', c:'A definir'},{id:59, d:'26/Jun', c:'A definir'},{id:60, d:'26/Jun', c:'A definir'},
+{id:61, d:'26/Jun', c:'A definir'},{id:62, d:'26/Jun', c:'A definir'},{id:63, d:'27/Jun', c:'A definir'},{id:64, d:'27/Jun', c:'A definir'},
+{id:65, d:'27/Jun', c:'A definir'},{id:66, d:'27/Jun', c:'A definir'},{id:67, d:'27/Jun', c:'A definir'},{id:68, d:'27/Jun', c:'A definir'},
+{id:69, d:'28/Jun', c:'A definir'},{id:70, d:'28/Jun', c:'A definir'},{id:71, d:'28/Jun', c:'A definir'},{id:72, d:'28/Jun', c:'A definir'},
+{id:73, d:'28/Jun', c:'Los Angeles'},{id:74, d:'29/Jun', c:'Boston'},{id:75, d:'29/Jun', c:'Monterrey'},{id:76, d:'29/Jun', c:'Houston'},
+{id:77, d:'30/Jun', c:'Nova Jersey'},{id:78, d:'30/Jun', c:'Dallas'},{id:79, d:'30/Jun', c:'Cidade do México'},{id:80, d:'01/Jul', c:'Atlanta'},
+{id:81, d:'01/Jul', c:'São Francisco'},{id:82, d:'01/Jul', c:'Seattle'},{id:83, d:'02/Jul', c:'Toronto'},{id:84, d:'02/Jul', c:'Los Angeles'},
+{id:85, d:'02/Jul', c:'Vancouver'},{id:86, d:'03/Jul', c:'Miami'},{id:87, d:'03/Jul', c:'Kansas City'},{id:88, d:'03/Jul', c:'Dallas'},
+{id:89, d:'04/Jul', c:'Filadélfia'},{id:90, d:'04/Jul', c:'Houston'},{id:91, d:'05/Jul', c:'Nova Jersey'},{id:92, d:'05/Jul', c:'Cidade do México'},
+{id:93, d:'06/Jul', c:'Seattle'},{id:94, d:'06/Jul', c:'Dallas'},{id:95, d:'07/Jul', c:'Atlanta'},{id:96, d:'07/Jul', c:'Vancouver'},
+{id:97, d:'09/Jul', c:'Boston'},{id:98, d:'10/Jul', c:'Los Angeles'},{id:99, d:'10/Jul', c:'Miami'},{id:100, d:'11/Jul', c:'Kansas City'},
+{id:101, d:'14/Jul', c:'Dallas'},{id:102, d:'15/Jul', c:'Atlanta'},{id:103, d:'18/Jul', c:'Miami'},{id:104, d:'19/Jul', c:'Nova Jersey'}
+];
+
+var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
+
+var GS_MAP = [
+{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}
+];
+
+var db = { 
+    u: [], t: [], j: [], p: {}, r: {}, c: { bReg: false, bPal: false }, 
+    pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [] 
+};
+
+var _u = safeGet('fwc_u'); if(_u) db.u = JSON.parse(_u);
+var _t = safeGet('fwc_t'); if(_t) db.t = JSON.parse(_t);
+var _j = safeGet('fwc_j'); if(_j) db.j = JSON.parse(_j);
+var _p = safeGet('fwc_p'); if(_p) db.p = JSON.parse(_p);
+var _r = safeGet('fwc_r'); if(_r) db.r = JSON.parse(_r);
+var _c = safeGet('fwc_c'); if(_c) db.c = JSON.parse(_c);
+var _pts = safeGet('fwc_pts'); if(_pts) db.pts = JSON.parse(_pts);
+var _l = safeGet('fwc_l'); if(_l) db.l = JSON.parse(_l);
+
 var cU = null;
-var currentSub = { res: 'grp', pal: 'grp', liga: 'rank', adm: 'users' };
+var _cuid = safeGet('fwc_cuid');
+if(_cuid) {
+    for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; }
+}
 
-async function init() {
-    try {
-        const { data: s } = await client.from('settings').select('*').single();
-        db.pts = s || {};
-        const { data: u } = await client.from('users').select('*');
-        db.u = u || [];
-        const { data: r } = await client.from('results').select('*');
-        (r || []).forEach(x => db.r['R_'+x.match_id] = { a: x.score_a, b: x.score_b });
-        const { data: p } = await client.from('predictions').select('*');
-        (p || []).forEach(x => db.p[x.user_id+'_'+x.match_id] = { a: x.score_a, b: x.score_b });
-        const { data: l } = await client.from('leagues').select('*, league_users(user_id)');
-        db.l = (l || []).map(x => ({ ...x, users: x.league_users.map(lu => lu.user_id) }));
+function salvar() { 
+    safeSet('fwc_u', JSON.stringify(db.u)); 
+    safeSet('fwc_t', JSON.stringify(db.t)); 
+    safeSet('fwc_j', JSON.stringify(db.j)); 
+    safeSet('fwc_p', JSON.stringify(db.p)); 
+    safeSet('fwc_r', JSON.stringify(db.r)); 
+    safeSet('fwc_c', JSON.stringify(db.c)); 
+    safeSet('fwc_pts', JSON.stringify(db.pts)); 
+    safeSet('fwc_l', JSON.stringify(db.l)); 
+}
 
-        document.getElementById('loading-overlay').style.display = 'none';
-        const cachedId = localStorage.getItem('fwc_cuid');
-        if(cachedId) cU = db.u.find(x => x.id === cachedId);
-        
-        if(cU) { updateUI(); nav('pag-resultados'); } else nav('pag-auth');
-    } catch (e) {
-        document.getElementById('loading-overlay').innerHTML = "Erro de Conexão. Verifique o RLS no Supabase.";
+var ISO_MAP = {'eua':'us', 'estados unidos':'us', 'colômbia':'co', 'itália':'it', 'austrália':'au', 'canadá':'ca', 'japão':'jp', 'suécia':'se', 'nigéria':'ng', 'méxico':'mx', 'camarões':'cm', 'croácia':'hr', 'coreia do sul':'kr', 'brasil':'br', 'gana':'gh', 'sérvia':'rs', 'irã':'ir', 'argentina':'ar', 'marrocos':'ma', 'dinamarca':'dk', 'catar':'qa', 'espanha':'es', 'senegal':'sn', 'equador':'ec', 'arábia saudita':'sa', 'frança':'fr', 'argélia':'dz', 'uruguai':'uy', 'iraque':'iq', 'inglaterra':'gb-eng', 'egito':'eg', 'chile':'cl', 'eau':'ae', 'alemanha':'de', 'mali':'ml', 'peru':'pe', 'uzbequistão':'uz', 'portugal':'pt', 'c. marfim':'ci', 'costa do marfim':'ci', 'venezuela':'ve', 'china':'cn', 'bélgica':'be', 'áf. sul':'za', 'áfrica do sul':'za', 'paraguai':'py', 'n. zelândia':'nz', 'nova zelândia':'nz', 'holanda':'nl', 'tunísia':'tn', 'bolívia':'bo', 'honduras':'hn', 'república tcheca':'cz', 'bósnia e herzegovina':'ba', 'suíça':'ch', 'haiti':'ht', 'escócia':'gb-sct', 'turquia':'tr', 'curaçao':'cw', 'cabo verde':'cv', 'noruega':'no', 'áustria':'at', 'austria':'at', 'jordânia':'jo', 'jordania':'jo', 'rd congo':'cd', 'república democrática do congo':'cd', 'panamá':'pa', 'panama':'pa'};
+
+function getImg(n) { 
+    var iso = n ? ISO_MAP[n.toLowerCase().trim()] : null; 
+    return iso ? '<img src="https://flagcdn.com/w40/' + iso + '.png" class="flag">' : '<div class="flag" style="display:none;"></div>'; 
+}
+
+function isTeam(n) { 
+    for(var i=0; i<db.t.length; i++) { if(db.t[i].n === n) return true; }
+    return false;
+}
+
+function limparDados() { if(confirm("APAGAR TUDO?")) { window.localStorage.clear(); window.location.reload(); } }
+
+if(db.t.length === 0 || db.j.length === 0 || db.j[2].grp !== 'B') { 
+    db.t = TEAMS_DATA; 
+    construtorDeTorneio(); 
+    salvar(); 
+}
+
+function criarLiga() {
+    var n = document.getElementById('nova-liga-nome').value.trim();
+    var s = document.getElementById('nova-liga-senha').value.trim();
+    if(!n || !s) return;
+    var novaLiga = { id: 'L' + new Date().getTime(), nome: n, senha: s, users: [cU.id] };
+    db.l.push(novaLiga); salvar(); alert('Liga criada!'); renderLigas();
+}
+
+function entrarLiga() {
+    var n = document.getElementById('entrar-liga-nome').value.trim();
+    var s = document.getElementById('entrar-liga-senha').value.trim();
+    var liga = null;
+    for(var i=0; i<db.l.length; i++) {
+        if(db.l[i].nome.toLowerCase() === n.toLowerCase() && db.l[i].senha === s) liga = db.l[i];
     }
-}
-
-function toggleMenu() { document.getElementById('menu-principal').classList.toggle('aberto'); }
-function switchAuth(m) { 
-    document.getElementById('tab-log-btn').classList.toggle('ativo', m==='login');
-    document.getElementById('tab-reg-btn').classList.toggle('ativo', m==='reg');
-    document.getElementById('btn-auth-action').innerText = m === 'login' ? 'Entrar' : 'Criar Usuário';
-}
-
-async function execAuth() {
-    const nome = document.getElementById('auth-nome').value.trim();
-    const senha = document.getElementById('auth-senha').value;
-    if(!nome || senha.length < 4) return alert("Preencha os dados corretamente.");
-    const mode = document.getElementById('btn-auth-action').innerText === 'Entrar' ? 'log' : 'reg';
-
-    if(mode === 'reg') {
-        const { data, error } = await client.from('users').insert([{ nome, senha, is_master: db.u.length === 0 }]).select();
-        if(error) return alert("Erro ou Usuário já existe.");
-        cU = data[0];
+    if(liga) {
+        var inLiga = false;
+        for(var j=0; j<liga.users.length; j++) { if(liga.users[j] === cU.id) inLiga = true; }
+        if(!inLiga) { liga.users.push(cU.id); salvar(); alert('Entrou!'); renderLigas(); }
+        else { alert('Você já está na liga.'); }
     } else {
-        cU = db.u.find(x => x.nome.toLowerCase() === nome.toLowerCase() && x.senha === senha);
-        if(!cU) return alert("Dados incorretos.");
+        alert('Liga não encontrada ou senha incorreta.');
     }
-    localStorage.setItem('fwc_cuid', cU.id);
-    window.location.reload();
+}
+
+function renderLigas() {
+    var html = '';
+    for(var i=0; i<db.l.length; i++) {
+        var inLiga = false;
+        for(var j=0; j<db.l[i].users.length; j++) { if(db.l[i].users[j] === cU.id) inLiga = true; }
+        if(inLiga) html += '<li><b>' + db.l[i].nome + '</b></li>';
+    }
+    document.getElementById('lista-minhas-ligas').innerHTML = html || 'Nenhuma liga.';
+}
+
+function renderizarValoresDePontos() {
+    var ids = ['v','p','d','r32','r16','r8','r4','r2','w','t3'];
+    for(var i=0; i<ids.length; i++) {
+        var id = ids[i];
+        var val = db.pts[id] !== undefined ? db.pts[id] : 0;
+        if(document.getElementById('lbl-pt-'+id)) document.getElementById('lbl-pt-'+id).innerText = val;
+        if(document.getElementById('cfg-pt-'+id)) document.getElementById('cfg-pt-'+id).value = val;
+    }
+}
+
+function salvarConfigPontos() {
+    var ids = ['v','p','d','r32','r16','r8','r4','r2','w','t3'];
+    for(var i=0; i<ids.length; i++) {
+        var id = ids[i];
+        db.pts[id] = parseInt(document.getElementById('cfg-pt-'+id).value) || 0;
+    }
+    salvar(); alert('Salvo!'); renderizarValoresDePontos();
+}
+
+function exportarDados() {
+    var dados = JSON.stringify(db);
+    document.getElementById('txt-export').value = dados;
+    alert('Código gerado! Copie e cole este código no outro aparelho para sincronizar as contas e palpites.');
+}
+
+function importarDados() {
+    var txt = document.getElementById('txt-import').value.trim();
+    if(!txt) return;
+    try {
+        var importado = JSON.parse(txt);
+        if(importado && importado.u && confirm("Atenção: Os dados atuais serão substituídos pelos importados. Pretende continuar?")) {
+            db = importado;
+            salvar();
+            alert('Sincronização concluída com sucesso!');
+            window.location.reload();
+        }
+    } catch(e) {
+        alert('Ocorreu um erro: Código inválido.');
+    }
+}
+
+function toggleMenu() {
+    var menu = document.getElementById('menu-principal');
+    if(menu.className.indexOf('aberto') !== -1) {
+        menu.className = menu.className.replace(' aberto', '');
+    } else {
+        menu.className += ' aberto';
+    }
+}
+
+function atualizarMenuUI() {
+    var header = document.getElementById('cabecalho-principal');
+    if(cU) {
+        header.style.display = 'flex';
+        document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none';
+        if(document.getElementById('lbl-apostador')) {
+            document.getElementById('lbl-apostador').innerText = ' - ' + cU.nome + (cU.isM ? ' (Master)' : '');
+        }
+    } else {
+        header.style.display = 'none';
+    }
+}
+
+function switchTabAuth(id) {
+    document.getElementById('aba-login').style.display = 'none';
+    document.getElementById('aba-reg').style.display = 'none';
+    document.getElementById('tab-login-btn').className = 'tab-btn';
+    document.getElementById('tab-reg-btn').className = 'tab-btn';
+    
+    document.getElementById(id).style.display = 'block';
+    if(id === 'aba-login') document.getElementById('tab-login-btn').className = 'tab-btn ativo';
+    if(id === 'aba-reg') document.getElementById('tab-reg-btn').className = 'tab-btn ativo';
+}
+
+function switchTabAdm(id) {
+    document.getElementById('adm-ligas').style.display = 'none';
+    document.getElementById('adm-users').style.display = 'none';
+    document.getElementById('adm-pts').style.display = 'none';
+    document.getElementById('adm-sys').style.display = 'none';
+    
+    document.getElementById('btn-adm-ligas').className = 'tab-btn';
+    document.getElementById('btn-adm-users').className = 'tab-btn';
+    document.getElementById('btn-adm-pts').className = 'tab-btn';
+    document.getElementById('btn-adm-sys').className = 'tab-btn';
+    
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('btn-' + id).className = 'tab-btn ativo';
+}
+
+function switchTabPal(id) {
+    document.getElementById('pal-grp').style.display = 'none';
+    document.getElementById('pal-cls').style.display = 'none';
+    document.getElementById('pal-elm').style.display = 'none';
+    
+    document.getElementById('btn-pal-grp').className = 'tab-btn';
+    document.getElementById('btn-pal-cls').className = 'tab-btn';
+    document.getElementById('btn-pal-elm').className = 'tab-btn';
+    
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('btn-' + id).className = 'tab-btn ativo';
+    
+    if(id === 'pal-grp' || id === 'pal-elm') renderPal();
+    if(id === 'pal-cls') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false);
+}
+
+function switchTabRes(id) {
+    document.getElementById('res-grp').style.display = 'none';
+    document.getElementById('res-cls').style.display = 'none';
+    document.getElementById('res-elm').style.display = 'none';
+    
+    document.getElementById('btn-res-grp').className = 'tab-btn';
+    document.getElementById('btn-res-cls').className = 'tab-btn';
+    document.getElementById('btn-res-elm').className = 'tab-btn';
+    
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('btn-' + id).className = 'tab-btn ativo';
+    
+    if(id === 'res-grp' || id === 'res-elm') renderRes();
+    if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true);
+}
+
+function switchTabRnk(id) {
+    document.getElementById('rnk-geral').style.display = 'none';
+    document.getElementById('rnk-jogo').style.display = 'none';
+    
+    document.getElementById('btn-rnk-geral').className = 'tab-btn';
+    document.getElementById('btn-rnk-jogo').className = 'tab-btn';
+    
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('btn-' + id).className = 'tab-btn ativo';
 }
 
 function nav(id) {
-    document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
+    var menu = document.getElementById('menu-principal');
+    if(menu) menu.className = menu.className.replace(' aberto', '');
+
+    var pags = document.querySelectorAll('.pagina');
+    for(var i=0; i<pags.length; i++) pags[i].style.display = 'none';
+    
+    var btns = document.querySelectorAll('#menu-principal button');
+    for(var k=0; k<btns.length; k++) btns[k].className = '';
+    
     document.getElementById(id).style.display = 'block';
-    document.getElementById('menu-principal').classList.remove('aberto');
-    if(id === 'pag-resultados') switchSub('res', 'grp');
-    if(id === 'pag-palpites') switchSub('pal', 'grp');
-    if(id === 'pag-ligas') switchSub('liga', 'rank');
+    var navBtn = document.getElementById(id.replace('pag-', 'nav-'));
+    if(navBtn) navBtn.className = 'ativo';
+    
+    window.scrollTo(0,0);
+    
+    if(id==='pag-palpites') { 
+        renderPal(); 
+        if(document.getElementById('pal-cls').style.display === 'block') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); 
+    }
+    if(id==='pag-ligas') { renderLigas(); }
+    if(id==='pag-resultados') { 
+        renderRes(); 
+        if(document.getElementById('res-cls').style.display === 'block') renderTbCls('res-cls-tbl', db.r, 'R_', true); 
+    }
+    if(id==='pag-ranking') { popLigasDropdown(); renderPontuacoes(); popRnkSel(); }
+    if(id==='pag-gestao') { 
+        renderAdm(); renderizarValoresDePontos();
+    }
+    if(id==='pag-regras') renderizarValoresDePontos();
 }
 
-function switchSub(prefix, val) {
-    currentSub[prefix] = val;
-    renderPage(prefix);
+function login() {
+    var n = document.getElementById('log-nome').value.trim();
+    var s = document.getElementById('log-senha').value;
+    var uName = null;
+    var u = null;
+    
+    for(var i=0; i<db.u.length; i++) {
+        if(db.u[i].nome.toLowerCase() === n.toLowerCase()) uName = db.u[i];
+        if(db.u[i].nome.toLowerCase() === n.toLowerCase() && db.u[i].senha === s) u = db.u[i];
+    }
+    
+    if(!uName) { alert('Utilizador não registado. Use a sincronização manual se registou a conta noutro aparelho.'); return; }
+    if(u) { 
+        cU = u; 
+        safeSet('fwc_cuid', cU.id);
+        atualizarMenuUI();
+        nav('pag-resultados'); 
+    } else {
+        alert('Senha incorreta.');
+    }
 }
 
-function renderPage(prefix) {
-    const area = document.getElementById(prefix + '-content') || document.getElementById('adm-content');
-    const sub = currentSub[prefix];
-    area.innerHTML = '';
+function registrar() {
+    var n = document.getElementById('reg-nome').value.trim();
+    var s = document.getElementById('reg-senha').value;
+    if(n && s.length===4) { 
+        var exists = false;
+        for(var i=0; i<db.u.length; i++) { if(db.u[i].nome.toLowerCase() === n.toLowerCase()) exists = true; }
+        if(exists) { alert('Nome de utilizador já registado.'); return; }
+        
+        db.u.push({id:'u'+new Date().getTime(), nome:n, senha:s, isM:db.u.length===0}); 
+        salvar(); 
+        alert('Registado com sucesso!'); 
+        document.getElementById('reg-nome').value = '';
+        document.getElementById('reg-senha').value = '';
+        switchTabAuth('aba-login');
+    }
+    else { alert('O nome é obrigatório e a senha deve ter 4 dígitos numéricos.'); }
+}
 
-    if(prefix === 'res' || prefix === 'pal') {
-        if(sub === 'grp') {
-            area.innerHTML = 'Fase de Grupos Carregada...'; // Lógica de renderização de jogos entra aqui
-        } else if (sub === 'cls') {
-            area.innerHTML = '<p style="text-align:center">Classificação em tempo real...</p>';
+function logout() { 
+    cU = null; 
+    safeSet('fwc_cuid', '');
+    atualizarMenuUI();
+    nav('pag-auth'); 
+}
+
+function construtorDeTorneio() {
+    db.j = []; 
+    var idB = 1;
+    for(var i=0; i<GS_MAP.length; i++) {
+        var mapItem = GS_MAP[i];
+        var info = SCHEDULE_CSV[i]; 
+        db.j.push({ id: info.id, f: 'G', t: 'Grupo ' + mapItem.g, grp: mapItem.g, d: info.d, cid: info.c, eA: mapItem.g + mapItem.a, eB: mapItem.g + mapItem.b });
+    }
+    
+    idB = 73;
+    var C32 = [{a:{g:'A',p:1}, b:{g:'B',p:1}}, {a:{g:'E',p:0}, b:{m3:0, ph:'3º A/B/C/D/F'}}, {a:{g:'F',p:0}, b:{g:'C',p:1}}, {a:{g:'C',p:0}, b:{g:'F',p:1}}, {a:{g:'I',p:0}, b:{m3:1, ph:'3º C/D/F/G/H'}}, {a:{g:'E',p:1}, b:{g:'I',p:1}}, {a:{g:'A',p:0}, b:{m3:2, ph:'3º C/E/F/H/I'}}, {a:{g:'L',p:0}, b:{m3:3, ph:'3º E/H/I/J/K'}}, {a:{g:'D',p:0}, b:{m3:4, ph:'3º B/E/F/I/J'}}, {a:{g:'G',p:0}, b:{m3:5, ph:'3º A/E/H/I/J'}}, {a:{g:'K',p:1}, b:{g:'L',p:1}}, {a:{g:'H',p:0}, b:{g:'J',p:1}}, {a:{g:'B',p:0}, b:{m3:6, ph:'3º E/F/G/I/J'}}, {a:{g:'J',p:0}, b:{g:'H',p:1}}, {a:{g:'K',p:0}, b:{m3:7, ph:'3º D/E/I/J/L'}}, {a:{g:'D',p:1}, b:{g:'G',p:1}}];
+    for(var i=0; i<16; i++) { 
+        var info = SCHEDULE_CSV[idB-1]; 
+        db.j.push({ id: idB++, f: 'E', t: 'Rodada de 32', d: info.d, cid: info.c, r: {t:'g', a:C32[i].a, b:C32[i].b} }); 
+    }
+    var C16 = [{jA: 74, jB: 77}, {jA: 73, jB: 75}, {jA: 76, jB: 78}, {jA: 79, jB: 80}, {jA: 83, jB: 84}, {jA: 81, jB: 82}, {jA: 86, jB: 88}, {jA: 85, jB: 87}];
+    for(var i=0; i<8; i++) { 
+        var info = SCHEDULE_CSV[idB-1]; 
+        db.j.push({ id: idB++, f: 'E', t: 'Oitavas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C16[i].jA, jB:C16[i].jB} }); 
+    }
+    var C8 = [{jA: 89, jB: 90}, {jA: 93, jB: 94}, {jA: 91, jB: 92}, {jA: 95, jB: 96}];
+    for(var i=0; i<4; i++) { 
+        var info = SCHEDULE_CSV[idB-1]; 
+        db.j.push({ id: idB++, f: 'E', t: 'Quartas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C8[i].jA, jB:C8[i].jB} }); 
+    }
+    var C4 = [{jA: 97, jB: 98}, {jA: 99, jB: 100}];
+    for(var i=0; i<2; i++) { 
+        var info = SCHEDULE_CSV[idB-1]; 
+        db.j.push({ id: idB++, f: 'E', t: 'Semifinal', d: info.d, cid: info.c, r: {t:'v', jA:C4[i].jA, jB:C4[i].jB} }); 
+    }
+    db.j.push({ id: 103, f: 'E', t: 'Terceiro Lugar', d: SCHEDULE_CSV[102].d, cid: SCHEDULE_CSV[102].c, r: { t:'p', jA: 101, jB: 102 } });
+    db.j.push({ id: 104, f: 'E', t: 'Final', d: SCHEDULE_CSV[103].d, cid: SCHEDULE_CSV[103].c, r: { t:'v', jA: 101, jB: 102 } });
+}
+
+function eqNome(pos) { 
+    for(var i=0; i<db.t.length; i++) { if(db.t[i].pos === pos) return db.t[i].n; }
+    return pos; 
+}
+
+function isGrd(dd, px, g) { 
+    for(var i=0; i<db.j.length; i++) {
+        if(db.j[i].grp === g) {
+            var val = dd[px+db.j[i].id];
+            if(!val || val.a === undefined || val.a === '') return false;
         }
     }
-    // Outras renderizações...
+    return true; 
 }
 
-function updateUI() {
-    document.getElementById('cabecalho-principal').style.display = 'flex';
-    document.getElementById('nav-gestao').style.display = cU?.is_master ? 'block' : 'none';
+function classificar(dd, px) {
+    var t = {}; var m3 = [];
+    var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    for(var idxG=0; idxG<grupos.length; idxG++) {
+        var g = grupos[idxG];
+        t[g] = [];
+        for(var i=0; i<db.t.length; i++) {
+            if(db.t[i].grp === g) t[g].push({ n:db.t[i].n, grp: g, p:0, j:0, v:0, e:0, d:0, gm:0, gs:0, sg:0 });
+        }
+    }
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i];
+        if(j.f==='G') {
+            var r = dd[px+j.id];
+            if(r && r.a!=="" && r.b!=="") {
+                var ga=parseInt(r.a), gb=parseInt(r.b);
+                var eA=null, eB=null;
+                for(var k=0; k<t[j.grp].length; k++) {
+                    if(t[j.grp][k].n === eqNome(j.eA)) eA = t[j.grp][k];
+                    if(t[j.grp][k].n === eqNome(j.eB)) eB = t[j.grp][k];
+                }
+                if(eA && eB) {
+                    eA.j++; eB.j++; eA.gm+=ga; eB.gm+=gb; eA.gs+=gb; eB.gs+=ga; eA.sg+=(ga-gb); eB.sg+=(gb-ga);
+                    if(ga>gb){eA.p+=3; eA.v++; eB.d++;} else if(gb>ga){eB.p+=3; eB.v++; eA.d++;} else{eA.p+=1; eB.p+=1; eA.e++; eB.e++;}
+                }
+            }
+        }
+    }
+    for(var idxG=0; idxG<grupos.length; idxG++) {
+        var g = grupos[idxG];
+        t[g].sort(function(a,b) { return b.p-a.p || b.sg-a.sg || b.gm-a.gm; }); 
+        if(t[g][2]) m3.push(t[g][2]); 
+    }
+    m3.sort(function(a,b) { return b.p-a.p || b.sg-a.sg || b.gm-a.gm; }); 
+    return { t: t, m3: m3 };
 }
 
-function logout() { localStorage.removeItem('fwc_cuid'); window.location.reload(); }
+var allocCache = {};
+function getM3Allocation(st) {
+    var m3_top8 = [];
+    for(var i=0; i<8 && i<st.m3.length; i++) m3_top8.push(st.m3[i]);
+    if(m3_top8.length < 8) {
+        var res = []; for(var i=0; i<m3_top8.length; i++) res.push(m3_top8[i].n); return res;
+    }
+    var keyStr = ''; for(var i=0; i<m3_top8.length; i++) keyStr += m3_top8[i].n + ',';
+    if(allocCache[keyStr]) return allocCache[keyStr];
 
-init();
+    var slots = [{id:0,allowed:['A','B','C','D','F'],t:null},{id:1,allowed:['C','D','F','G','H'],t:null},{id:2,allowed:['C','E','F','H','I'],t:null},{id:3,allowed:['E','H','I','J','K'],t:null},{id:4,allowed:['B','E','F','I','J'],t:null},{id:5,allowed:['A','E','H','I','J'],t:null},{id:6,allowed:['E','F','G','I','J'],t:null},{id:7,allowed:['D','E','I','J','L'],t:null}];
+    function solve(idx) {
+        if(idx === 8) return true; var team = m3_top8[idx];
+        for(var i=0; i<8; i++) { 
+            var isAllowed = false;
+            for(var k=0; k<slots[i].allowed.length; k++){ if(slots[i].allowed[k] === team.grp) isAllowed = true; }
+            if(!slots[i].t && isAllowed) { 
+                slots[i].t = team.n; 
+                if(solve(idx+1)) return true; 
+                slots[i].t = null; 
+            } 
+        }
+        return false;
+    }
+    solve(0); 
+    var finalRes = []; for(var i=0; i<slots.length; i++) finalRes.push(slots[i].t);
+    allocCache[keyStr] = finalRes; return finalRes;
+}
+
+function reqEquipe(j, dd, px) {
+    if(j.f === 'G') return { A: eqNome(j.eA), B: eqNome(j.eB) };
+    if(j.r.t === 'g') {
+        var st = classificar(dd, px);
+        var getT = function(c) {
+            if (c.g) return isGrd(dd,px,c.g) ? (st.t[c.g] && st.t[c.g][c.p] ? st.t[c.g][c.p].n : 'ND') : (c.p===0?'1º ':'2º ') + c.g;
+            else { 
+                var todosGrd = true;
+                var grps = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+                for(var k=0; k<grps.length; k++){ if(!isGrd(dd,px,grps[k])) todosGrd = false; }
+                if (todosGrd) return getM3Allocation(st)[c.m3] || 'ND'; 
+                return (c.ph || 'M3'); 
+            }
+        };
+        return { A: getT(j.r.a), B: getT(j.r.b) };
+    }
+    if(j.r.t === 'v') return { A: (dd[px+j.r.jA] ? dd[px+j.r.jA].w || 'Venc J'+j.r.jA : 'Venc J'+j.r.jA), B: (dd[px+j.r.jB] ? dd[px+j.r.jB].w || 'Venc J'+j.r.jB : 'Venc J'+j.r.jB) };
+    if(j.r.t === 'p') { 
+        var getL = function(jId, obj) { 
+            var eq = null;
+            for(var i=0; i<db.j.length; i++){ if(db.j[i].id === jId) eq = reqEquipe(db.j[i], dd, px); }
+            if(!eq) return 'Perd J'+jId;
+            return (obj && obj.w) ? (obj.w===eq.A ? eq.B : eq.A) : 'Perd J'+jId; 
+        };
+        return { A: getL(j.r.jA, dd[px+j.r.jA]), B: getL(j.r.jB, dd[px+j.r.jB]) }; 
+    }
+}
+
+function getPtsFase(uId, fase) { 
+    var ls = []; 
+    for(var i=0; i<db.j.length; i++){
+        if(db.j[i].t === fase) {
+            var e = reqEquipe(db.j[i], db.r, 'R_');
+            ls.push(e.A); ls.push(e.B);
+        }
+    }
+    return ls; 
+}
+
+function ptoCalc(uId, j) {
+    var p = db.p[uId+'_'+j.id] || {a:'', b:'', w:''};
+    var res = db.r['R_'+j.id];
+    var pts = 0;
+    
+    if(j.f === 'G') {
+        if(res && p.a!=='' && p.b!=='' && res.a!==undefined && res.a!=='') {
+            var gaP=parseInt(p.a), gbP=parseInt(p.b), gaR=parseInt(res.a), gbR=parseInt(res.b);
+            if((gaP>gbP && gaR>gbR) || (gaP<gbP && gaR<gbR) || (gaP===gbP && gaR===gbR)) pts += db.pts.v; 
+            if((gaP-gbP) === (gaR-gbR)) pts += db.pts.d; 
+            if(gaP===gaR && gbP===gbR) pts += db.pts.p; 
+        }
+    } else {
+        if (p.w && isTeam(p.w)) {
+            var targetStage = ''; var bonus = 0;
+            if (j.t === 'Rodada de 32') { targetStage = 'Oitavas de Final'; bonus = db.pts.r16; }
+            else if (j.t === 'Oitavas de Final') { targetStage = 'Quartas de Final'; bonus = db.pts.r8; }
+            else if (j.t === 'Quartas de Final') { targetStage = 'Semifinal'; bonus = db.pts.r4; }
+            else if (j.t === 'Semifinal') { targetStage = 'Final'; bonus = db.pts.r2; }
+            else if (j.t === 'Final') { 
+                var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null;
+                if(officialChampion && officialChampion === p.w) pts += db.pts.w; 
+            }
+            else if (j.t === 'Terceiro Lugar') {
+                var officialThird = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null;
+                if(officialThird && officialThird === p.w) pts += (db.pts.t3 || 0); 
+            }
+            if (targetStage) {
+                var eqR = getPtsFase('m', targetStage); 
+                var found = false;
+                for(var k=0; k<eqR.length; k++) { if(eqR[k] === p.w) found = true; }
+                if(found) pts += bonus;
+            }
+        }
+    }
+    return { pt: pts };
+}
+
+function savP(j, c, v) { if(db.c.bPal) return; var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; salvar(); if(c==='w') renderPal(); }
+function savR(j, c, v) { if(!cU.isM) return; var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; salvar(); if(c==='w') renderRes(); }
+
+function renderTbCls(alvo, dds, px, isOfc) {
+    var d = document.getElementById(alvo); d.innerHTML = ''; var st = classificar(dds, px);
+    var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    
+    for(var m=0; m<grupos.length; m++) {
+        var g = grupos[m];
+        if(!st.t[g] || st.t[g].length===0) continue;
+        
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th><th>Pts Apostador</th></tr></thead><tbody>';
+        for(var n=0; n<st.t[g].length; n++) {
+            var x = st.t[g][n];
+            var pAp = 0; 
+            if(cU) { 
+                var oficiais32 = getPtsFase('m', 'Rodada de 32'); 
+                var r32u = []; 
+                for(var k=0; k<db.j.length; k++) {
+                    if(db.j[k].t==='Rodada de 32'){
+                        var re = reqEquipe(db.j[k], db.p, cU.id+'_');
+                        r32u.push(re.A); r32u.push(re.B);
+                    }
+                }
+                var inOfc = false, inUser = false;
+                for(var o=0; o<oficiais32.length; o++) { if(oficiais32[o]===x.n) inOfc = true; }
+                for(var o=0; o<r32u.length; o++) { if(r32u[o]===x.n) inUser = true; }
+                if (isTeam(x.n) && inOfc && inUser) pAp += db.pts.r32;
+            }
+            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td><td style="font-weight:bold; color:var(--text);">' + pAp + '</td></tr>';
+        }
+        html += '</tbody></table></div>';
+        d.innerHTML += html;
+    }
+}
+
+function geraLinha(j, e, val, pt, isOfc) {
+    var inp = '', vA = (val && val.a !== undefined) ? val.a : '', vB = (val && val.b !== undefined) ? val.b : '', vW = (val && val.w) ? val.w : '';
+    if(isOfc && cU && cU.isM === true) {
+        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savR('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savR('+j.id+',\'b\',this.value)">';
+        else inp = '<select class="ipt-combo" onchange="savR('+j.id+',\'w\',this.value)"><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
+    } else if(isOfc) { 
+        inp = j.f==='G' ? (vA!=='' ? vA+' x '+vB : '-') : (vW||'-');
+    } else {
+        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savP('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savP('+j.id+',\'b\',this.value)">';
+        else inp = '<select class="ipt-combo" onchange="savP('+j.id+',\'w\',this.value)"><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
+    }
+    var metaTxt = '<b>J'+j.id+'</b> | ' + j.d + '<br>' + j.cid;
+    return '<div class="jogo-linha"><div class="jogo-meta">'+metaTxt+'</div><div class="equipe eq-esq">'+e.A+' '+getImg(e.A)+'</div><div class="palpite-area">'+inp+'</div><div class="equipe eq-dir">'+getImg(e.B)+' '+e.B+'</div><div class="pts-badge">'+pt.pt+' Pts</div></div>';
+}
+
+function renderPal() {
+    var hG = '', hE = '';
+    var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    for(var g=0; g<grupos.length; g++) {
+        var groupMatches = '';
+        for(var i=0; i<db.j.length; i++) {
+            var j = db.j[i];
+            if(j.f === 'G' && j.grp === grupos[g]) {
+                var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_');
+                db.p[cU.id+'_'+j.id] = p; 
+                groupMatches += geraLinha(j, eq, p, ptoCalc(cU.id, j), false);
+            }
+        }
+        if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
+    }
+
+    var tAt = '';
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i];
+        if(j.f === 'E') {
+            if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; }
+            var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_');
+            db.p[cU.id+'_'+j.id] = db.p[cU.id+'_'+j.id] || {}; db.p[cU.id+'_'+j.id].nA=eq.A; db.p[cU.id+'_'+j.id].nB=eq.B;
+            hE += geraLinha(j, eq, p, ptoCalc(cU.id, j), false);
+        }
+    }
+    
+    document.getElementById('pal-grp').innerHTML = hG; 
+    document.getElementById('pal-elm').innerHTML = hE;
+}
+
+function renderRes() {
+    var hG = '', hE = '';
+    var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    for(var g=0; g<grupos.length; g++) {
+        var groupMatches = '';
+        for(var i=0; i<db.j.length; i++) {
+            var j = db.j[i];
+            if(j.f === 'G' && j.grp === grupos[g]) {
+                var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id];
+                groupMatches += geraLinha(j, e, r, cU ? ptoCalc(cU.id, j) : {pt:0}, true);
+            }
+        }
+        if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
+    }
+
+    var tAt = '';
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i];
+        if(j.f === 'E') {
+            if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; }
+            var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id];
+            hE += geraLinha(j, e, r, cU ? ptoCalc(cU.id, j) : {pt:0}, true);
+        }
+    }
+    
+    document.getElementById('res-grp').innerHTML = hG; 
+    document.getElementById('res-elm').innerHTML = hE;
+}
+
+function popLigasDropdown() {
+    var sel = document.getElementById('sel-liga-pont');
+    var ligasU = []; 
+    for(var i=0; i<db.l.length; i++) { 
+        for(var k=0; k<db.l[i].users.length; k++) { 
+            if(db.l[i].users[k]===cU.id) ligasU.push(db.l[i]); 
+        } 
+    }
+    var opts = '<option value="">-- Selecione --</option>';
+    for(var i=0; i<ligasU.length; i++) opts += '<option value="' + ligasU[i].id + '">' + ligasU[i].nome + '</option>';
+    
+    var valAtual = sel.value;
+    sel.innerHTML = opts;
+    
+    var found = false; 
+    for(var i=0; i<ligasU.length; i++) { if(ligasU[i].id === valAtual) found = true; }
+    if(valAtual && found) sel.value = valAtual;
+    else if(ligasU.length > 0) sel.value = ligasU[0].id;
+}
+
+function renderPontuacoes() {
+    var lId = document.getElementById('sel-liga-pont').value; 
+    if(!lId) { document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="4" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; return; }
+    
+    var liga = null; 
+    for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
+    
+    var usersLiga = [];
+    for(var i=0; i<db.u.length; i++){ 
+        for(var k=0; k<liga.users.length; k++){ 
+            if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); 
+        } 
+    }
+    
+    var oficiais32 = getPtsFase('m','Rodada de 32'); 
+    var r32j = []; 
+    for(var i=0; i<db.j.length; i++){ if(db.j[i].t==='Rodada de 32') r32j.push(db.j[i]); }
+    
+    var rk = [];
+    for(var i=0; i<usersLiga.length; i++){
+        var u = usersLiga[i];
+        var t=0; 
+        for(var k=0; k<db.j.length; k++) t += ptoCalc(u.id, db.j[k]).pt;
+        
+        for(var teamIdx=0; teamIdx<oficiais32.length; teamIdx++){
+            var team = oficiais32[teamIdx];
+            if(isTeam(team)) {
+                var r32u=[]; 
+                for(var m=0; m<r32j.length; m++){ 
+                    var re = reqEquipe(r32j[m], db.p, u.id+'_'); 
+                    r32u.push(re.A); r32u.push(re.B); 
+                }
+                var hasTeam = false; 
+                for(var m=0; m<r32u.length; m++){ if(r32u[m]===team) hasTeam = true; }
+                if(hasTeam) t += db.pts.r32; 
+            }
+        }
+        rk.push({ n: u.nome, to: t });
+    }
+    rk.sort(function(a,b){ return b.to - a.to; });
+    
+    var html = '';
+    for(var i=0; i<rk.length; i++) html += '<tr><td class="t-left">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td>-</td><td>' + rk[i].to + '</td></tr>';
+    document.getElementById('tb-ranking').innerHTML = html;
+}
+
+function popRnkSel() {
+    var sel = document.getElementById('sel-rnk-jogo');
+    var atual = sel.value;
+    var opts = '<option value="">-- Jogo --</option>';
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i]; 
+        var re = reqEquipe(j,db.r,'R_');
+        opts += '<option value="' + j.id + '">J' + j.id + ' - ' + re.A + ' x ' + re.B + '</option>';
+    }
+    sel.innerHTML = opts;
+    if(atual) sel.value = atual;
+}
+
+function renderRnkJogo() {
+    var lId = document.getElementById('sel-liga-pont').value;
+    var jId = parseInt(document.getElementById('sel-rnk-jogo').value);
+    
+    if(!lId) { document.getElementById('rnk-jogo-res').innerHTML = 'Selecione uma liga primeiro.'; document.getElementById('tb-ranking-jogo').innerHTML = ''; return; }
+    if(!jId) { document.getElementById('rnk-jogo-res').innerHTML = ''; document.getElementById('tb-ranking-jogo').innerHTML = ''; return; }
+    
+    var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
+    var j = null; for(var i=0; i<db.j.length; i++){ if(db.j[i].id===jId) j = db.j[i]; }
+    var res = db.r['R_'+jId];
+    
+    var resTxt = 'Aguardando resultado oficial';
+    if(res) {
+        var eq = reqEquipe(j, db.r, 'R_');
+        if(j.f === 'G' && res.a !== '' && res.b !== '') resTxt = eq.A + ' ' + res.a + ' x ' + res.b + ' ' + eq.B;
+        else if (j.f !== 'G' && res.w) resTxt = 'Vencedor: ' + res.w;
+    }
+    document.getElementById('rnk-jogo-res').innerHTML = 'Resultado Oficial: <br><span style="font-size:1.3rem; color:var(--text);">' + resTxt + '</span>';
+    
+    var usersLiga = [];
+    for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
+    
+    var lista = [];
+    for(var i=0; i<usersLiga.length; i++){
+        var u = usersLiga[i];
+        var p = db.p[u.id+'_'+jId];
+        var pTxt = p ? (j.f==='G' ? (p.a!=='' ? p.a+'x'+p.b : '-') : (p.w||'-')) : '-';
+        lista.push({ n: u.nome, pal: pTxt, pts: ptoCalc(u.id,j).pt });
+    }
+    lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
+    
+    var html = '';
+    for(var i=0; i<lista.length; i++) html += '<tr><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td>' + lista[i].pts + '</td></tr>';
+    document.getElementById('tb-ranking-jogo').innerHTML = html;
+}
+
+function renderAdm() {
+    var html = '';
+    for(var i=0; i<db.u.length; i++) {
+        var u = db.u[i];
+        html += '<tr><td class="t-left">' + u.nome + '</td><td>' + u.senha + '</td><td><button type="button" onclick="if(confirm(\'Remover?\')){ var nu=[]; for(var k=0;k<db.u.length;k++){if(db.u[k].id!==\''+u.id+'\')nu.push(db.u[k]);} db.u=nu; salvar(); renderAdm();}">Remover</button></td></tr>';
+    }
+    document.getElementById('tb-users').innerHTML = html;
+}
+
+if (cU) {
+    atualizarMenuUI();
+    nav('pag-resultados');
+} else {
+    atualizarMenuUI();
+    nav('pag-auth');
+}
 </script>
 </body>
 </html>
