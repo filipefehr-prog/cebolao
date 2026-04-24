@@ -3,41 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bolão da Copa</title>
+    <title>Cebolão da Copa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @font-face { font-family: 'Aptos'; src: local('Aptos'), local('Segoe UI'), sans-serif; }
+        /* Fallback para fontes parecidas com Google Sans usando a nativa Product Sans/Open Sans */
         :root {
             --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
             --muted: #666666; --danger: #dc3545; --accent: #000000;
         }
-        * { box-sizing: border-box; font-family: 'Aptos', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Google Sans', 'Open Sans', 'Segoe UI', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
         
-        /* CABEÇALHO COM TÍTULO CENTRALIZADO E MENU ALINHADO */
+        /* CABEÇALHO BRANCO COM LETRAS PRETAS - ALINHADO VERTICALMENTE */
         header { 
-            display: none; background: #009b3a; color: #ffffff; 
+            display: none; background: #ffffff; color: #000000; 
             padding: 12px 15px; 
-            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
         }
         .header-spacer { width: 30px; }
-        header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; flex: 1; text-align: center; }
-        .menu-btn { background: transparent; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 0; outline: none; touch-action: manipulation; width: 30px; text-align: right; }
+        header h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; flex: 1; text-align: center; }
+        .menu-btn { background: transparent; border: none; color: #000000; font-size: 1.6rem; cursor: pointer; padding: 0; outline: none; touch-action: manipulation; width: 30px; text-align: right; }
         
         nav { 
-            display: none; flex-direction: column; width: auto; min-width: 180px; background: #007a2e; 
-            position: absolute; top: 100%; right: 0; z-index: 999; box-shadow: -2px 4px 6px rgba(0,0,0,0.2); border-bottom-left-radius: 8px;
+            display: none; flex-direction: column; width: auto; min-width: 180px; background: #ffffff; 
+            position: absolute; top: 100%; right: 0; z-index: 999; box-shadow: -2px 4px 6px rgba(0,0,0,0.2); border-bottom-left-radius: 8px; border: 1px solid var(--border);
         }
         nav.aberto { display: flex; }
         nav button { 
-            background: transparent; border: none; color: white; text-align: left; 
+            background: transparent; border: none; color: #000000; text-align: left; 
             padding: 15px 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; outline: none; touch-action: manipulation;
+            border-bottom: 1px solid var(--border); cursor: pointer; outline: none; touch-action: manipulation;
         }
-        nav button.ativo { background: #005c23; font-weight: 800; border-left: 4px solid white; }
+        nav button.ativo { background: var(--light); font-weight: 800; border-left: 4px solid var(--text); }
         
         .container { max-width: 950px; margin: 30px auto; padding: 0 15px; }
         .pagina { display: none; }
-        h2 { font-weight: 600; text-transform: uppercase; font-size: 1.2rem; border-bottom: 1px solid var(--text); padding-bottom: 8px; margin-bottom: 20px; }
         
         .tabs-nav { display: flex; gap: 5px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap;}
         .tab-btn { background: transparent; border: none; outline: none; padding: 12px 15px; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
@@ -54,47 +56,69 @@
         .btn-danger { background: var(--danger); color: white; border: none; }
         
         @media (hover: hover) {
-            nav button:hover { background: #008a33; }
+            nav button:hover { background: var(--light); }
             .btn:hover { background: var(--text); color: var(--bg); }
             .btn-danger:hover { background: #b02a37; }
         }
 
-        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 30px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text);}
+        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 40px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text);}
         
-        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--light); gap: 10px; }
-        .jogo-meta { width: 100px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; line-height: 1.3; flex-shrink:0; }
+        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--light); gap: 8px; }
+        .jogo-meta { width: 145px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; line-height: 1.3; flex-shrink:0; }
         .equipe { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 500; }
         .eq-esq { justify-content: flex-end; text-align: right; }
         .eq-dir { justify-content: flex-start; text-align: left; }
         .flag { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; background-color: var(--light); display: block; flex-shrink: 0; }
-        .palpite-area { display: flex; align-items: center; justify-content: center; gap: 6px; width: 110px; flex-shrink:0; }
-        .ipt-gol { width: 44px; height: 44px; text-align: center; border: 1px solid var(--border); font-size: 1.1rem; font-weight: 600; outline: none; padding: 0; background: var(--bg); border-radius:6px; }
-        .pts-badge { width: 60px; font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; flex-shrink:0; }
+        .palpite-area { display: flex; align-items: center; justify-content: center; gap: 6px; width: 90px; flex-shrink:0; }
+        .ipt-gol { width: 36px; height: 36px; text-align: center; border: 1px solid var(--border); font-size: 1rem; font-weight: 600; outline: none; padding: 0; background: var(--bg); border-radius:4px; }
         
-        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; }
-        table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed; margin-bottom: 0; }
+        .pts-container { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; width: 100px; }
+        .res-ofc { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-right: 12px; }
+        .pts-badge { font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; }
+        
+        /* Nota de Critérios de Desempate */
+        .nota-desempate { font-size: 0.75rem; color: var(--muted); margin: -10px 0 15px 0; line-height: 1.4; padding: 0 5px; }
+
+        /* Tabela com scroll horizontal e coluna congelada */
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; position: relative; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 0; text-align: left; }
         th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); font-weight: 600; background: var(--light); }
         .t-left { text-align: left; padding-left: 10px; }
-        .col-num { width: 45px; } 
-        .col-eq { width: 170px; }
         
-        /* FONTE REDUZIDA PARA REGRAS EM MOBILE */
-        #pag-regras table { min-width: 100%; font-size: 0.75rem; }
-        #pag-regras th, #pag-regras td { padding: 6px 4px; }
+        /* Colunas de largura reduzida */
+        .col-num { width: 50px; text-align: center; } 
+        .col-pos { width: 45px; text-align: center; }
+
+        /* Tabela Específica de Classificação (com min-width e colunas congeladas) */
+        table.tabela-classificacao { min-width: 650px; table-layout: fixed; }
+        .tabela-classificacao th.col-eq { position: sticky; left: 0; background: var(--light); z-index: 2; border-right: 1px solid var(--border); width: 210px; }
+        .tabela-classificacao td.col-eq { position: sticky; left: 0; background: var(--bg); z-index: 1; border-right: 1px solid var(--border); width: 210px; }
         
         .grid-cfg { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         @media (max-width: 650px) { 
             .grid-cfg { grid-template-columns: 1fr; } 
-            .jogo-linha { flex-wrap: wrap; position: relative; padding: 15px 0; justify-content: center; }
-            .jogo-meta { width: 100%; text-align: center; margin-bottom: 10px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 5px; }
-            .pts-badge { width: 100%; text-align: center; margin-top: 10px; background: #e8f5e9; padding: 5px; border-radius: 4px; }
+            .jogo-linha { flex-wrap: wrap; position: relative; padding: 6px 0; justify-content: center; gap: 2px; } 
+            
+            .jogo-meta { width: 100%; text-align: center; margin-bottom: 0px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 2px; }
+            
             .equipe { width: 35%; flex-direction: column; text-align: center !important; justify-content: flex-start; gap: 4px; font-size: 0.8rem; align-items: center !important; }
             .eq-esq { flex-direction: column-reverse; } 
-            .palpite-area { width: 30%; justify-content: center; }
-            .ipt-combo { font-size: 0.75rem; padding: 5px; }
-            .flag { width: 30px; height: 30px; }
+            .palpite-area { width: 25%; justify-content: center; }
+            .ipt-combo { font-size: 0.75rem; padding: 4px; height: 36px; }
+            .flag { width: 26px; height: 26px; }
+            
+            .pts-container { width: 100%; justify-content: center; margin-top: 4px; background: #e8f5e9; padding: 4px; border-radius: 4px; gap: 14px; }
+            .res-ofc { margin-right: 0; color: var(--muted); }
+            .pts-badge { width: auto; margin-top: 0; background: transparent; padding: 0; }
+
+            .nota-desempate { font-size: 0.7rem; }
+
+            table { font-size: 0.8rem; }
+            th, td { padding: 10px 4px; }
+            .col-num { width: 40px; }
+            .col-pos { width: 35px; }
         }
     </style>
 </head>
@@ -102,14 +126,12 @@
 
 <header id="cabecalho-principal">
     <div class="header-spacer"></div>
-    <h1>Bolão da Copa</h1>
+    <h1 id="header-title">Cebolão da Copa</h1>
     <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
     <nav id="menu-principal">
         <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
         <button type="button" id="nav-palpites" onclick="nav('pag-palpites')">Palpites</button>
-        <button type="button" id="nav-ligas" onclick="nav('pag-ligas')">Ligas</button>
-        <button type="button" id="nav-ranking" onclick="nav('pag-ranking')">Pontuações</button>
-        <button type="button" id="nav-regras" onclick="nav('pag-regras')">Regras</button>
+        <button type="button" id="nav-pontuacoes" onclick="nav('pag-pontuacoes')">Pontuações</button>
         <button type="button" id="nav-gestao" onclick="nav('pag-gestao')" style="display:none;">Gestão</button>
         <button type="button" id="nav-logout" onclick="logout()">Sair da Conta</button>
     </nav>
@@ -119,80 +141,172 @@
     
     <section id="pag-auth" class="pagina">
         <div style="max-width: 350px; margin: 0 auto; padding-top: 30px; text-align: center;">
-            <h1 style="text-align:center; font-weight:800; letter-spacing:2px; margin-bottom:30px; margin-top: 0;">BOLÃO DA COPA</h1>
+            <h1 style="text-align:center; font-weight:800; letter-spacing:2px; margin-bottom:5px; margin-top: 0;">CEBOLÃO DA COPA</h1>
+            <p style="font-size:0.95rem; color:var(--muted); margin-top:0; margin-bottom:30px; font-weight: 500;">Aqui o choro é livre</p>
+            
             <div class="tabs-nav">
                 <button type="button" id="tab-login-btn" class="tab-btn ativo" onclick="switchTabAuth('aba-login')">Login</button>
-                <button type="button" id="tab-reg-btn" class="tab-btn" onclick="switchTabAuth('aba-reg')">Registo</button>
+                <button type="button" id="tab-reg-btn" class="tab-btn" onclick="switchTabAuth('aba-reg')">Registro</button>
             </div>
+            
             <div id="aba-login" class="tab-content ativa" style="display:block; text-align: left;">
                 <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="log-nome"></div>
-                <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="log-senha" maxlength="4" pattern="\d*"></div>
+                <div class="form-group" id="grp-senha"><label>Senha (4 Dígitos)</label><input type="password" id="log-senha" maxlength="4" pattern="\d*"></div>
+                <div class="form-group" id="grp-mae" style="display:none;"><label>Nome de solteira da mãe</label><input type="text" id="log-mae"></div>
+                
+                <div style="text-align:right; margin-bottom:15px;">
+                    <a href="#" id="lnk-esqueci" onclick="toggleEsqueciSenha(); return false;" style="font-size:0.8rem; color:var(--text); font-weight: 600;">Esqueci a senha</a>
+                </div>
+                
                 <button type="button" class="btn" onclick="login()">Entrar</button>
             </div>
+            
             <div id="aba-reg" class="tab-content" style="display:none; text-align: left;">
                 <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="reg-nome"></div>
                 <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="reg-senha" maxlength="4" pattern="\d*"></div>
-                <button type="button" class="btn" onclick="registrar()">Salvar Registo</button>
+                <div class="form-group"><label>Confirmar Senha (4 Dígitos)</label><input type="password" id="reg-senha-conf" maxlength="4" pattern="\d*"></div>
+                <div class="form-group">
+                    <label>Nome de solteira da mãe <span style="text-transform:none; font-weight:normal; font-size:0.85em; color:var(--muted);">(Olha o respeito)</span></label>
+                    <input type="text" id="reg-mae">
+                </div>
+                <button type="button" class="btn" onclick="registrar()">Salvar Registro</button>
             </div>
         </div>
     </section>
 
     <section id="pag-resultados" class="pagina">
-        <h2>Resultados</h2>
-        <div class="tabs-nav">
-            <button type="button" id="btn-res-grp" class="tab-btn ativo" onclick="switchTabRes('res-grp')">Fase de Grupos</button>
-            <button type="button" id="btn-res-cls" class="tab-btn" onclick="switchTabRes('res-cls')">Classificação</button>
-            <button type="button" id="btn-res-elm" class="tab-btn" onclick="switchTabRes('res-elm')">Fases Eliminatórias</button>
-        </div>
+        <select class="ipt-combo" onchange="switchTabRes(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+            <option value="res-grp">Fase de Grupos - Por Grupo</option>
+            <option value="res-grp-data">Fase de Grupos - Por Data</option>
+            <option value="res-cls">Classificação</option>
+            <option value="res-elm">Mata-mata</option>
+        </select>
         <div id="res-grp" class="tab-content" style="display:block;"></div>
-        <div id="res-cls" class="tab-content" style="display:none;"><div id="res-cls-tbl"></div></div>
+        <div id="res-grp-data" class="tab-content" style="display:none;"></div>
+        <div id="res-cls" class="tab-content" style="display:none;">
+            <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
+            <div id="res-cls-tbl"></div>
+        </div>
         <div id="res-elm" class="tab-content" style="display:none;"></div>
     </section>
 
     <section id="pag-palpites" class="pagina">
-        <h2>Palpites <span id="lbl-apostador" style="color:var(--muted); font-size: 0.9rem;"></span></h2>
         <div id="pal-conteudo">
-            <div class="tabs-nav">
-                <button type="button" id="btn-pal-grp" class="tab-btn ativo" onclick="switchTabPal('pal-grp')">Fase de Grupos</button>
-                <button type="button" id="btn-pal-cls" class="tab-btn" onclick="switchTabPal('pal-cls')">Classificação</button>
-                <button type="button" id="btn-pal-elm" class="tab-btn" onclick="switchTabPal('pal-elm')">Fases Eliminatórias</button>
-            </div>
+            <select class="ipt-combo" onchange="switchTabPal(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+                <option value="pal-grp">Fase de Grupos - Por Grupo</option>
+                <option value="pal-grp-data">Fase de Grupos - Por Data</option>
+                <option value="pal-cls">Classificação</option>
+                <option value="pal-elm">Mata-mata</option>
+            </select>
             <div id="pal-grp" class="tab-content" style="display:block;"></div>
-            <div id="pal-cls" class="tab-content" style="display:none;"><div id="pal-cls-tbl"></div></div>
+            <div id="pal-grp-data" class="tab-content" style="display:none;"></div>
+            <div id="pal-cls" class="tab-content" style="display:none;">
+                <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
+                <div id="pal-cls-tbl"></div>
+            </div>
             <div id="pal-elm" class="tab-content" style="display:none;"></div>
         </div>
     </section>
 
-    <section id="pag-ligas" class="pagina">
-        <h2>Ligas</h2>
-        <div class="grid-cfg">
-            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px;">
+    <section id="pag-pontuacoes" class="pagina">
+        <div style="max-width:450px; margin: 0 auto 20px;">
+            <label>Selecione a Liga ou Ação</label>
+            <select id="sel-liga-pont" onchange="handleLeagueSelect(this.value)" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select>
+        </div>
+
+        <div id="menu-p-criar" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; max-width: 450px; margin: 0 auto;">
                 <h3 style="margin-top:0;">Criar Nova Liga</h3>
                 <div class="form-group"><label>Nome da Liga</label><input type="text" id="nova-liga-nome"></div>
                 <div class="form-group"><label>Senha da Liga</label><input type="password" id="nova-liga-senha"></div>
                 <button type="button" class="btn" onclick="criarLiga()">Criar e Entrar</button>
             </div>
-            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px;">
+        </div>
+
+        <div id="menu-p-entrar" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; max-width: 450px; margin: 0 auto;">
                 <h3 style="margin-top:0;">Entrar em uma Liga</h3>
                 <div class="form-group"><label>Nome da Liga</label><input type="text" id="entrar-liga-nome"></div>
                 <div class="form-group"><label>Senha da Liga</label><input type="password" id="entrar-liga-senha"></div>
                 <button type="button" class="btn" onclick="entrarLiga()">Entrar na Liga</button>
             </div>
         </div>
-        <div style="margin-top:20px; padding: 15px; background:var(--light); border-radius:4px;">
-            <h3 style="margin-top:0;">Minhas Ligas</h3>
-            <ul id="lista-minhas-ligas" style="padding-left: 20px; margin-bottom:0;"></ul>
+
+        <div id="menu-p-ranking" style="display:block;">
+            <div class="tabs-nav">
+                <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
+                <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Último Jogo</button>
+                <button type="button" id="btn-rnk-regras" class="tab-btn" onclick="switchTabRnk('rnk-regras'); renderizarValoresDePontos();">Regras</button>
+            </div>
+
+            <div id="rnk-geral" class="tab-content" style="display:block;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th>Rodada</th><th class="col-num">Total</th></tr></thead>
+                        <tbody id="tb-ranking"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="rnk-jogo" class="tab-content" style="display:none;">
+                <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select></div>
+                <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Apostador</th><th style="width:80px;">Palpite</th><th class="col-num">Pts</th></tr></thead>
+                        <tbody id="tb-ranking-jogo"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="rnk-regras" class="tab-content" style="display:none;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Critério de Acerto</th><th class="col-num">Pts</th></tr></thead>
+                        <tbody>
+                            <tr><td class="t-left">Vencedor ou Empate (Grupos)</td><td class="col-num" id="lbl-pt-v"></td></tr>
+                            <tr><td class="t-left">Diferença de gols (Grupos)</td><td class="col-num" id="lbl-pt-d"></td></tr>
+                            <tr><td class="t-left">Placar exato (Grupos)</td><td class="col-num" id="lbl-pt-p"></td></tr>
+                            <tr><td class="t-left">Classificada para Rodada de 32</td><td class="col-num" id="lbl-pt-r32"></td></tr>
+                            <tr><td class="t-left">Classificada para Oitavas</td><td class="col-num" id="lbl-pt-r16"></td></tr>
+                            <tr><td class="t-left">Classificada para Quartas</td><td class="col-num" id="lbl-pt-r8"></td></tr>
+                            <tr><td class="t-left">Classificada para Semifinal</td><td class="col-num" id="lbl-pt-r4"></td></tr>
+                            <tr><td class="t-left">Classificada para Final</td><td class="col-num" id="lbl-pt-r2"></td></tr>
+                            <tr><td class="t-left">3º Lugar</td><td class="col-num" id="lbl-pt-t3"></td></tr>
+                            <tr><td class="t-left">Campeão</td><td class="col-num" id="lbl-pt-w"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <section id="pag-gestao" class="pagina">
-        <h2>Gestão do Sistema</h2>
         <div class="tabs-nav" id="nav-gestao-tabs">
             <button type="button" id="btn-adm-users" class="tab-btn ativo" onclick="switchTabAdm('adm-users')">Usuários</button>
             <button type="button" id="btn-adm-pts" class="tab-btn" onclick="switchTabAdm('adm-pts')">Tabela de Pontos</button>
+            <button type="button" id="btn-adm-ctrl" class="tab-btn" onclick="switchTabAdm('adm-ctrl')">Controles</button>
+            <button type="button" id="btn-adm-ligas" class="tab-btn" onclick="switchTabAdm('adm-ligas')">Ligas</button>
             <button type="button" id="btn-adm-sys" class="tab-btn" onclick="switchTabAdm('adm-sys')">Sincronização</button>
         </div>
-        <div id="adm-users" class="tab-content ativo" style="display:block;"><div class="table-wrapper"><table><tbody id="tb-users"></tbody></table></div></div>
+        
+        <div id="adm-users" class="tab-content ativo" style="display:block;">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="t-left">Apostador</th>
+                            <th>Senha</th>
+                            <th>Master</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-users"></tbody>
+                </table>
+            </div>
+        </div>
+        
         <div id="adm-pts" class="tab-content" style="display:none;">
             <div class="grid-cfg">
                 <div class="form-group"><label>Vencedor ou Empate (Grupos)</label><input type="tel" id="cfg-pt-v"></div>
@@ -208,6 +322,28 @@
             </div>
             <button type="button" class="btn" onclick="salvarConfigPontos()">Salvar Regras de Pontos</button>
         </div>
+
+        <div id="adm-ctrl" class="tab-content" style="display:none;">
+            <div class="grid-cfg" style="margin-bottom: 20px;">
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Bloqueios Globais</h3>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bReg" onchange="toggleCfg('bReg', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear novos usuários</label></div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bLig" onchange="toggleCfg('bLig', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear novos acessos às ligas</label></div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bPal" onchange="toggleCfg('bPal', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear alterações nos palpites</label></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="adm-ligas" class="tab-content" style="display:none;">
+            <div class="grid-cfg" style="margin-bottom: 20px;">
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Gerenciar Ligas</h3>
+                    <select id="adm-sel-liga" onchange="renderAdmLigas()" class="ipt-combo" style="margin-bottom:15px;"></select>
+                    <div id="adm-liga-users"></div>
+                </div>
+            </div>
+        </div>
+        
         <div id="adm-sys" class="tab-content" style="display:none;">
             <div class="grid-cfg" style="margin-bottom: 20px;">
                 <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
@@ -230,50 +366,6 @@
         </div>
     </section>
 
-    <section id="pag-regras" class="pagina">
-        <h2>Regras de Pontuação</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead><tr><th class="t-left">Critério de Acerto</th><th class="col-num">Pts</th></tr></thead>
-                <tbody>
-                    <tr><td class="t-left">Vencedor ou Empate (Grupos)</td><td class="col-num" id="lbl-pt-v"></td></tr>
-                    <tr><td class="t-left">Diferença de gols (Grupos)</td><td class="col-num" id="lbl-pt-d"></td></tr>
-                    <tr><td class="t-left">Placar exato (Grupos)</td><td class="col-num" id="lbl-pt-p"></td></tr>
-                    <tr><td class="t-left">Classificada para Rodada de 32</td><td class="col-num" id="lbl-pt-r32"></td></tr>
-                    <tr><td class="t-left">Classificada para Oitavas</td><td class="col-num" id="lbl-pt-r16"></td></tr>
-                    <tr><td class="t-left">Classificada para Quartas</td><td class="col-num" id="lbl-pt-r8"></td></tr>
-                    <tr><td class="t-left">Classificada para Semifinal</td><td class="col-num" id="lbl-pt-r4"></td></tr>
-                    <tr><td class="t-left">Classificada para Final</td><td class="col-num" id="lbl-pt-r2"></td></tr>
-                    <tr><td class="t-left">3º Lugar</td><td class="col-num" id="lbl-pt-t3"></td></tr>
-                    <tr><td class="t-left">Campeão</td><td class="col-num" id="lbl-pt-w"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="pag-ranking" class="pagina">
-        <h2>Pontuações das Ligas</h2>
-        <div style="max-width:450px; margin: 0 auto 20px;">
-            <label>Selecione a Liga</label>
-            <select id="sel-liga-pont" onchange="renderPontuacoes(); renderRnkJogo();" style="font-weight:bold; padding:12px; border-radius:4px;"></select>
-        </div>
-        <div class="tabs-nav">
-            <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
-            <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Último Jogo</button>
-        </div>
-        <div id="rnk-geral" class="tab-content" style="display:block;">
-            <div class="table-wrapper">
-                <table><thead><tr><th class="t-left">Pos</th><th class="t-left">Apostador</th><th>Rodada</th><th>Total</th></tr></thead><tbody id="tb-ranking"></tbody></table>
-            </div>
-        </div>
-        <div id="rnk-jogo" class="tab-content" style="display:none;">
-            <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px;"></select></div>
-            <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
-            <div class="table-wrapper">
-                <table><thead><tr><th class="t-left">Apostador</th><th style="width:120px;">Palpite</th><th class="col-num">Pts</th></tr></thead><tbody id="tb-ranking-jogo"></tbody></table>
-            </div>
-        </div>
-    </section>
 </div>
 
 <script>
@@ -291,32 +383,32 @@ function safeSet(key, val) {
 }
 
 var SCHEDULE_CSV = [
-{id:1, d:'11/Jun', c:'Cidade do México'},{id:2, d:'12/Jun', c:'Guadalajara'},{id:3, d:'12/Jun', c:'Toronto'},{id:4, d:'13/Jun', c:'Los Angeles'},
-{id:5, d:'13/Jun', c:'São Francisco'},{id:6, d:'13/Jun', c:'Nova Jersey'},{id:7, d:'14/Jun', c:'Boston'},{id:8, d:'14/Jun', c:'Vancouver'},
-{id:9, d:'14/Jun', c:'Houston'},{id:10, d:'14/Jun', c:'Dallas'},{id:11, d:'15/Jun', c:'Filadélfia'},{id:12, d:'15/Jun', c:'Monterrey'},
-{id:13, d:'15/Jun', c:'Atlanta'},{id:14, d:'15/Jun', c:'Seattle'},{id:15, d:'15/Jun', c:'Miami'},{id:16, d:'16/Jun', c:'Los Angeles'},
-{id:17, d:'16/Jun', c:'Nova Jersey'},{id:18, d:'16/Jun', c:'Boston'},{id:19, d:'17/Jun', c:'Kansas City'},{id:20, d:'17/Jun', c:'São Francisco'},
-{id:21, d:'17/Jun', c:'Houston'},{id:22, d:'17/Jun', c:'Dallas'},{id:23, d:'18/Jun', c:'Toronto'},{id:24, d:'18/Jun', c:'Monterrey'},
-{id:25, d:'18/Jun', c:'Atlanta'},{id:26, d:'18/Jun', c:'Los Angeles'},{id:27, d:'18/Jun', c:'Vancouver'},{id:28, d:'19/Jun', c:'Guadalajara'},
-{id:29, d:'19/Jun', c:'Seattle'},{id:30, d:'19/Jun', c:'Boston'},{id:31, d:'20/Jun', c:'Filadélfia'},{id:32, d:'20/Jun', c:'São Francisco'},
-{id:33, d:'20/Jun', c:'Houston'},{id:34, d:'20/Jun', c:'Toronto'},{id:35, d:'21/Jun', c:'Kansas City'},{id:36, d:'21/Jun', c:'Monterrey'},
-{id:37, d:'21/Jun', c:'Atlanta'},{id:38, d:'21/Jun', c:'Los Angeles'},{id:39, d:'21/Jun', c:'Miami'},{id:40, d:'22/Jun', c:'Vancouver'},
-{id:41, d:'22/Jun', c:'A definir'},{id:42, d:'22/Jun', c:'A definir'},{id:43, d:'22/Jun', c:'A definir'},{id:44, d:'23/Jun', c:'A definir'},
-{id:45, d:'23/Jun', c:'A definir'},{id:46, d:'23/Jun', c:'A definir'},{id:47, d:'23/Jun', c:'A definir'},{id:48, d:'24/Jun', c:'A definir'},
-{id:49, d:'24/Jun', c:'A definir'},{id:50, d:'24/Jun', c:'A definir'},{id:51, d:'24/Jun', c:'A definir'},{id:52, d:'24/Jun', c:'A definir'},
-{id:53, d:'25/Jun', c:'A definir'},{id:54, d:'25/Jun', c:'A definir'},{id:55, d:'25/Jun', c:'A definir'},{id:56, d:'25/Jun', c:'A definir'},
-{id:57, d:'25/Jun', c:'A definir'},{id:58, d:'26/Jun', c:'A definir'},{id:59, d:'26/Jun', c:'A definir'},{id:60, d:'26/Jun', c:'A definir'},
-{id:61, d:'26/Jun', c:'A definir'},{id:62, d:'26/Jun', c:'A definir'},{id:63, d:'27/Jun', c:'A definir'},{id:64, d:'27/Jun', c:'A definir'},
-{id:65, d:'27/Jun', c:'A definir'},{id:66, d:'27/Jun', c:'A definir'},{id:67, d:'27/Jun', c:'A definir'},{id:68, d:'27/Jun', c:'A definir'},
-{id:69, d:'28/Jun', c:'A definir'},{id:70, d:'28/Jun', c:'A definir'},{id:71, d:'28/Jun', c:'A definir'},{id:72, d:'28/Jun', c:'A definir'},
-{id:73, d:'28/Jun', c:'Los Angeles'},{id:74, d:'29/Jun', c:'Boston'},{id:75, d:'29/Jun', c:'Monterrey'},{id:76, d:'29/Jun', c:'Houston'},
-{id:77, d:'30/Jun', c:'Nova Jersey'},{id:78, d:'30/Jun', c:'Dallas'},{id:79, d:'30/Jun', c:'Cidade do México'},{id:80, d:'01/Jul', c:'Atlanta'},
-{id:81, d:'01/Jul', c:'São Francisco'},{id:82, d:'01/Jul', c:'Seattle'},{id:83, d:'02/Jul', c:'Toronto'},{id:84, d:'02/Jul', c:'Los Angeles'},
-{id:85, d:'02/Jul', c:'Vancouver'},{id:86, d:'03/Jul', c:'Miami'},{id:87, d:'03/Jul', c:'Kansas City'},{id:88, d:'03/Jul', c:'Dallas'},
-{id:89, d:'04/Jul', c:'Filadélfia'},{id:90, d:'04/Jul', c:'Houston'},{id:91, d:'05/Jul', c:'Nova Jersey'},{id:92, d:'05/Jul', c:'Cidade do México'},
-{id:93, d:'06/Jul', c:'Seattle'},{id:94, d:'06/Jul', c:'Dallas'},{id:95, d:'07/Jul', c:'Atlanta'},{id:96, d:'07/Jul', c:'Vancouver'},
-{id:97, d:'09/Jul', c:'Boston'},{id:98, d:'10/Jul', c:'Los Angeles'},{id:99, d:'10/Jul', c:'Miami'},{id:100, d:'11/Jul', c:'Kansas City'},
-{id:101, d:'14/Jul', c:'Dallas'},{id:102, d:'15/Jul', c:'Atlanta'},{id:103, d:'18/Jul', c:'Miami'},{id:104, d:'19/Jul', c:'Nova Jersey'}
+{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun', c:'Guadalajara'},{id:3, d:'12/jun', c:'Toronto'},{id:4, d:'12/jun', c:'Los Angeles'},
+{id:5, d:'13/jun', c:'Vancouver'},{id:6, d:'13/jun', c:'São Francisco'},{id:7, d:'13/jun', c:'Nova York'},{id:8, d:'13/jun', c:'Boston'},
+{id:9, d:'14/jun', c:'Houston'},{id:10, d:'14/jun', c:'Dallas'},{id:11, d:'14/jun', c:'Filadélfia'},{id:12, d:'14/jun', c:'Monterrey'},
+{id:13, d:'15/jun', c:'Atlanta'},{id:14, d:'15/jun', c:'Seattle'},{id:15, d:'15/jun', c:'Miami'},{id:16, d:'15/jun', c:'Los Angeles'},
+{id:17, d:'16/jun', c:'Nova York'},{id:18, d:'16/jun', c:'Boston'},{id:19, d:'16/jun', c:'Kansas City'},{id:20, d:'16/jun', c:'São Francisco'},
+{id:21, d:'17/jun', c:'Houston'},{id:22, d:'17/jun', c:'Dallas'},{id:23, d:'17/jun', c:'Toronto'},{id:24, d:'17/jun', c:'Cidade do México'},
+{id:25, d:'18/jun', c:'Atlanta'},{id:26, d:'18/jun', c:'Los Angeles'},{id:27, d:'18/jun', c:'Vancouver'},{id:28, d:'18/jun', c:'Guadalajara'},
+{id:29, d:'19/jun', c:'São Francisco'},{id:30, d:'19/jun', c:'Seattle'},{id:31, d:'19/jun', c:'Boston'},{id:32, d:'19/jun', c:'Filadélfia'},
+{id:33, d:'20/jun', c:'Houston'},{id:34, d:'20/jun', c:'Toronto'},{id:35, d:'20/jun', c:'Kansas City'},{id:36, d:'20/jun', c:'Monterrey'},
+{id:37, d:'21/jun', c:'Atlanta'},{id:38, d:'21/jun', c:'Los Angeles'},{id:39, d:'21/jun', c:'Miami'},{id:40, d:'21/jun', c:'Vancouver'},
+{id:41, d:'22/jun', c:'Dallas'},{id:42, d:'22/jun', c:'Filadélfia'},{id:43, d:'22/jun', c:'Nova York'},{id:44, d:'22/jun', c:'São Francisco'},
+{id:45, d:'23/jun', c:'Houston'},{id:46, d:'23/jun', c:'Boston'},{id:47, d:'23/jun', c:'Toronto'},{id:48, d:'23/jun', c:'Guadalajara'},
+{id:49, d:'24/jun', c:'Vancouver'},{id:50, d:'24/jun', c:'Seattle'},{id:51, d:'24/jun', c:'Miami'},{id:52, d:'24/jun', c:'Atlanta'},
+{id:53, d:'24/jun', c:'Cidade do México'},{id:54, d:'24/jun', c:'Monterrey'},{id:55, d:'25/jun', c:'Nova York'},{id:56, d:'25/jun', c:'Filadélfia'},
+{id:57, d:'25/jun', c:'Dallas'},{id:58, d:'25/jun', c:'Kansas City'},{id:59, d:'25/jun', c:'Los Angeles'},{id:60, d:'25/jun', c:'São Francisco'},
+{id:61, d:'26/jun', c:'Boston'},{id:62, d:'26/jun', c:'Toronto'},{id:63, d:'26/jun', c:'Guadalajara'},{id:64, d:'26/jun', c:'Houston'},
+{id:65, d:'26/jun', c:'Seattle'},{id:66, d:'26/jun', c:'Vancouver'},{id:67, d:'27/jun', c:'Nova York'},{id:68, d:'27/jun', c:'Filadélfia'},
+{id:69, d:'27/jun', c:'Miami'},{id:70, d:'27/jun', c:'Atlanta'},{id:71, d:'27/jun', c:'Dallas'},{id:72, d:'27/jun', c:'Kansas City'},
+{id:73, d:'28/jun', c:'Los Angeles'},{id:74, d:'29/jun', c:'Boston'},{id:75, d:'29/jun', c:'Monterrey'},{id:76, d:'29/jun', c:'Houston'},
+{id:77, d:'30/jun', c:'Nova York'},{id:78, d:'30/jun', c:'Dallas'},{id:79, d:'30/jun', c:'Cidade do México'},{id:80, d:'01/jul', c:'Atlanta'},
+{id:81, d:'01/jul', c:'São Francisco'},{id:82, d:'01/jul', c:'Seattle'},{id:83, d:'02/jul', c:'Toronto'},{id:84, d:'02/jul', c:'Los Angeles'},
+{id:85, d:'02/jul', c:'Vancouver'},{id:86, d:'03/jul', c:'Miami'},{id:87, d:'03/jul', c:'Kansas City'},{id:88, d:'03/jul', c:'Dallas'},
+{id:89, d:'04/jul', c:'Filadélfia'},{id:90, d:'04/jul', c:'Houston'},{id:91, d:'05/jul', c:'Nova York'},{id:92, d:'05/jul', c:'Cidade do México'},
+{id:93, d:'06/jul', c:'Dallas'},{id:94, d:'06/jul', c:'Seattle'},{id:95, d:'08/jul', c:'Atlanta'},{id:96, d:'08/jul', c:'Vancouver'},
+{id:97, d:'09/jul', c:'Boston'},{id:98, d:'10/jul', c:'Los Angeles'},{id:99, d:'11/jul', c:'Miami'},{id:100, d:'11/jul', c:'Kansas City'},
+{id:101, d:'14/jul', c:'Dallas'},{id:102, d:'15/jul', c:'Atlanta'},{id:103, d:'18/jul', c:'Miami'},{id:104, d:'19/jul', c:'Nova York'}
 ];
 
 var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
@@ -326,7 +418,7 @@ var GS_MAP = [
 ];
 
 var db = { 
-    u: [], t: [], j: [], p: {}, r: {}, c: { bReg: false, bPal: false }, 
+    u: [], t: [], j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, 
     pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [] 
 };
 
@@ -335,11 +427,11 @@ var _t = safeGet('fwc_t'); if(_t) db.t = JSON.parse(_t);
 var _j = safeGet('fwc_j'); if(_j) db.j = JSON.parse(_j);
 var _p = safeGet('fwc_p'); if(_p) db.p = JSON.parse(_p);
 var _r = safeGet('fwc_r'); if(_r) db.r = JSON.parse(_r);
-var _c = safeGet('fwc_c'); if(_c) db.c = JSON.parse(_c);
+var _c = safeGet('fwc_c'); if(_c) db.c = Object.assign({ bReg: false, bLig: false, bPal: false }, JSON.parse(_c));
 var _pts = safeGet('fwc_pts'); if(_pts) db.pts = JSON.parse(_pts);
 var _l = safeGet('fwc_l'); if(_l) db.l = JSON.parse(_l);
 
-var cU = null;
+var cU = null; 
 var _cuid = safeGet('fwc_cuid');
 if(_cuid) {
     for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; }
@@ -370,21 +462,34 @@ function isTeam(n) {
 
 function limparDados() { if(confirm("APAGAR TUDO?")) { window.localStorage.clear(); window.location.reload(); } }
 
-if(db.t.length === 0 || db.j.length === 0 || db.j[2].grp !== 'B') { 
-    db.t = TEAMS_DATA; 
-    construtorDeTorneio(); 
-    salvar(); 
+function toggleCfg(key, val) {
+    db.c[key] = val;
+    salvar();
 }
 
 function criarLiga() {
     var n = document.getElementById('nova-liga-nome').value.trim();
     var s = document.getElementById('nova-liga-senha').value.trim();
     if(!n || !s) return;
+    
+    for(var i=0; i<db.l.length; i++) {
+        if(db.l[i].nome.toLowerCase() === n.toLowerCase()) {
+            alert('Já existe uma liga com este nome. Por favor, escolha outro.');
+            return;
+        }
+    }
+    
     var novaLiga = { id: 'L' + new Date().getTime(), nome: n, senha: s, users: [cU.id] };
-    db.l.push(novaLiga); salvar(); alert('Liga criada!'); renderLigas();
+    db.l.push(novaLiga); salvar(); alert('Liga criada e adicionada!');
+    document.getElementById('nova-liga-nome').value = '';
+    document.getElementById('nova-liga-senha').value = '';
+    popLigasDropdown();
+    document.getElementById('sel-liga-pont').value = novaLiga.id;
+    handleLeagueSelect(novaLiga.id);
 }
 
 function entrarLiga() {
+    if(db.c.bLig && !cU.isM) { alert('Novos acessos a ligas estão bloqueados temporariamente pelo administrador.'); return; }
     var n = document.getElementById('entrar-liga-nome').value.trim();
     var s = document.getElementById('entrar-liga-senha').value.trim();
     var liga = null;
@@ -394,21 +499,16 @@ function entrarLiga() {
     if(liga) {
         var inLiga = false;
         for(var j=0; j<liga.users.length; j++) { if(liga.users[j] === cU.id) inLiga = true; }
-        if(!inLiga) { liga.users.push(cU.id); salvar(); alert('Entrou!'); renderLigas(); }
+        if(!inLiga) { 
+            liga.users.push(cU.id); salvar(); alert('Entrou na Liga com Sucesso!'); 
+            popLigasDropdown();
+            document.getElementById('sel-liga-pont').value = liga.id;
+            handleLeagueSelect(liga.id);
+        }
         else { alert('Você já está na liga.'); }
     } else {
         alert('Liga não encontrada ou senha incorreta.');
     }
-}
-
-function renderLigas() {
-    var html = '';
-    for(var i=0; i<db.l.length; i++) {
-        var inLiga = false;
-        for(var j=0; j<db.l[i].users.length; j++) { if(db.l[i].users[j] === cU.id) inLiga = true; }
-        if(inLiga) html += '<li><b>' + db.l[i].nome + '</b></li>';
-    }
-    document.getElementById('lista-minhas-ligas').innerHTML = html || 'Nenhuma liga.';
 }
 
 function renderizarValoresDePontos() {
@@ -461,14 +561,27 @@ function toggleMenu() {
     }
 }
 
+function toggleEsqueciSenha() {
+    var grpS = document.getElementById('grp-senha');
+    var grpM = document.getElementById('grp-mae');
+    var lnkE = document.getElementById('lnk-esqueci');
+    
+    if(grpS.style.display !== 'none') {
+        grpS.style.display = 'none';
+        grpM.style.display = 'block';
+        lnkE.innerText = 'Lembrei a senha';
+    } else {
+        grpS.style.display = 'block';
+        grpM.style.display = 'none';
+        lnkE.innerText = 'Esqueci a senha';
+    }
+}
+
 function atualizarMenuUI() {
     var header = document.getElementById('cabecalho-principal');
     if(cU) {
         header.style.display = 'flex';
         document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none';
-        if(document.getElementById('lbl-apostador')) {
-            document.getElementById('lbl-apostador').innerText = ' - ' + cU.nome + (cU.isM ? ' (Master)' : '');
-        }
     } else {
         header.style.display = 'none';
     }
@@ -486,61 +599,59 @@ function switchTabAuth(id) {
 }
 
 function switchTabAdm(id) {
-    document.getElementById('adm-ligas').style.display = 'none';
     document.getElementById('adm-users').style.display = 'none';
     document.getElementById('adm-pts').style.display = 'none';
+    document.getElementById('adm-ctrl').style.display = 'none';
+    document.getElementById('adm-ligas').style.display = 'none';
     document.getElementById('adm-sys').style.display = 'none';
     
-    document.getElementById('btn-adm-ligas').className = 'tab-btn';
     document.getElementById('btn-adm-users').className = 'tab-btn';
     document.getElementById('btn-adm-pts').className = 'tab-btn';
+    document.getElementById('btn-adm-ctrl').className = 'tab-btn';
+    document.getElementById('btn-adm-ligas').className = 'tab-btn';
     document.getElementById('btn-adm-sys').className = 'tab-btn';
     
     document.getElementById(id).style.display = 'block';
     document.getElementById('btn-' + id).className = 'tab-btn ativo';
+    
+    if(id === 'adm-ligas') popAdmLigas();
 }
 
 function switchTabPal(id) {
     document.getElementById('pal-grp').style.display = 'none';
+    document.getElementById('pal-grp-data').style.display = 'none';
     document.getElementById('pal-cls').style.display = 'none';
     document.getElementById('pal-elm').style.display = 'none';
     
-    document.getElementById('btn-pal-grp').className = 'tab-btn';
-    document.getElementById('btn-pal-cls').className = 'tab-btn';
-    document.getElementById('btn-pal-elm').className = 'tab-btn';
-    
     document.getElementById(id).style.display = 'block';
-    document.getElementById('btn-' + id).className = 'tab-btn ativo';
     
-    if(id === 'pal-grp' || id === 'pal-elm') renderPal();
+    if(id === 'pal-grp' || id === 'pal-grp-data' || id === 'pal-elm') renderPal();
     if(id === 'pal-cls') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false);
 }
 
 function switchTabRes(id) {
     document.getElementById('res-grp').style.display = 'none';
+    document.getElementById('res-grp-data').style.display = 'none';
     document.getElementById('res-cls').style.display = 'none';
     document.getElementById('res-elm').style.display = 'none';
     
-    document.getElementById('btn-res-grp').className = 'tab-btn';
-    document.getElementById('btn-res-cls').className = 'tab-btn';
-    document.getElementById('btn-res-elm').className = 'tab-btn';
-    
     document.getElementById(id).style.display = 'block';
-    document.getElementById('btn-' + id).className = 'tab-btn ativo';
     
-    if(id === 'res-grp' || id === 'res-elm') renderRes();
+    if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes();
     if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true);
 }
 
 function switchTabRnk(id) {
     document.getElementById('rnk-geral').style.display = 'none';
     document.getElementById('rnk-jogo').style.display = 'none';
+    document.getElementById('rnk-regras').style.display = 'none';
     
-    document.getElementById('btn-rnk-geral').className = 'tab-btn';
-    document.getElementById('btn-rnk-jogo').className = 'tab-btn';
+    if(document.getElementById('btn-rnk-geral')) document.getElementById('btn-rnk-geral').className = 'tab-btn';
+    if(document.getElementById('btn-rnk-jogo')) document.getElementById('btn-rnk-jogo').className = 'tab-btn';
+    if(document.getElementById('btn-rnk-regras')) document.getElementById('btn-rnk-regras').className = 'tab-btn';
     
     document.getElementById(id).style.display = 'block';
-    document.getElementById('btn-' + id).className = 'tab-btn ativo';
+    if(document.getElementById('btn-' + id)) document.getElementById('btn-' + id).className = 'tab-btn ativo';
 }
 
 function nav(id) {
@@ -557,62 +668,89 @@ function nav(id) {
     var navBtn = document.getElementById(id.replace('pag-', 'nav-'));
     if(navBtn) navBtn.className = 'ativo';
     
+    var hTitle = document.getElementById('header-title');
+    if(hTitle) {
+        if(id === 'pag-resultados') hTitle.innerText = 'Resultados';
+        else if(id === 'pag-palpites') hTitle.innerText = 'Palpites';
+        else if(id === 'pag-pontuacoes') hTitle.innerText = 'Pontuações';
+        else if(id === 'pag-gestao') hTitle.innerText = 'Gestão do Sistema';
+        else if(id === 'pag-auth') hTitle.innerText = 'Cebolão da Copa';
+    }
+    
     window.scrollTo(0,0);
     
     if(id==='pag-palpites') { 
         renderPal(); 
         if(document.getElementById('pal-cls').style.display === 'block') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); 
     }
-    if(id==='pag-ligas') { renderLigas(); }
     if(id==='pag-resultados') { 
         renderRes(); 
         if(document.getElementById('res-cls').style.display === 'block') renderTbCls('res-cls-tbl', db.r, 'R_', true); 
     }
-    if(id==='pag-ranking') { popLigasDropdown(); renderPontuacoes(); popRnkSel(); }
-    if(id==='pag-gestao') { 
-        renderAdm(); renderizarValoresDePontos();
+    if(id==='pag-pontuacoes') { 
+        popLigasDropdown(); 
+        renderizarValoresDePontos();
     }
-    if(id==='pag-regras') renderizarValoresDePontos();
+    if(id==='pag-gestao') { 
+        renderAdm(); renderizarValoresDePontos(); renderControles(); popAdmLigas();
+    }
 }
 
 function login() {
+    var isEsqueci = document.getElementById('grp-mae').style.display === 'block';
     var n = document.getElementById('log-nome').value.trim();
     var s = document.getElementById('log-senha').value;
+    var m = document.getElementById('log-mae').value.trim();
+    
     var uName = null;
     var u = null;
     
     for(var i=0; i<db.u.length; i++) {
         if(db.u[i].nome.toLowerCase() === n.toLowerCase()) uName = db.u[i];
-        if(db.u[i].nome.toLowerCase() === n.toLowerCase() && db.u[i].senha === s) u = db.u[i];
+        
+        if (isEsqueci) {
+            if(db.u[i].nome.toLowerCase() === n.toLowerCase() && db.u[i].mae && db.u[i].mae.toLowerCase() === m.toLowerCase()) u = db.u[i];
+        } else {
+            if(db.u[i].nome.toLowerCase() === n.toLowerCase() && db.u[i].senha === s) u = db.u[i];
+        }
     }
     
-    if(!uName) { alert('Utilizador não registado. Use a sincronização manual se registou a conta noutro aparelho.'); return; }
+    if(!uName) { alert('Apostador não registrado. Verifique os dados ou registre-se.'); return; }
+    
     if(u) { 
         cU = u; 
         safeSet('fwc_cuid', cU.id);
         atualizarMenuUI();
         nav('pag-resultados'); 
     } else {
-        alert('Senha incorreta.');
+        if(isEsqueci) alert('Nome de solteira da mãe incorreto.');
+        else alert('Senha incorreta.');
     }
 }
 
 function registrar() {
+    if (db.c.bReg) { alert('Novos registros estão bloqueados temporariamente pelo administrador.'); return; }
     var n = document.getElementById('reg-nome').value.trim();
     var s = document.getElementById('reg-senha').value;
-    if(n && s.length===4) { 
+    var conf = document.getElementById('reg-senha-conf').value;
+    var m = document.getElementById('reg-mae').value.trim();
+    
+    if(n && s.length===4 && m) { 
+        if (s !== conf) { alert('As senhas digitadas não coincidem.'); return; }
         var exists = false;
         for(var i=0; i<db.u.length; i++) { if(db.u[i].nome.toLowerCase() === n.toLowerCase()) exists = true; }
-        if(exists) { alert('Nome de utilizador já registado.'); return; }
+        if(exists) { alert('Nome de apostador já em uso.'); return; }
         
-        db.u.push({id:'u'+new Date().getTime(), nome:n, senha:s, isM:db.u.length===0}); 
+        db.u.push({id:'u'+new Date().getTime(), nome:n, senha:s, mae:m, isM:db.u.length===0}); 
         salvar(); 
-        alert('Registado com sucesso!'); 
+        alert('Registrado com sucesso! Pode agora fazer o login.'); 
         document.getElementById('reg-nome').value = '';
         document.getElementById('reg-senha').value = '';
+        document.getElementById('reg-senha-conf').value = '';
+        document.getElementById('reg-mae').value = '';
         switchTabAuth('aba-login');
     }
-    else { alert('O nome é obrigatório e a senha deve ter 4 dígitos numéricos.'); }
+    else { alert('Preencha todos os campos e certifique-se que a senha tem 4 dígitos numéricos.'); }
 }
 
 function logout() { 
@@ -814,7 +952,10 @@ function ptoCalc(uId, j) {
     return { pt: pts };
 }
 
-function savP(j, c, v) { if(db.c.bPal) return; var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; salvar(); if(c==='w') renderPal(); }
+function savP(j, c, v) { 
+    if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; }
+    var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; salvar(); if(c==='w') renderPal(); 
+}
 function savR(j, c, v) { if(!cU.isM) return; var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; salvar(); if(c==='w') renderRes(); }
 
 function renderTbCls(alvo, dds, px, isOfc) {
@@ -825,7 +966,11 @@ function renderTbCls(alvo, dds, px, isOfc) {
         var g = grupos[m];
         if(!st.t[g] || st.t[g].length===0) continue;
         
-        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th><th>Pts Apostador</th></tr></thead><tbody>';
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table class="tabela-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th>';
+        
+        if(!isOfc) html += '<th>Pts Apostador</th>';
+        
+        html += '</tr></thead><tbody>';
         for(var n=0; n<st.t[g].length; n++) {
             var x = st.t[g][n];
             var pAp = 0; 
@@ -843,14 +988,18 @@ function renderTbCls(alvo, dds, px, isOfc) {
                 for(var o=0; o<r32u.length; o++) { if(r32u[o]===x.n) inUser = true; }
                 if (isTeam(x.n) && inOfc && inUser) pAp += db.pts.r32;
             }
-            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td><td style="font-weight:bold; color:var(--text);">' + pAp + '</td></tr>';
+            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td>';
+            
+            if(!isOfc) html += '<td style="font-weight:bold; color:var(--text);">' + pAp + '</td>';
+            
+            html += '</tr>';
         }
         html += '</tbody></table></div>';
         d.innerHTML += html;
     }
 }
 
-function geraLinha(j, e, val, pt, isOfc) {
+function geraLinha(j, e, val, pt, isOfc, showGroup) {
     var inp = '', vA = (val && val.a !== undefined) ? val.a : '', vB = (val && val.b !== undefined) ? val.b : '', vW = (val && val.w) ? val.w : '';
     if(isOfc && cU && cU.isM === true) {
         if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savR('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savR('+j.id+',\'b\',this.value)">';
@@ -858,16 +1007,34 @@ function geraLinha(j, e, val, pt, isOfc) {
     } else if(isOfc) { 
         inp = j.f==='G' ? (vA!=='' ? vA+' x '+vB : '-') : (vW||'-');
     } else {
-        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savP('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savP('+j.id+',\'b\',this.value)">';
-        else inp = '<select class="ipt-combo" onchange="savP('+j.id+',\'w\',this.value)"><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
+        var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
+        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savP('+j.id+',\'a\',this.value)"'+disabledAttr+'> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savP('+j.id+',\'b\',this.value)"'+disabledAttr+'>';
+        else inp = '<select class="ipt-combo" onchange="savP('+j.id+',\'w\',this.value)"'+disabledAttr+'><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
     }
+    
     var metaTxt = '<b>J'+j.id+'</b> | ' + j.d + '<br>' + j.cid;
-    return '<div class="jogo-linha"><div class="jogo-meta">'+metaTxt+'</div><div class="equipe eq-esq">'+e.A+' '+getImg(e.A)+'</div><div class="palpite-area">'+inp+'</div><div class="equipe eq-dir">'+getImg(e.B)+' '+e.B+'</div><div class="pts-badge">'+pt.pt+' Pts</div></div>';
+    if(showGroup && j.f === 'G') metaTxt = '<b style="color:var(--text);">GRUPO '+j.grp+'</b> | <b>J'+j.id+'</b><br>' + j.d + ' - ' + j.cid;
+    
+    var ptsHtml = '';
+    
+    if (!isOfc) {
+        var extraInfo = '';
+        if (j.f === 'G') {
+            var rOfc = db.r['R_'+j.id];
+            if (rOfc && rOfc.a !== '' && rOfc.b !== '' && rOfc.a !== undefined) {
+                extraInfo = '<div class="res-ofc">(' + rOfc.a + 'x' + rOfc.b + ')</div>';
+            }
+        }
+        ptsHtml = '<div class="pts-container">' + extraInfo + '<div class="pts-badge">' + pt.pt + ' Pts</div></div>';
+    }
+    
+    return '<div class="jogo-linha"><div class="jogo-meta">'+metaTxt+'</div><div class="equipe eq-esq">'+e.A+' '+getImg(e.A)+'</div><div class="palpite-area">'+inp+'</div><div class="equipe eq-dir">'+getImg(e.B)+' '+e.B+'</div>' + ptsHtml + '</div>';
 }
 
 function renderPal() {
-    var hG = '', hE = '';
+    var hG = '', hGData = '', hE = '';
     var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    
     for(var g=0; g<grupos.length; g++) {
         var groupMatches = '';
         for(var i=0; i<db.j.length; i++) {
@@ -875,10 +1042,18 @@ function renderPal() {
             if(j.f === 'G' && j.grp === grupos[g]) {
                 var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_');
                 db.p[cU.id+'_'+j.id] = p; 
-                groupMatches += geraLinha(j, eq, p, ptoCalc(cU.id, j), false);
+                groupMatches += geraLinha(j, eq, p, ptoCalc(cU.id, j), false, false);
             }
         }
         if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
+    }
+
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i];
+        if(j.f === 'G') {
+            var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_');
+            hGData += geraLinha(j, eq, p, ptoCalc(cU.id, j), false, true);
+        }
     }
 
     var tAt = '';
@@ -888,27 +1063,37 @@ function renderPal() {
             if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; }
             var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_');
             db.p[cU.id+'_'+j.id] = db.p[cU.id+'_'+j.id] || {}; db.p[cU.id+'_'+j.id].nA=eq.A; db.p[cU.id+'_'+j.id].nB=eq.B;
-            hE += geraLinha(j, eq, p, ptoCalc(cU.id, j), false);
+            hE += geraLinha(j, eq, p, ptoCalc(cU.id, j), false, false);
         }
     }
     
     document.getElementById('pal-grp').innerHTML = hG; 
+    document.getElementById('pal-grp-data').innerHTML = hGData; 
     document.getElementById('pal-elm').innerHTML = hE;
 }
 
 function renderRes() {
-    var hG = '', hE = '';
+    var hG = '', hGData = '', hE = '';
     var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    
     for(var g=0; g<grupos.length; g++) {
         var groupMatches = '';
         for(var i=0; i<db.j.length; i++) {
             var j = db.j[i];
             if(j.f === 'G' && j.grp === grupos[g]) {
                 var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id];
-                groupMatches += geraLinha(j, e, r, cU ? ptoCalc(cU.id, j) : {pt:0}, true);
+                groupMatches += geraLinha(j, e, r, {pt:0}, true, false);
             }
         }
         if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
+    }
+
+    for(var i=0; i<db.j.length; i++) {
+        var j = db.j[i];
+        if(j.f === 'G') {
+            var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id];
+            hGData += geraLinha(j, e, r, {pt:0}, true, true);
+        }
     }
 
     var tAt = '';
@@ -917,12 +1102,29 @@ function renderRes() {
         if(j.f === 'E') {
             if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; }
             var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id];
-            hE += geraLinha(j, e, r, cU ? ptoCalc(cU.id, j) : {pt:0}, true);
+            hE += geraLinha(j, e, r, {pt:0}, true, false);
         }
     }
     
     document.getElementById('res-grp').innerHTML = hG; 
+    document.getElementById('res-grp-data').innerHTML = hGData; 
     document.getElementById('res-elm').innerHTML = hE;
+}
+
+function handleLeagueSelect(val) {
+    document.getElementById('menu-p-criar').style.display = 'none';
+    document.getElementById('menu-p-entrar').style.display = 'none';
+    document.getElementById('menu-p-ranking').style.display = 'none';
+
+    if(val === 'CREATE') {
+        document.getElementById('menu-p-criar').style.display = 'block';
+    } else if (val === 'JOIN') {
+        document.getElementById('menu-p-entrar').style.display = 'block';
+    } else if (val !== '') {
+        document.getElementById('menu-p-ranking').style.display = 'block';
+        renderPontuacoes();
+        renderRnkJogo();
+    }
 }
 
 function popLigasDropdown() {
@@ -933,24 +1135,47 @@ function popLigasDropdown() {
             if(db.l[i].users[k]===cU.id) ligasU.push(db.l[i]); 
         } 
     }
-    var opts = '<option value="">-- Selecione --</option>';
-    for(var i=0; i<ligasU.length; i++) opts += '<option value="' + ligasU[i].id + '">' + ligasU[i].nome + '</option>';
+    
+    var opts = '<option value="">-- Selecione a Liga --</option>';
+    if (ligasU.length > 0) {
+        opts += '<optgroup label="Suas Ligas">';
+        for(var i=0; i<ligasU.length; i++) opts += '<option value="' + ligasU[i].id + '">' + ligasU[i].nome + '</option>';
+        opts += '</optgroup>';
+    }
+    
+    opts += '<optgroup label="Ações">';
+    opts += '<option value="CREATE">+ Criar Nova Liga</option>';
+    opts += '<option value="JOIN">> Entrar em Liga Existente</option>';
+    opts += '</optgroup>';
     
     var valAtual = sel.value;
     sel.innerHTML = opts;
     
-    var found = false; 
-    for(var i=0; i<ligasU.length; i++) { if(ligasU[i].id === valAtual) found = true; }
-    if(valAtual && found) sel.value = valAtual;
-    else if(ligasU.length > 0) sel.value = ligasU[0].id;
+    if(valAtual && valAtual !== 'CREATE' && valAtual !== 'JOIN') {
+        var found = false; 
+        for(var i=0; i<ligasU.length; i++) { if(ligasU[i].id === valAtual) found = true; }
+        if(found) {
+            sel.value = valAtual;
+        } else if(ligasU.length > 0) {
+            sel.value = ligasU[0].id;
+        }
+    } else if (!valAtual && ligasU.length > 0) {
+        sel.value = ligasU[0].id;
+    }
+
+    handleLeagueSelect(sel.value);
 }
 
 function renderPontuacoes() {
     var lId = document.getElementById('sel-liga-pont').value; 
-    if(!lId) { document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="4" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; return; }
+    if(!lId || lId === 'CREATE' || lId === 'JOIN') { 
+        document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="4" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; 
+        return; 
+    }
     
     var liga = null; 
     for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
+    if(!liga) return;
     
     var usersLiga = [];
     for(var i=0; i<db.u.length; i++){ 
@@ -987,7 +1212,7 @@ function renderPontuacoes() {
     rk.sort(function(a,b){ return b.to - a.to; });
     
     var html = '';
-    for(var i=0; i<rk.length; i++) html += '<tr><td class="t-left">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td>-</td><td>' + rk[i].to + '</td></tr>';
+    for(var i=0; i<rk.length; i++) html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td>-</td><td class="col-num">' + rk[i].to + '</td></tr>';
     document.getElementById('tb-ranking').innerHTML = html;
 }
 
@@ -1008,8 +1233,16 @@ function renderRnkJogo() {
     var lId = document.getElementById('sel-liga-pont').value;
     var jId = parseInt(document.getElementById('sel-rnk-jogo').value);
     
-    if(!lId) { document.getElementById('rnk-jogo-res').innerHTML = 'Selecione uma liga primeiro.'; document.getElementById('tb-ranking-jogo').innerHTML = ''; return; }
-    if(!jId) { document.getElementById('rnk-jogo-res').innerHTML = ''; document.getElementById('tb-ranking-jogo').innerHTML = ''; return; }
+    if(!lId || lId === 'CREATE' || lId === 'JOIN') { 
+        document.getElementById('rnk-jogo-res').innerHTML = 'Selecione uma liga primeiro.'; 
+        document.getElementById('tb-ranking-jogo').innerHTML = ''; 
+        return; 
+    }
+    if(!jId) { 
+        document.getElementById('rnk-jogo-res').innerHTML = ''; 
+        document.getElementById('tb-ranking-jogo').innerHTML = ''; 
+        return; 
+    }
     
     var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
     var j = null; for(var i=0; i<db.j.length; i++){ if(db.j[i].id===jId) j = db.j[i]; }
@@ -1036,26 +1269,109 @@ function renderRnkJogo() {
     lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
     
     var html = '';
-    for(var i=0; i<lista.length; i++) html += '<tr><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td>' + lista[i].pts + '</td></tr>';
+    for(var i=0; i<lista.length; i++) html += '<tr><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td class="col-num">' + lista[i].pts + '</td></tr>';
     document.getElementById('tb-ranking-jogo').innerHTML = html;
+}
+
+function toggleMaster(uid, isMasterChecked) {
+    for(var i=0; i<db.u.length; i++) {
+        if(db.u[i].id === uid) db.u[i].isM = isMasterChecked;
+    }
+    salvar();
 }
 
 function renderAdm() {
     var html = '';
     for(var i=0; i<db.u.length; i++) {
         var u = db.u[i];
-        html += '<tr><td class="t-left">' + u.nome + '</td><td>' + u.senha + '</td><td><button type="button" onclick="if(confirm(\'Remover?\')){ var nu=[]; for(var k=0;k<db.u.length;k++){if(db.u[k].id!==\''+u.id+'\')nu.push(db.u[k]);} db.u=nu; salvar(); renderAdm();}">Remover</button></td></tr>';
+        var masterBox = '<input type="checkbox" '+(u.isM ? 'checked' : '')+' onchange="toggleMaster(\''+u.id+'\', this.checked)"> Master';
+        html += '<tr><td class="t-left col-eq">' + u.nome + '</td><td>' + u.senha + '</td><td>'+masterBox+'</td><td><button type="button" class="btn btn-danger" style="padding: 6px;" onclick="if(confirm(\'Remover usuário?\')){ var nu=[]; for(var k=0;k<db.u.length;k++){if(db.u[k].id!==\''+u.id+'\')nu.push(db.u[k]);} db.u=nu; salvar(); renderAdm(); renderControles();}">Remover</button></td></tr>';
     }
     document.getElementById('tb-users').innerHTML = html;
 }
 
+function renderControles() {
+    document.getElementById('cfg-bReg').checked = !!db.c.bReg;
+    document.getElementById('cfg-bLig').checked = !!db.c.bLig;
+    document.getElementById('cfg-bPal').checked = !!db.c.bPal;
+    popAdmLigas();
+}
+
+function popAdmLigas() {
+    var s = document.getElementById('adm-sel-liga');
+    if(!s) return;
+    var html = '<option value="">-- Selecione a Liga --</option>';
+    for(var i=0; i<db.l.length; i++) html += '<option value="'+db.l[i].id+'">'+db.l[i].nome+'</option>';
+    s.innerHTML = html;
+    renderAdmLigas();
+}
+
+function renderAdmLigas() {
+    var lid = document.getElementById('adm-sel-liga').value;
+    var d = document.getElementById('adm-liga-users');
+    if(!lid) { d.innerHTML = ''; return; }
+    var liga = null; for(var i=0;i<db.l.length;i++) if(db.l[i].id===lid) liga=db.l[i];
+    
+    var html = '<div style="background:var(--light); padding:10px; border-radius:4px; margin-bottom:15px;">';
+    html += '<strong>Senha da Liga: </strong><span style="font-size:1.1rem; color:var(--text); font-family:monospace;">' + liga.senha + '</span>';
+    html += '</div>';
+    
+    html += '<table style="margin-top:10px;">';
+    for(var i=0; i<liga.users.length; i++) {
+        var uid = liga.users[i];
+        var u = null; for(var k=0; k<db.u.length; k++){ if(db.u[k].id===uid) u=db.u[k]; }
+        var unome = u ? u.nome : uid;
+        html += '<tr><td class="t-left">'+unome+'</td><td style="width:90px;"><button class="btn btn-danger" style="padding:5px;" onclick="remUserLiga(\''+lid+'\',\''+uid+'\')">Remover</button></td></tr>';
+    }
+    html += '</table>';
+    
+    if(liga.users.length === 0) {
+        html += '<p style="font-size:0.8rem; color:var(--muted);">Liga vazia.</p>';
+    }
+    
+    html += '<div style="margin-top: 15px; text-align: center; border-top: 1px dashed var(--border); padding-top: 15px;">';
+    html += '<button class="btn btn-danger" style="padding: 10px;" onclick="apagarLiga(\''+lid+'\')">Apagar Liga Permanentemente</button>';
+    html += '</div>';
+
+    d.innerHTML = html;
+}
+
+function remUserLiga(lid, uid) {
+    if(confirm('Tem a certeza que deseja remover o apostador desta liga?')) {
+        for(var i=0; i<db.l.length; i++) {
+            if(db.l[i].id === lid) {
+                var newUsers = [];
+                for(var j=0; j<db.l[i].users.length; j++) { if(db.l[i].users[j] !== uid) newUsers.push(db.l[i].users[j]); }
+                db.l[i].users = newUsers;
+            }
+        }
+        salvar();
+        renderAdmLigas();
+        alert('Apostador removido da liga.');
+    }
+}
+
+function apagarLiga(lid) {
+    if(confirm('Tem a certeza que deseja apagar esta liga permanentemente?')) {
+        var novasLigas = [];
+        for(var i=0; i<db.l.length; i++) {
+            if(db.l[i].id !== lid) novasLigas.push(db.l[i]);
+        }
+        db.l = novasLigas;
+        salvar();
+        popAdmLigas(); 
+        alert('Liga apagada com sucesso.');
+    }
+}
+
+// Inicializa a UI com Login Automático (se aplicável).
+atualizarMenuUI();
 if (cU) {
-    atualizarMenuUI();
     nav('pag-resultados');
 } else {
-    atualizarMenuUI();
     nav('pag-auth');
 }
+
 </script>
 </body>
 </html>
