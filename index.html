@@ -6,6 +6,7 @@
     <title>Cebolão da Copa</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Fallback para fontes parecidas com Google Sans usando a nativa Product Sans/Open Sans */
         :root {
             --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
             --muted: #666666; --danger: #dc3545; --accent: #000000;
@@ -13,6 +14,7 @@
         * { box-sizing: border-box; font-family: 'Google Sans', 'Open Sans', 'Segoe UI', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
         
+        /* CABEÇALHO BRANCO COM LETRAS PRETAS - ALINHADO VERTICALMENTE */
         header { 
             display: none; background: #ffffff; color: #000000; 
             padding: 12px 15px; 
@@ -74,17 +76,21 @@
         .res-ofc { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-right: 12px; }
         .pts-badge { font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; }
         
+        /* Nota de Critérios de Desempate */
         .nota-desempate { font-size: 0.75rem; color: var(--muted); margin: -10px 0 15px 0; line-height: 1.4; padding: 0 5px; }
 
+        /* Tabela com scroll horizontal e coluna congelada */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 0; text-align: left; }
         th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); font-weight: 600; background: var(--light); }
         .t-left { text-align: left; padding-left: 10px; }
         
+        /* Colunas de largura reduzida */
         .col-num { width: 50px; text-align: center; } 
         .col-pos { width: 45px; text-align: center; }
 
+        /* Tabela Específica de Classificação (com min-width e colunas congeladas) */
         table.tabela-classificacao { min-width: 650px; table-layout: fixed; }
         .tabela-classificacao th.col-eq { position: sticky; left: 0; background: var(--light); z-index: 2; border-right: 1px solid var(--border); width: 210px; }
         .tabela-classificacao td.col-eq { position: sticky; left: 0; background: var(--bg); z-index: 1; border-right: 1px solid var(--border); width: 210px; }
@@ -94,16 +100,21 @@
         @media (max-width: 650px) { 
             .grid-cfg { grid-template-columns: 1fr; } 
             .jogo-linha { flex-wrap: wrap; position: relative; padding: 6px 0; justify-content: center; gap: 2px; } 
+            
             .jogo-meta { width: 100%; text-align: center; margin-bottom: 0px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 2px; }
+            
             .equipe { width: 35%; flex-direction: column; text-align: center !important; justify-content: flex-start; gap: 4px; font-size: 0.8rem; align-items: center !important; }
             .eq-esq { flex-direction: column-reverse; } 
             .palpite-area { width: 25%; justify-content: center; }
             .ipt-combo { font-size: 0.75rem; padding: 4px; height: 36px; }
             .flag { width: 26px; height: 26px; }
+            
             .pts-container { width: 100%; justify-content: center; margin-top: 4px; background: #e8f5e9; padding: 4px; border-radius: 4px; gap: 14px; }
             .res-ofc { margin-right: 0; color: var(--muted); }
             .pts-badge { width: auto; margin-top: 0; background: transparent; padding: 0; }
+
             .nota-desempate { font-size: 0.7rem; }
+
             table { font-size: 0.8rem; }
             th, td { padding: 10px 4px; }
             .col-num { width: 40px; }
@@ -142,7 +153,11 @@
                 <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="log-nome"></div>
                 <div class="form-group" id="grp-senha"><label>Senha (4 Dígitos)</label><input type="password" id="log-senha" maxlength="4" pattern="\d*"></div>
                 <div class="form-group" id="grp-mae" style="display:none;"><label>Nome de solteira da mãe</label><input type="text" id="log-mae"></div>
-                <div style="text-align:right; margin-bottom:15px;"><a href="#" id="lnk-esqueci" onclick="toggleEsqueciSenha(); return false;" style="font-size:0.8rem; color:var(--text); font-weight: 600;">Esqueci a senha</a></div>
+                
+                <div style="text-align:right; margin-bottom:15px;">
+                    <a href="#" id="lnk-esqueci" onclick="toggleEsqueciSenha(); return false;" style="font-size:0.8rem; color:var(--text); font-weight: 600;">Esqueci a senha</a>
+                </div>
+                
                 <button type="button" class="btn" onclick="login()">Entrar</button>
             </div>
             
@@ -150,7 +165,10 @@
                 <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="reg-nome"></div>
                 <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="reg-senha" maxlength="4" pattern="\d*"></div>
                 <div class="form-group"><label>Confirmar Senha (4 Dígitos)</label><input type="password" id="reg-senha-conf" maxlength="4" pattern="\d*"></div>
-                <div class="form-group"><label>Nome de solteira da mãe <span style="text-transform:none; font-weight:normal; font-size:0.85em; color:var(--muted);">(Olha o respeito)</span></label><input type="text" id="reg-mae"></div>
+                <div class="form-group">
+                    <label>Nome de solteira da mãe <span style="text-transform:none; font-weight:normal; font-size:0.85em; color:var(--muted);">(Olha o respeito)</span></label>
+                    <input type="text" id="reg-mae">
+                </div>
                 <button type="button" class="btn" onclick="registrar()">Salvar Registro</button>
             </div>
         </div>
@@ -260,6 +278,7 @@
                     </table>
                 </div>
             </div>
+
         </div>
     </section>
 
@@ -275,7 +294,14 @@
         <div id="adm-users" class="tab-content ativo" style="display:block;">
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th class="t-left">Apostador</th><th>Senha</th><th>Master</th><th>Ações</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th class="t-left">Apostador</th>
+                            <th>Senha</th>
+                            <th>Master</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
                     <tbody id="tb-users"></tbody>
                 </table>
             </div>
@@ -352,7 +378,7 @@ var SCHEDULE_CSV = [{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun',
 var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
 var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}];
 
-var db = { u: [], t: [], j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:0, r32:2, r16:5, r8:10, r4:15, r2:20, w:25, t3:20 }, l: [] };
+var db = { u: [], t: [], j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [] };
 
 var _u = safeGet('fwc_u'); if(_u) db.u = JSON.parse(_u);
 var _t = safeGet('fwc_t'); if(_t) db.t = JSON.parse(_t);
@@ -360,18 +386,49 @@ var _j = safeGet('fwc_j'); if(_j) db.j = JSON.parse(_j);
 var _p = safeGet('fwc_p'); if(_p) db.p = JSON.parse(_p);
 var _r = safeGet('fwc_r'); if(_r) db.r = JSON.parse(_r);
 var _c = safeGet('fwc_c'); if(_c) db.c = Object.assign({ bReg: false, bLig: false, bPal: false }, JSON.parse(_c));
-var _pts = safeGet('fwc_pts'); if(_pts) db.pts = Object.assign(db.pts, JSON.parse(_pts));
+var _pts = safeGet('fwc_pts'); if(_pts) db.pts = JSON.parse(_pts);
 var _l = safeGet('fwc_l'); if(_l) db.l = JSON.parse(_l);
 
-var cU = null; var _cuid = safeGet('fwc_cuid'); if(_cuid) { for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; } }
+var cU = null; 
+var _cuid = safeGet('fwc_cuid');
+if(_cuid) { for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; } }
+
+function salvar() { safeSet('fwc_u', JSON.stringify(db.u)); safeSet('fwc_t', JSON.stringify(db.t)); safeSet('fwc_j', JSON.stringify(db.j)); safeSet('fwc_p', JSON.stringify(db.p)); safeSet('fwc_r', JSON.stringify(db.r)); safeSet('fwc_c', JSON.stringify(db.c)); safeSet('fwc_pts', JSON.stringify(db.pts)); safeSet('fwc_l', JSON.stringify(db.l)); }
 
 var ISO_MAP = {'eua':'us', 'estados unidos':'us', 'colômbia':'co', 'itália':'it', 'austrália':'au', 'canadá':'ca', 'japão':'jp', 'suécia':'se', 'nigéria':'ng', 'méxico':'mx', 'camarões':'cm', 'croácia':'hr', 'coreia do sul':'kr', 'brasil':'br', 'gana':'gh', 'sérvia':'rs', 'irã':'ir', 'argentina':'ar', 'marrocos':'ma', 'dinamarca':'dk', 'catar':'qa', 'espanha':'es', 'senegal':'sn', 'equador':'ec', 'arábia saudita':'sa', 'frança':'fr', 'argélia':'dz', 'uruguai':'uy', 'iraque':'iq', 'inglaterra':'gb-eng', 'egito':'eg', 'chile':'cl', 'eau':'ae', 'alemanha':'de', 'mali':'ml', 'peru':'pe', 'uzbequistão':'uz', 'portugal':'pt', 'c. marfim':'ci', 'costa do marfim':'ci', 'venezuela':'ve', 'china':'cn', 'bélgica':'be', 'áf. sul':'za', 'áfrica do sul':'za', 'paraguai':'py', 'n. zelândia':'nz', 'nova zelândia':'nz', 'holanda':'nl', 'tunísia':'tn', 'bolívia':'bo', 'honduras':'hn', 'república tcheca':'cz', 'bósnia e herzegovina':'ba', 'suíça':'ch', 'haiti':'ht', 'escócia':'gb-sct', 'turquia':'tr', 'curaçao':'cw', 'cabo verde':'cv', 'noruega':'no', 'áustria':'at', 'austria':'at', 'jordânia':'jo', 'jordania':'jo', 'rd congo':'cd', 'república democrática do congo':'cd', 'panamá':'pa', 'panama':'pa'};
 
 function getImg(n) { var iso = n ? ISO_MAP[n.toLowerCase().trim()] : null; return iso ? '<img src="https://flagcdn.com/w40/' + iso + '.png" class="flag">' : '<div class="flag" style="display:none;"></div>'; }
+
 function isTeam(n) { for(var i=0; i<db.t.length; i++) { if(db.t[i].n === n) return true; } return false; }
+
+function construtorDeTorneio() {
+    db.j = []; 
+    var idB = 1;
+    for(var i=0; i<GS_MAP.length; i++) {
+        var mapItem = GS_MAP[i], info = SCHEDULE_CSV[i]; 
+        db.j.push({ id: info.id, f: 'G', t: 'Grupo ' + mapItem.g, grp: mapItem.g, d: info.d, cid: info.c, eA: mapItem.g + mapItem.a, eB: mapItem.g + mapItem.b });
+    }
+    
+    idB = 73;
+    var C32 = [{a:{g:'A',p:1}, b:{g:'B',p:1}}, {a:{g:'E',p:0}, b:{m3:0, ph:'3º A/B/C/D/F'}}, {a:{g:'F',p:0}, b:{g:'C',p:1}}, {a:{g:'C',p:0}, b:{g:'F',p:1}}, {a:{g:'I',p:0}, b:{m3:1, ph:'3º C/D/F/G/H'}}, {a:{g:'E',p:1}, b:{g:'I',p:1}}, {a:{g:'A',p:0}, b:{m3:2, ph:'3º C/E/F/H/I'}}, {a:{g:'L',p:0}, b:{m3:3, ph:'3º E/H/I/J/K'}}, {a:{g:'D',p:0}, b:{m3:4, ph:'3º B/E/F/I/J'}}, {a:{g:'G',p:0}, b:{m3:5, ph:'3º A/E/H/I/J'}}, {a:{g:'K',p:1}, b:{g:'L',p:1}}, {a:{g:'H',p:0}, b:{g:'J',p:1}}, {a:{g:'B',p:0}, b:{m3:6, ph:'3º E/F/G/I/J'}}, {a:{g:'J',p:0}, b:{g:'H',p:1}}, {a:{g:'K',p:0}, b:{m3:7, ph:'3º D/E/I/J/L'}}, {a:{g:'D',p:1}, b:{g:'G',p:1}}];
+    for(var i=0; i<16; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Rodada de 32', d: info.d, cid: info.c, r: {t:'g', a:C32[i].a, b:C32[i].b} }); }
+    var C16 = [{jA: 74, jB: 77}, {jA: 73, jB: 75}, {jA: 76, jB: 78}, {jA: 79, jB: 80}, {jA: 83, jB: 84}, {jA: 81, jB: 82}, {jA: 86, jB: 88}, {jA: 85, jB: 87}];
+    for(var i=0; i<8; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Oitavas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C16[i].jA, jB:C16[i].jB} }); }
+    var C8 = [{jA: 89, jB: 90}, {jA: 93, jB: 94}, {jA: 91, jB: 92}, {jA: 95, jB: 96}];
+    for(var i=0; i<4; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Quartas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C8[i].jA, jB:C8[i].jB} }); }
+    var C4 = [{jA: 97, jB: 98}, {jA: 99, jB: 100}];
+    for(var i=0; i<2; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Semifinal', d: info.d, cid: info.c, r: {t:'v', jA:C4[i].jA, jB:C4[i].jB} }); }
+    db.j.push({ id: 103, f: 'E', t: 'Terceiro Lugar', d: SCHEDULE_CSV[102].d, cid: SCHEDULE_CSV[102].c, r: { t:'p', jA: 101, jB: 102 } });
+    db.j.push({ id: 104, f: 'E', t: 'Final', d: SCHEDULE_CSV[103].d, cid: SCHEDULE_CSV[103].c, r: { t:'v', jA: 101, jB: 102 } });
+}
+
 function limparDados() { if(confirm("APAGAR TUDO?")) { window.localStorage.clear(); window.location.reload(); } }
 
-if(db.t.length === 0 || db.j.length !== 104) { db.t = TEAMS_DATA; construtorDeTorneio(); salvar(); }
+if(db.t.length === 0 || db.j.length !== 104) { 
+    db.t = TEAMS_DATA; 
+    construtorDeTorneio(); 
+    salvar(); 
+}
 
 function toggleCfg(key, val) { db.c[key] = val; salvar(); }
 
@@ -412,14 +469,29 @@ function salvarConfigPontos() {
 }
 
 function exportarDados() { var dados = JSON.stringify(db); document.getElementById('txt-export').value = dados; alert('Código gerado! Copie e cole este código no outro aparelho para sincronizar as contas e palpites.'); }
-function importarDados() { var txt = document.getElementById('txt-import').value.trim(); if(!txt) return; try { var importado = JSON.parse(txt); if(importado && importado.u && confirm("Atenção: Os dados atuais serão substituídos pelos importados. Pretende continuar?")) { db = importado; salvar(); alert('Sincronização concluída com sucesso!'); window.location.reload(); } } catch(e) { alert('Ocorreu um erro: Código inválido.'); } }
+
+function importarDados() {
+    var txt = document.getElementById('txt-import').value.trim(); if(!txt) return;
+    try { var importado = JSON.parse(txt); if(importado && importado.u && confirm("Atenção: Os dados atuais serão substituídos pelos importados. Pretende continuar?")) { db = importado; salvar(); alert('Sincronização concluída com sucesso!'); window.location.reload(); } } catch(e) { alert('Ocorreu um erro: Código inválido.'); }
+}
+
 function toggleMenu() { var menu = document.getElementById('menu-principal'); if(menu.className.indexOf('aberto') !== -1) { menu.className = menu.className.replace(' aberto', ''); } else { menu.className += ' aberto'; } }
-function toggleEsqueciSenha() { var grpS = document.getElementById('grp-senha'), grpM = document.getElementById('grp-mae'), lnkE = document.getElementById('lnk-esqueci'); if(grpS.style.display !== 'none') { grpS.style.display = 'none'; grpM.style.display = 'block'; lnkE.innerText = 'Lembrei a senha'; } else { grpS.style.display = 'block'; grpM.style.display = 'none'; lnkE.innerText = 'Esqueci a senha'; } }
+
+function toggleEsqueciSenha() {
+    var grpS = document.getElementById('grp-senha'), grpM = document.getElementById('grp-mae'), lnkE = document.getElementById('lnk-esqueci');
+    if(grpS.style.display !== 'none') { grpS.style.display = 'none'; grpM.style.display = 'block'; lnkE.innerText = 'Lembrei a senha'; } else { grpS.style.display = 'block'; grpM.style.display = 'none'; lnkE.innerText = 'Esqueci a senha'; }
+}
+
 function atualizarMenuUI() { var header = document.getElementById('cabecalho-principal'); if(cU) { header.style.display = 'flex'; document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; } else { header.style.display = 'none'; } }
+
 function switchTabAuth(id) { document.getElementById('aba-login').style.display = 'none'; document.getElementById('aba-reg').style.display = 'none'; document.getElementById('tab-login-btn').className = 'tab-btn'; document.getElementById('tab-reg-btn').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; if(id === 'aba-login') document.getElementById('tab-login-btn').className = 'tab-btn ativo'; if(id === 'aba-reg') document.getElementById('tab-reg-btn').className = 'tab-btn ativo'; }
+
 function switchTabAdm(id) { document.getElementById('adm-users').style.display = 'none'; document.getElementById('adm-pts').style.display = 'none'; document.getElementById('adm-ctrl').style.display = 'none'; document.getElementById('adm-ligas').style.display = 'none'; document.getElementById('adm-sys').style.display = 'none'; document.getElementById('btn-adm-users').className = 'tab-btn'; document.getElementById('btn-adm-pts').className = 'tab-btn'; document.getElementById('btn-adm-ctrl').className = 'tab-btn'; document.getElementById('btn-adm-ligas').className = 'tab-btn'; document.getElementById('btn-adm-sys').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; if(id === 'adm-ligas') popAdmLigas(); }
+
 function switchTabPal(id) { document.getElementById('pal-grp').style.display = 'none'; document.getElementById('pal-grp-data').style.display = 'none'; document.getElementById('pal-cls').style.display = 'none'; document.getElementById('pal-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'pal-grp' || id === 'pal-grp-data' || id === 'pal-elm') renderPal(); if(id === 'pal-cls') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); }
+
 function switchTabRes(id) { document.getElementById('res-grp').style.display = 'none'; document.getElementById('res-grp-data').style.display = 'none'; document.getElementById('res-cls').style.display = 'none'; document.getElementById('res-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
+
 function switchTabRnk(id) { document.getElementById('rnk-geral').style.display = 'none'; document.getElementById('rnk-jogo').style.display = 'none'; document.getElementById('rnk-regras').style.display = 'none'; document.getElementById('btn-rnk-geral').className = 'tab-btn'; document.getElementById('btn-rnk-jogo').className = 'tab-btn'; document.getElementById('btn-rnk-regras').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; }
 
 function nav(id) {
@@ -468,22 +540,6 @@ function registrar() {
 }
 
 function logout() { cU = null; safeSet('fwc_cuid', ''); atualizarMenuUI(); nav('pag-auth'); }
-
-function construtorDeTorneio() {
-    db.j = []; var idB = 1;
-    for(var i=0; i<GS_MAP.length; i++) { var mapItem = GS_MAP[i], info = SCHEDULE_CSV[i]; db.j.push({ id: info.id, f: 'G', t: 'Grupo ' + mapItem.g, grp: mapItem.g, d: info.d, cid: info.c, eA: mapItem.g + mapItem.a, eB: mapItem.g + mapItem.b }); }
-    idB = 73;
-    var C32 = [{a:{g:'A',p:1}, b:{g:'B',p:1}}, {a:{g:'E',p:0}, b:{m3:0, ph:'3º A/B/C/D/F'}}, {a:{g:'F',p:0}, b:{g:'C',p:1}}, {a:{g:'C',p:0}, b:{g:'F',p:1}}, {a:{g:'I',p:0}, b:{m3:1, ph:'3º C/D/F/G/H'}}, {a:{g:'E',p:1}, b:{g:'I',p:1}}, {a:{g:'A',p:0}, b:{m3:2, ph:'3º C/E/F/H/I'}}, {a:{g:'L',p:0}, b:{m3:3, ph:'3º E/H/I/J/K'}}, {a:{g:'D',p:0}, b:{m3:4, ph:'3º B/E/F/I/J'}}, {a:{g:'G',p:0}, b:{m3:5, ph:'3º A/E/H/I/J'}}, {a:{g:'K',p:1}, b:{g:'L',p:1}}, {a:{g:'H',p:0}, b:{g:'J',p:1}}, {a:{g:'B',p:0}, b:{m3:6, ph:'3º E/F/G/I/J'}}, {a:{g:'J',p:0}, b:{g:'H',p:1}}, {a:{g:'K',p:0}, b:{m3:7, ph:'3º D/E/I/J/L'}}, {a:{g:'D',p:1}, b:{g:'G',p:1}}];
-    for(var i=0; i<16; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Rodada de 32', d: info.d, cid: info.c, r: {t:'g', a:C32[i].a, b:C32[i].b} }); }
-    var C16 = [{jA: 74, jB: 77}, {jA: 73, jB: 75}, {jA: 76, jB: 78}, {jA: 79, jB: 80}, {jA: 83, jB: 84}, {jA: 81, jB: 82}, {jA: 86, jB: 88}, {jA: 85, jB: 87}];
-    for(var i=0; i<8; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Oitavas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C16[i].jA, jB:C16[i].jB} }); }
-    var C8 = [{jA: 89, jB: 90}, {jA: 93, jB: 94}, {jA: 91, jB: 92}, {jA: 95, jB: 96}];
-    for(var i=0; i<4; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Quartas de Final', d: info.d, cid: info.c, r: {t:'v', jA:C8[i].jA, jB:C8[i].jB} }); }
-    var C4 = [{jA: 97, jB: 98}, {jA: 99, jB: 100}];
-    for(var i=0; i<2; i++) { var info = SCHEDULE_CSV[idB-1]; db.j.push({ id: idB++, f: 'E', t: 'Semifinal', d: info.d, cid: info.c, r: {t:'v', jA:C4[i].jA, jB:C4[i].jB} }); }
-    db.j.push({ id: 103, f: 'E', t: 'Terceiro Lugar', d: SCHEDULE_CSV[102].d, cid: SCHEDULE_CSV[102].c, r: { t:'p', jA: 101, jB: 102 } });
-    db.j.push({ id: 104, f: 'E', t: 'Final', d: SCHEDULE_CSV[103].d, cid: SCHEDULE_CSV[103].c, r: { t:'v', jA: 101, jB: 102 } });
-}
 
 function eqNome(pos) { for(var i=0; i<db.t.length; i++) { if(db.t[i].pos === pos) return db.t[i].n; } return pos; }
 
@@ -550,31 +606,15 @@ function ptoCalc(uId, j) {
     } else {
         if (p.w && isTeam(p.w)) {
             var targetStage = '', bonus = 0;
-            if (j.t === 'Rodada de 32') { targetStage = 'Oitavas de Final'; bonus = db.pts.r16; } 
-            else if (j.t === 'Oitavas de Final') { targetStage = 'Quartas de Final'; bonus = db.pts.r8; } 
-            else if (j.t === 'Quartas de Final') { targetStage = 'Semifinal'; bonus = db.pts.r4; } 
-            else if (j.t === 'Semifinal') { targetStage = 'Final'; bonus = db.pts.r2; } 
-            else if (j.t === 'Final') { var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialChampion && officialChampion === p.w) pts += db.pts.w; } 
-            else if (j.t === 'Terceiro Lugar') { var officialThird = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialThird && officialThird === p.w) pts += (db.pts.t3 || 0); }
+            if (j.t === 'Rodada de 32') { targetStage = 'Oitavas de Final'; bonus = db.pts.r16; } else if (j.t === 'Oitavas de Final') { targetStage = 'Quartas de Final'; bonus = db.pts.r8; } else if (j.t === 'Quartas de Final') { targetStage = 'Semifinal'; bonus = db.pts.r4; } else if (j.t === 'Semifinal') { targetStage = 'Final'; bonus = db.pts.r2; } else if (j.t === 'Final') { var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialChampion && officialChampion === p.w) pts += db.pts.w; } else if (j.t === 'Terceiro Lugar') { var officialThird = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialThird && officialThird === p.w) pts += (db.pts.t3 || 0); }
             if (targetStage) { var eqR = getPtsFase('m', targetStage), found = false; for(var k=0; k<eqR.length; k++) { if(eqR[k] === p.w) found = true; } if(found) pts += bonus; }
         }
     }
     return { pt: pts };
 }
 
-function savP(j, c, v) { 
-    if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; } 
-    var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; salvar(); 
-    renderPal(); 
-    if(document.getElementById('pal-cls').style.display === 'block') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); 
-}
-
-function savR(j, c, v) { 
-    if(!cU.isM) return; 
-    var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; salvar(); 
-    renderRes(); 
-    if(document.getElementById('res-cls').style.display === 'block') renderTbCls('res-cls-tbl', db.r, 'R_', true); 
-}
+function savP(j, c, v) { if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; } var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; salvar(); if(c==='w') renderPal(); }
+function savR(j, c, v) { if(!cU.isM) return; var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; salvar(); if(c==='w') renderRes(); }
 
 function renderTbCls(alvo, dds, px, isOfc) {
     var d = document.getElementById(alvo); d.innerHTML = ''; var st = classificar(dds, px); var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
@@ -600,17 +640,18 @@ function renderTbCls(alvo, dds, px, isOfc) {
 function geraLinha(j, e, val, pt, isOfc, showGroup) {
     var inp = '', vA = (val && val.a !== undefined) ? val.a : '', vB = (val && val.b !== undefined) ? val.b : '', vW = (val && val.w) ? val.w : '';
     if(isOfc && cU && cU.isM === true) {
-        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" onchange="savR('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" onchange="savR('+j.id+',\'b\',this.value)">';
+        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savR('+j.id+',\'a\',this.value)"> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savR('+j.id+',\'b\',this.value)">';
         else inp = '<select class="ipt-combo" onchange="savR('+j.id+',\'w\',this.value)"><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
     } else if(isOfc) { 
         inp = j.f==='G' ? (vA!=='' ? vA+' x '+vB : '-') : (vW||'-');
     } else {
         var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
-        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" onchange="savP('+j.id+',\'a\',this.value)"'+disabledAttr+'> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" onchange="savP('+j.id+',\'b\',this.value)"'+disabledAttr+'>';
+        if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savP('+j.id+',\'a\',this.value)"'+disabledAttr+'> <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savP('+j.id+',\'b\',this.value)"'+disabledAttr+'>';
         else inp = '<select class="ipt-combo" onchange="savP('+j.id+',\'w\',this.value)"'+disabledAttr+'><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
     }
     
-    var cidName = j.cid || j.c, metaTxt = '<b>J'+j.id+'</b> | ' + j.d + '<br>' + cidName;
+    var cidName = j.cid || j.c;
+    var metaTxt = '<b>J'+j.id+'</b> | ' + j.d + '<br>' + cidName;
     if(showGroup && j.f === 'G') metaTxt = '<b style="color:var(--text);">GRUPO '+j.grp+'</b> | <b>J'+j.id+'</b><br>' + j.d + ' - ' + cidName;
     
     var ptsHtml = '';
@@ -766,3 +807,17 @@ atualizarMenuUI(); if (cU) { nav('pag-resultados'); } else { nav('pag-auth'); }
 </script>
 </body>
 </html>
+}
+
+O usuário deseja saber por que o site (cebolao-mu.vercel.app/Index.html) não abre no Chrome, e apresentou uma imagem de erro 404 (NOT_FOUND) retornada pelo Vercel. O arquivo html do site foi carregado no github e ocorreu o deploy no vercel.
+
+I must use the provided information to help the user.
+O erro 404 que você está recebendo ao aceder ao endereço do seu site (`cebolao-mu.vercel.app/Index.html`) e o fato de o site não abrir, provavelmente se deve a como o Vercel procura o arquivo de página inicial no repositório do Github.
+
+Ao digitar a URL principal (`cebolao-mu.vercel.app`), os servidores do Vercel, que diferenciam maiúsculas de minúsculas, não conseguem encontrar o arquivo da página inicial, pois eles são configurados para buscar automaticamente pelo arquivo **`index.html`** (com 'i' minúsculo) e não `Index.html`. 
+
+Para resolver o problema de maneira que funcione corretamente de primeira vez:
+
+1.  Mude o nome do seu arquivo localmente de `Index.html` para **`index.html`** (tudo em minúsculo).
+2.  Faça upload desse novo ficheiro `index.html` para a pasta principal no seu repositório Github (não esqueça de remover o `Index.html` que está lá para evitar conflito). 
+3.  Com isso, o Vercel deverá automaticamente atualizar o seu deploy e seu Cebolão da Copa ficará acessível simplesmente acedendo ao link: **`https://cebolao-mu.vercel.app`**
