@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bolão da Copa</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;700&display=swap');
+        :root { --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; --muted: #666666; --danger: #dc3545; --accent: #009b3a; }
+        * { box-sizing: border-box; font-family: 'Product Sans', sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.1; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center; font-weight: 700; color: var(--accent); }
+        header { display: none; background: #009b3a; color: #ffffff; height: 60px; align-items: center; position: sticky; top: 0; z-index: 1000; padding: 0 15px; }
+        header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; font-weight: 800; flex: 1; text-align: center; }
+        .menu-btn { background: transparent; border: none; color: white; font-size: 1.8rem; cursor: pointer; position: absolute; right: 15px; }
+        nav { display: none; flex-direction: column; width: auto; min-width: 160px; background: #007a2e; position: absolute; top: 60px; right: 0; z-index: 999; border-bottom-left-radius: 8px; }
+        nav.aberto { display: flex; }
+        nav button { background: transparent; border: none; color: white; text-align: left; padding: 15px 20px; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .container { max-width: 950px; margin: 15px auto; padding: 0 15px; }
+        .pagina { display: none; }
+        h2 { font-weight: 700; text-transform: uppercase; font-size: 1.1rem; border-bottom: 2px solid var(--text); padding-bottom: 5px; margin-bottom: 15px; }
+        .submenu-select { width: 100%; height: 42px; font-size: 0.9rem; font-weight: bold; border: 2px solid var(--accent); background: white; margin-bottom: 15px; border-radius: 6px; }
+        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--light); gap: 5px; }
+        .jogo-meta { width: 85px; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
+        .equipe { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; }
+        .palpite-area { display: flex; align-items: center; gap: 4px; }
+        .ipt-gol { width: 40px; height: 40px; text-align: center; font-size: 1.1rem; font-weight: 700; border: 1px solid var(--border); border-radius: 4px; }
+        .tabela-classificacao td:first-child { position: sticky; left: 0; background: #fff; z-index: 10; border-right: 2px solid var(--border); }
+        .btn { background: var(--accent); color: white; border: none; padding: 14px; text-transform: uppercase; font-weight: 700; cursor: pointer; width: 100%; border-radius:6px; }
+        @media (max-width: 650px) { .jogo-linha { flex-wrap: wrap; justify-content: center; } .jogo-meta { width: 100%; text-align: center; } }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">Conectando ao Cebolão...</div>
+
+<header id="cabecalho-principal">
+    <div style="width:40px"></div>
+    <h1>Bolão da Copa</h1>
+    <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
+    <nav id="menu-principal">
+        <button onclick="nav('pag-resultados')">Resultados</button>
+        <button onclick="nav('pag-palpites')">Palpites</button>
+        <button onclick="nav('pag-ligas')">Ligas</button>
+        <button onclick="nav('pag-regras')">Regras</button>
+        <button id="nav-gestao" style="display:none" onclick="nav('pag-gestao')">Gestão</button>
+        <button onclick="logout()">Sair</button>
+    </nav>
+</header>
+
+<div class="container">
+    <section id="pag-auth" class="pagina">
+        <div style="max-width: 340px; margin: 40px auto; text-align: center;">
+            <h1 style="font-weight:800; color:#009b3a; margin-bottom:30px;">BOLÃO DA COPA</h1>
+            <div class="tabs-nav" style="display:flex; gap:10px; margin-bottom:20px">
+                <button id="tab-log-btn" class="tab-btn ativo" onclick="switchAuth('login')">Entrar</button>
+                <button id="tab-reg-btn" class="tab-btn" onclick="switchAuth('reg')">Registro</button>
+            </div>
+            <input type="text" id="auth-nome" placeholder="USUÁRIO" style="margin-bottom:10px; width:100%; padding:12px">
+            <input type="password" id="auth-senha" placeholder="SENHA (4 DÍGITOS)" maxlength="4" style="margin-bottom:20px; width:100%; padding:12px">
+            <button class="btn" id="btn-auth-action" onclick="execAuth()">Entrar</button>
+        </div>
+    </section>
+
+    <section id="pag-resultados" class="pagina">
+        <h2>Resultados</h2>
+        <select class="submenu-select" onchange="switchSub('res', this.value)">
+            <option value="grp">Fase de Grupos</option>
+            <option value="cls">Classificação</option>
+            <option value="elm">Mata-Mata</option>
+        </select>
+        <div id="res-content"></div>
+    </section>
+
+    <section id="pag-palpites" class="pagina">
+        <h2>Palpites</h2>
+        <select class="submenu-select" onchange="switchSub('pal', this.value)">
+            <option value="grp">Fase de Grupos</option>
+            <option value="cls">Classificação</option>
+            <option value="elm">Mata-Mata</option>
+        </select>
+        <div id="pal-content"></div>
+    </section>
+
+    <section id="pag-ligas" class="pagina">
+        <h2>Ligas</h2>
+        <select class="submenu-select" onchange="switchSub('liga', this.value)">
+            <option value="rank">Pontuações</option>
+            <option value="config">Criar / Entrar em Liga</option>
+        </select>
+        <div id="liga-content"></div>
+    </section>
+
+    <section id="pag-regras" class="pagina">
+        <h2>Regras</h2>
+        <div class="table-wrapper"><table><thead><tr><th class="t-left">Critério</th><th>Pts</th></tr></thead><tbody id="tb-regras"></tbody></table></div>
+    </section>
+
+    <section id="pag-gestao" class="pagina">
+        <h2>Gestão Master</h2>
+        <select class="submenu-select" onchange="switchSub('adm', this.value)">
+            <option value="users">Usuários</option>
+            <option value="pts">Editar Pontuações</option>
+            <option value="pals">Bloqueios</option>
+        </select>
+        <div id="adm-content"></div>
+    </section>
+</div>
+
+<script>
+// CONFIGURAÇÃO SUPABASE
+const S_URL = 'https://hhlufnllvjdpliggoysy.supabase.co';
+const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhobHVmbmxsdmpkcGxpZ2dveXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzAzNzksImV4cCI6MjA5MjU0NjM3OX0.o6555R5IRo0GijEuvYpgK2b9zGvPeIeGCcLrhzYgX-k';
+const client = supabase.createClient(S_URL, S_KEY);
+
+var db = { u: [], j: [], p: {}, r: {}, pts: {}, l: [] };
+var cU = null;
+var currentSub = { res: 'grp', pal: 'grp', liga: 'rank', adm: 'users' };
+
+async function init() {
+    try {
+        const { data: s } = await client.from('settings').select('*').single();
+        db.pts = s || {};
+        const { data: u } = await client.from('users').select('*');
+        db.u = u || [];
+        const { data: r } = await client.from('results').select('*');
+        (r || []).forEach(x => db.r['R_'+x.match_id] = { a: x.score_a, b: x.score_b });
+        const { data: p } = await client.from('predictions').select('*');
+        (p || []).forEach(x => db.p[x.user_id+'_'+x.match_id] = { a: x.score_a, b: x.score_b });
+        const { data: l } = await client.from('leagues').select('*, league_users(user_id)');
+        db.l = (l || []).map(x => ({ ...x, users: x.league_users.map(lu => lu.user_id) }));
+
+        document.getElementById('loading-overlay').style.display = 'none';
+        const cachedId = localStorage.getItem('fwc_cuid');
+        if(cachedId) cU = db.u.find(x => x.id === cachedId);
+        
+        if(cU) { updateUI(); nav('pag-resultados'); } else nav('pag-auth');
+    } catch (e) {
+        document.getElementById('loading-overlay').innerHTML = "Erro de Conexão. Verifique o RLS no Supabase.";
+    }
+}
+
+function toggleMenu() { document.getElementById('menu-principal').classList.toggle('aberto'); }
+function switchAuth(m) { 
+    document.getElementById('tab-log-btn').classList.toggle('ativo', m==='login');
+    document.getElementById('tab-reg-btn').classList.toggle('ativo', m==='reg');
+    document.getElementById('btn-auth-action').innerText = m === 'login' ? 'Entrar' : 'Criar Usuário';
+}
+
+async function execAuth() {
+    const nome = document.getElementById('auth-nome').value.trim();
+    const senha = document.getElementById('auth-senha').value;
+    if(!nome || senha.length < 4) return alert("Preencha os dados corretamente.");
+    const mode = document.getElementById('btn-auth-action').innerText === 'Entrar' ? 'log' : 'reg';
+
+    if(mode === 'reg') {
+        const { data, error } = await client.from('users').insert([{ nome, senha, is_master: db.u.length === 0 }]).select();
+        if(error) return alert("Erro ou Usuário já existe.");
+        cU = data[0];
+    } else {
+        cU = db.u.find(x => x.nome.toLowerCase() === nome.toLowerCase() && x.senha === senha);
+        if(!cU) return alert("Dados incorretos.");
+    }
+    localStorage.setItem('fwc_cuid', cU.id);
+    window.location.reload();
+}
+
+function nav(id) {
+    document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('menu-principal').classList.remove('aberto');
+    if(id === 'pag-resultados') switchSub('res', 'grp');
+    if(id === 'pag-palpites') switchSub('pal', 'grp');
+    if(id === 'pag-ligas') switchSub('liga', 'rank');
+}
+
+function switchSub(prefix, val) {
+    currentSub[prefix] = val;
+    renderPage(prefix);
+}
+
+function renderPage(prefix) {
+    const area = document.getElementById(prefix + '-content') || document.getElementById('adm-content');
+    const sub = currentSub[prefix];
+    area.innerHTML = '';
+
+    if(prefix === 'res' || prefix === 'pal') {
+        if(sub === 'grp') {
+            area.innerHTML = 'Fase de Grupos Carregada...'; // Lógica de renderização de jogos entra aqui
+        } else if (sub === 'cls') {
+            area.innerHTML = '<p style="text-align:center">Classificação em tempo real...</p>';
+        }
+    }
+    // Outras renderizações...
+}
+
+function updateUI() {
+    document.getElementById('cabecalho-principal').style.display = 'flex';
+    document.getElementById('nav-gestao').style.display = cU?.is_master ? 'block' : 'none';
+}
+
+function logout() { localStorage.removeItem('fwc_cuid'); window.location.reload(); }
+
+init();
+</script>
+</body>
+</html>
