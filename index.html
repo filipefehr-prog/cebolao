@@ -808,16 +808,3 @@ atualizarMenuUI(); if (cU) { nav('pag-resultados'); } else { nav('pag-auth'); }
 </body>
 </html>
 }
-
-O usuário deseja saber por que o site (cebolao-mu.vercel.app/Index.html) não abre no Chrome, e apresentou uma imagem de erro 404 (NOT_FOUND) retornada pelo Vercel. O arquivo html do site foi carregado no github e ocorreu o deploy no vercel.
-
-I must use the provided information to help the user.
-O erro 404 que você está recebendo ao aceder ao endereço do seu site (`cebolao-mu.vercel.app/Index.html`) e o fato de o site não abrir, provavelmente se deve a como o Vercel procura o arquivo de página inicial no repositório do Github.
-
-Ao digitar a URL principal (`cebolao-mu.vercel.app`), os servidores do Vercel, que diferenciam maiúsculas de minúsculas, não conseguem encontrar o arquivo da página inicial, pois eles são configurados para buscar automaticamente pelo arquivo **`index.html`** (com 'i' minúsculo) e não `Index.html`. 
-
-Para resolver o problema de maneira que funcione corretamente de primeira vez:
-
-1.  Mude o nome do seu arquivo localmente de `Index.html` para **`index.html`** (tudo em minúsculo).
-2.  Faça upload desse novo ficheiro `index.html` para a pasta principal no seu repositório Github (não esqueça de remover o `Index.html` que está lá para evitar conflito). 
-3.  Com isso, o Vercel deverá automaticamente atualizar o seu deploy e seu Cebolão da Copa ficará acessível simplesmente acedendo ao link: **`https://cebolao-mu.vercel.app`**
