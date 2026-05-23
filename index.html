@@ -60,9 +60,15 @@
             .btn-danger:hover { background: #b02a37; }
         }
 
-        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 40px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text);}
+        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 40px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text); display: flex; justify-content: space-between; align-items: flex-end;}
+        .contador-fase { font-size: 0.7rem; font-weight: 600; color: var(--muted); background: var(--light); padding: 2px 8px; border-radius: 12px; }
+        .contador-fase.erro { color: white; background: var(--danger); }
+        .contador-fase.ok { color: white; background: #009b3a; }
         
         .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--light); gap: 8px; }
+        .chk-linha { display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--light); gap: 15px; }
+        .chk-linha:hover { background: #f9f9f9; }
+        
         .jogo-meta { width: 145px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; line-height: 1.3; flex-shrink:0; }
         .equipe { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 500; }
         .eq-esq { justify-content: flex-end; text-align: right; }
@@ -70,6 +76,8 @@
         .flag { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; background-color: var(--light); display: block; flex-shrink: 0; }
         .palpite-area { display: flex; align-items: center; justify-content: center; gap: 6px; width: 90px; flex-shrink:0; }
         .ipt-gol { width: 36px; height: 36px; text-align: center; border: 1px solid var(--border); font-size: 1rem; font-weight: 600; outline: none; padding: 0; background: var(--bg); border-radius:4px; }
+        
+        input[type="checkbox"].ipt-chk, input[type="radio"].ipt-chk { width: 22px; height: 22px; cursor: pointer; accent-color: var(--text); flex-shrink: 0;}
         
         .pts-container { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; width: 100px; }
         .res-ofc { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-right: 12px; }
@@ -90,6 +98,11 @@
         .tabela-classificacao th.col-eq { position: sticky; left: 0; background: var(--light); z-index: 2; border-right: 1px solid var(--border); width: 210px; }
         .tabela-classificacao td.col-eq { position: sticky; left: 0; background: var(--bg); z-index: 1; border-right: 1px solid var(--border); width: 210px; }
         
+        /* Ajuste para tabela de classificação de palpites (sem scroll horizontal) */
+        table.tabela-palpite-classificacao { min-width: 100%; table-layout: auto; }
+        .tabela-palpite-classificacao th.col-eq { width: auto; position: static; border-right: none;}
+        .tabela-palpite-classificacao td.col-eq { width: auto; position: static; border-right: none;}
+        
         .grid-cfg { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         @media (max-width: 650px) { 
@@ -109,6 +122,7 @@
             th, td { padding: 10px 4px; }
             .col-num { width: 40px; }
             .col-pos { width: 35px; }
+            .chk-linha { padding: 8px 5px; }
         }
     </style>
 </head>
@@ -191,7 +205,6 @@
             <div id="pal-grp" class="tab-content" style="display:block;"></div>
             <div id="pal-grp-data" class="tab-content" style="display:none;"></div>
             <div id="pal-cls" class="tab-content" style="display:none;">
-                <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
                 <div id="pal-cls-tbl"></div>
             </div>
             <div id="pal-elm" class="tab-content" style="display:none;"></div>
@@ -358,7 +371,7 @@ var SCHEDULE_CSV = [{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun',
 var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
 var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}];
 
-var db = { u: [], t: TEAMS_DATA, j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [] };
+var db = { u: [], t: TEAMS_DATA, j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [], pStage: {} };
 var cU = null; 
 
 function construtorDeTorneio() {
@@ -396,6 +409,7 @@ async function carregarBanco() {
                 if (item.chave === 'fwc_l') db.l = item.valor;
                 if (item.chave === 'fwc_r') db.r = item.valor;
                 if (item.chave === 'fwc_p') db.p = item.valor;
+                if (item.chave === 'fwc_pStage') db.pStage = item.valor;
             });
         } else {
             await sincronizarChave('fwc_c', db.c);
@@ -403,27 +417,18 @@ async function carregarBanco() {
             await sincronizarChave('fwc_l', db.l);
             await sincronizarChave('fwc_r', db.r);
             await sincronizarChave('fwc_p', db.p);
+            await sincronizarChave('fwc_pStage', db.pStage);
         }
 
         var _cuid = safeGet('fwc_cuid');
         if(_cuid) { for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; } }
 
         atualizarMenuUI(); 
-        
-        // RECUPERA A ÚLTIMA PÁGINA ACEDIDA
         if (cU) { 
             var lastPage = safeGet('fwc_last_page');
-            if (lastPage && document.getElementById(lastPage)) {
-                nav(lastPage);
-            } else {
-                nav('pag-resultados');
-            }
-        } else { 
-            nav('pag-auth'); 
-        }
-    } catch (err) {
-        console.error("Erro ao inicializar o Supabase:", err);
-    }
+            if (lastPage && document.getElementById(lastPage)) { nav(lastPage); } else { nav('pag-resultados'); }
+        } else { nav('pag-auth'); }
+    } catch (err) { console.error("Erro ao inicializar o Supabase:", err); }
 }
 
 async function sincronizarChave(chave, valor) {
@@ -436,6 +441,7 @@ async function salvar() {
     await sincronizarChave('fwc_l', db.l);
     await sincronizarChave('fwc_r', db.r);
     await sincronizarChave('fwc_p', db.p);
+    await sincronizarChave('fwc_pStage', db.pStage);
 }
 
 async function limparDados() { 
@@ -501,14 +507,24 @@ function atualizarMenuUI() { var header = document.getElementById('cabecalho-pri
 
 function switchTabAuth(id) { document.getElementById('aba-login').style.display = 'none'; document.getElementById('aba-reg').style.display = 'none'; document.getElementById('tab-login-btn').className = 'tab-btn'; document.getElementById('tab-reg-btn').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; if(id === 'aba-login') document.getElementById('tab-login-btn').className = 'tab-btn ativo'; if(id === 'aba-reg') document.getElementById('tab-reg-btn').className = 'tab-btn ativo'; }
 function switchTabAdm(id) { document.getElementById('adm-users').style.display = 'none'; document.getElementById('adm-pts').style.display = 'none'; document.getElementById('adm-ctrl').style.display = 'none'; document.getElementById('adm-ligas').style.display = 'none'; document.getElementById('adm-sys').style.display = 'none'; document.getElementById('btn-adm-users').className = 'tab-btn'; document.getElementById('btn-adm-pts').className = 'tab-btn'; document.getElementById('btn-adm-ctrl').className = 'tab-btn'; document.getElementById('btn-adm-ligas').className = 'tab-btn'; document.getElementById('btn-adm-sys').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; if(id === 'adm-ligas') popAdmLigas(); }
-function switchTabPal(id) { document.getElementById('pal-grp').style.display = 'none'; document.getElementById('pal-grp-data').style.display = 'none'; document.getElementById('pal-cls').style.display = 'none'; document.getElementById('pal-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'pal-grp' || id === 'pal-grp-data' || id === 'pal-elm') renderPal(); if(id === 'pal-cls') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); }
+
+function switchTabPal(id) { 
+    document.getElementById('pal-grp').style.display = 'none'; 
+    document.getElementById('pal-grp-data').style.display = 'none'; 
+    document.getElementById('pal-cls').style.display = 'none'; 
+    document.getElementById('pal-elm').style.display = 'none'; 
+    document.getElementById(id).style.display = 'block'; 
+    
+    if(id === 'pal-grp' || id === 'pal-grp-data') { renderPal(); }
+    if(id === 'pal-elm') { renderMataMataPalpites(); }
+    if(id === 'pal-cls') { renderClsPalpites(); }
+}
+
 function switchTabRes(id) { document.getElementById('res-grp').style.display = 'none'; document.getElementById('res-grp-data').style.display = 'none'; document.getElementById('res-cls').style.display = 'none'; document.getElementById('res-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
 function switchTabRnk(id) { document.getElementById('rnk-geral').style.display = 'none'; document.getElementById('rnk-jogo').style.display = 'none'; document.getElementById('rnk-regras').style.display = 'none'; document.getElementById('btn-rnk-geral').className = 'tab-btn'; document.getElementById('btn-rnk-jogo').className = 'tab-btn'; document.getElementById('btn-rnk-regras').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; }
 
 function nav(id) {
-    // SALVA A PÁGINA ATUAL
     safeSet('fwc_last_page', id);
-    
     var menu = document.getElementById('menu-principal'); if(menu) menu.className = menu.className.replace(' aberto', '');
     var pags = document.querySelectorAll('.pagina'); for(var i=0; i<pags.length; i++) pags[i].style.display = 'none';
     var btns = document.querySelectorAll('#menu-principal button'); for(var k=0; k<btns.length; k++) btns[k].className = '';
@@ -522,7 +538,11 @@ function nav(id) {
         else if(id === 'pag-auth') hTitle.innerText = 'Cebolão da Copa';
     }
     window.scrollTo(0,0);
-    if(id==='pag-palpites') { renderPal(); if(document.getElementById('pal-cls').style.display === 'block') renderTbCls('pal-cls-tbl', db.p, cU.id+'_', false); }
+    if(id==='pag-palpites') { 
+        if(document.getElementById('pal-grp').style.display === 'block' || document.getElementById('pal-grp-data').style.display === 'block') renderPal();
+        if(document.getElementById('pal-cls').style.display === 'block') renderClsPalpites();
+        if(document.getElementById('pal-elm').style.display === 'block') renderMataMataPalpites();
+    }
     if(id==='pag-resultados') { renderRes(); if(document.getElementById('res-cls').style.display === 'block') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
     if(id==='pag-pontuacoes') { popLigasDropdown(); renderizarValoresDePontos(); }
     if(id==='pag-gestao') { renderAdm(); renderizarValoresDePontos(); renderControles(); popAdmLigas(); }
@@ -611,7 +631,16 @@ function reqEquipe(j, dd, px) {
     if(j.r.t === 'p') { var getL = function(jId, obj) { var eq = null; for(var i=0; i<db.j.length; i++){ if(db.j[i].id === jId) eq = reqEquipe(db.j[i], dd, px); } if(!eq) return 'Perd J'+jId; return (obj && obj.w) ? (obj.w===eq.A ? eq.B : eq.A) : 'Perd J'+jId; }; return { A: getL(j.r.jA, dd[px+j.r.jA]), B: getL(j.r.jB, dd[px+j.r.jB]) }; }
 }
 
-function getPtsFase(uId, fase) { var ls = []; for(var i=0; i<db.j.length; i++){ if(db.j[i].t === fase) { var e = reqEquipe(db.j[i], db.r, 'R_'); ls.push(e.A); ls.push(e.B); } } return ls; }
+function getOficiaisFase(fase) {
+    var ls = []; 
+    for(var i=0; i<db.j.length; i++) { 
+        if(db.j[i].t === fase) { 
+            var e = reqEquipe(db.j[i], db.r, 'R_'); 
+            ls.push(e.A); ls.push(e.B); 
+        } 
+    } 
+    return ls; 
+}
 
 function ptoCalc(uId, j) {
     var p = db.p[uId+'_'+j.id] || {a:'', b:'', w:''}, res = db.r['R_'+j.id], pts = 0;
@@ -623,15 +652,201 @@ function ptoCalc(uId, j) {
             if(gaP===gaR && gbP===gbR) pts += db.pts.p; 
         }
     } else {
+        // Cálculo antigo de mata-mata mantido compatível se acessado no rank
         if (p.w && isTeam(p.w)) {
-            var targetStage = '', bonus = 0;
-            if (j.t === 'Rodada de 32') { targetStage = 'Oitavas de Final'; bonus = db.pts.r16; } else if (j.t === 'Oitavas de Final') { targetStage = 'Quartas de Final'; bonus = db.pts.r8; } else if (j.t === 'Quartas de Final') { targetStage = 'Semifinal'; bonus = db.pts.r4; } else if (j.t === 'Semifinal') { targetStage = 'Final'; bonus = db.pts.r2; } else if (j.t === 'Final') { var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialChampion && officialChampion === p.w) pts += db.pts.w; } else if (j.t === 'Terceiro Lugar') { var officialThird = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; if(officialThird && officialThird === p.w) pts += (db.pts.t3 || 0); }
-            if (targetStage) { var eqR = getPtsFase('m', targetStage), found = false; for(var k=0; k<eqR.length; k++) { if(eqR[k] === p.w) found = true; } if(found) pts += bonus; }
+            var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; 
+            if(j.t === 'Final' && officialChampion && officialChampion === p.w) pts += db.pts.w; 
+            if(j.t === 'Terceiro Lugar' && officialChampion && officialChampion === p.w) pts += (db.pts.t3 || 0); 
         }
     }
     return { pt: pts };
 }
 
+// NOVA FUNÇÃO DE CÁLCULO DE PONTOS POR CHECKLIST
+function getPtsFaseChecklist(uId, fase, pontos) {
+    if(!db.pStage || !db.pStage[uId]) return 0;
+    var palpitesNaFase = db.pStage[uId][fase] || [];
+    var oficiaisNaFase = getOficiaisFase(fase);
+    var pts = 0;
+    
+    // Na Final, a verificação é do vencedor
+    if (fase === 'Campeao') {
+        var resFinal = db.r['R_104'];
+        if(resFinal && resFinal.w && palpitesNaFase[0] === resFinal.w) pts += pontos;
+        return pts;
+    }
+
+    for (var i = 0; i < palpitesNaFase.length; i++) {
+        var teamP = palpitesNaFase[i];
+        if (isTeam(teamP) && oficiaisNaFase.indexOf(teamP) !== -1) {
+            pts += pontos;
+        }
+    }
+    return pts;
+}
+
+// --- FUNÇÕES DE LISTAGEM PROGRESSIVA (CHECKLIST) ---
+function getSelectedTeamsForStage(uId, targetStageName) {
+    if (!db.pStage || !db.pStage[uId]) return [];
+    var sourceStage = '';
+    if (targetStageName === 'Rodada de 32') sourceStage = 'r32';
+    if (targetStageName === 'Oitavas de Final') sourceStage = 'Rodada de 32';
+    if (targetStageName === 'Quartas de Final') sourceStage = 'Oitavas de Final';
+    if (targetStageName === 'Semifinal') sourceStage = 'Quartas de Final';
+    if (targetStageName === 'Final') sourceStage = 'Semifinal';
+    
+    return db.pStage[uId][sourceStage] || [];
+}
+
+async function savPStage(fase, maxTeams, team, isChecked, domElement) {
+    if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); domElement.checked = !isChecked; return; }
+    
+    var uId = cU.id;
+    if(!db.pStage) db.pStage = {};
+    if(!db.pStage[uId]) db.pStage[uId] = {};
+    if(!db.pStage[uId][fase]) db.pStage[uId][fase] = [];
+    
+    var currentList = db.pStage[uId][fase];
+    
+    if (isChecked) {
+        if (currentList.length >= maxTeams) {
+            alert('Você já selecionou o limite máximo de ' + maxTeams + ' equipas para esta fase.');
+            domElement.checked = false;
+            return;
+        }
+        if (currentList.indexOf(team) === -1) { currentList.push(team); }
+    } else {
+        var idx = currentList.indexOf(team);
+        if (idx !== -1) { currentList.splice(idx, 1); }
+    }
+    
+    // Limpeza em cascata (se remover uma equipa das oitavas, tem de sair das quartas, etc)
+    if (!isChecked) {
+        var cascadeStages = ['Rodada de 32', 'Oitavas de Final', 'Quartas de Final', 'Semifinal', 'Final', 'Campeao'];
+        var startIndex = cascadeStages.indexOf(fase);
+        if (startIndex !== -1) {
+            for(var k = startIndex + 1; k < cascadeStages.length; k++) {
+                var nextStage = cascadeStages[k];
+                if (db.pStage[uId][nextStage]) {
+                    var nIdx = db.pStage[uId][nextStage].indexOf(team);
+                    if (nIdx !== -1) db.pStage[uId][nextStage].splice(nIdx, 1);
+                }
+            }
+        }
+    }
+    
+    await salvar();
+    
+    if (fase === 'r32') { renderClsPalpites(); } else { renderMataMataPalpites(); }
+}
+
+function renderClsPalpites() {
+    var alvo = 'pal-cls-tbl';
+    var d = document.getElementById(alvo); d.innerHTML = ''; 
+    var uId = cU.id;
+    var ptsApostadorHtml = '';
+    
+    if(!db.pStage) db.pStage = {};
+    if(!db.pStage[uId]) db.pStage[uId] = { r32: [] };
+    if(!db.pStage[uId]['r32']) db.pStage[uId]['r32'] = [];
+    
+    var totalSelected = db.pStage[uId]['r32'].length;
+    var statusClass = totalSelected === 32 ? 'ok' : 'erro';
+    
+    var headerHtml = '<div class="fase-titulo"><span>Seleção para Rodada de 32</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / 32 selecionadas</span></div>';
+    d.innerHTML += headerHtml;
+
+    var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    for(var m=0; m<grupos.length; m++) {
+        var g = grupos[m];
+        var equipasNoGrupo = db.t.filter(function(t) { return t.grp === g; });
+        if(equipasNoGrupo.length === 0) continue;
+        
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><tbody>';
+        
+        for(var n=0; n<equipasNoGrupo.length; n++) {
+            var x = equipasNoGrupo[n];
+            var isChecked = db.pStage[uId]['r32'].indexOf(x.n) !== -1;
+            
+            var pontosObtidos = 0;
+            if (isChecked) {
+                var ofcR32 = getOficiaisFase('Rodada de 32');
+                if (ofcR32.indexOf(x.n) !== -1) { pontosObtidos = db.pts.r32; }
+            }
+            
+            var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
+            var chkBox = '<input type="checkbox" class="ipt-chk" onchange="savPStage(\'r32\', 32, \'' + x.n + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
+            
+            html += '<tr class="chk-linha"><td style="width:40px;">' + chkBox + '</td><td class="col-eq t-left" style="flex:1;"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td style="width:60px; text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+        }
+        html += '</tbody></table></div>'; d.innerHTML += html;
+    }
+}
+
+function renderMataMataPalpites() {
+    var alvo = 'pal-elm';
+    var d = document.getElementById(alvo); d.innerHTML = ''; 
+    var uId = cU.id;
+    
+    if(!db.pStage) db.pStage = {};
+    if(!db.pStage[uId]) db.pStage[uId] = {};
+
+    var stages = [
+        { name: 'Oitavas de Final', max: 16, pt: db.pts.r16 },
+        { name: 'Quartas de Final', max: 8, pt: db.pts.r8 },
+        { name: 'Semifinal', max: 4, pt: db.pts.r4 },
+        { name: 'Final', max: 2, pt: db.pts.r2 },
+        { name: 'Campeao', title: 'Campeão do Torneio', max: 1, pt: db.pts.w }
+    ];
+
+    var html = '';
+    for (var i = 0; i < stages.length; i++) {
+        var stage = stages[i];
+        var availableTeams = getSelectedTeamsForStage(uId, stage.name);
+        
+        if(!db.pStage[uId][stage.name]) db.pStage[uId][stage.name] = [];
+        var totalSelected = db.pStage[uId][stage.name].length;
+        var statusClass = totalSelected === stage.max ? 'ok' : 'erro';
+        
+        var displayTitle = stage.title || stage.name;
+        html += '<div class="fase-titulo" style="margin-top:30px;"><span>' + displayTitle + '</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / ' + stage.max + '</span></div>';
+        
+        if (availableTeams.length === 0) {
+            html += '<div style="padding:15px; text-align:center; color:var(--muted); font-size:0.8rem; background:var(--light); border-radius:4px;">Selecione as equipas na fase anterior para disponibilizá-las aqui.</div>';
+            continue;
+        }
+
+        html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><tbody>';
+        
+        for (var k = 0; k < availableTeams.length; k++) {
+            var tName = availableTeams[k];
+            var isChecked = db.pStage[uId][stage.name].indexOf(tName) !== -1;
+            
+            var pontosObtidos = 0;
+            if (isChecked) {
+                if (stage.name === 'Campeao') {
+                    var resFinal = db.r['R_104'];
+                    if (resFinal && resFinal.w && resFinal.w === tName) pontosObtidos = stage.pt;
+                } else {
+                    var ofcTeams = getOficiaisFase(stage.name);
+                    if (ofcTeams.indexOf(tName) !== -1) { pontosObtidos = stage.pt; }
+                }
+            }
+
+            var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
+            var inputType = stage.name === 'Campeao' ? 'radio' : 'checkbox';
+            var nameAttr = stage.name === 'Campeao' ? 'name="rad_campeao"' : '';
+            var chkBox = '<input type="' + inputType + '" class="ipt-chk" ' + nameAttr + ' onchange="savPStage(\'' + stage.name + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
+            
+            html += '<tr class="chk-linha"><td style="width:40px;">' + chkBox + '</td><td class="col-eq t-left" style="flex:1;"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td style="width:60px; text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+        }
+        html += '</tbody></table></div>';
+    }
+    
+    d.innerHTML = html;
+}
+
+// FUNÇÕES ANTIGAS DE GERAÇÃO (Apenas para Fase de Grupos)
 async function savP(j, c, v) { if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; } var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; await salvar(); if(c==='w') renderPal(); }
 async function savR(j, c, v) { if(!cU.isM) return; var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; await salvar(); if(c==='w') renderRes(); }
 
@@ -639,18 +854,10 @@ function renderTbCls(alvo, dds, px, isOfc) {
     var d = document.getElementById(alvo); d.innerHTML = ''; var st = classificar(dds, px); var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
     for(var m=0; m<grupos.length; m++) {
         var g = grupos[m]; if(!st.t[g] || st.t[g].length===0) continue;
-        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table class="tabela-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th>';
-        if(!isOfc) html += '<th>Pts Apostador</th>'; html += '</tr></thead><tbody>';
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table class="tabela-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th></tr></thead><tbody>';
         for(var n=0; n<st.t[g].length; n++) {
-            var x = st.t[g][n], pAp = 0; 
-            if(cU) { 
-                var oficiais32 = getPtsFase('m', 'Rodada de 32'), r32u = []; 
-                for(var k=0; k<db.j.length; k++) { if(db.j[k].t==='Rodada de 32'){ var re = reqEquipe(db.j[k], db.p, cU.id+'_'); r32u.push(re.A); r32u.push(re.B); } }
-                var inOfc = false, inUser = false; for(var o=0; o<oficiais32.length; o++) { if(oficiais32[o]===x.n) inOfc = true; } for(var o=0; o<r32u.length; o++) { if(r32u[o]===x.n) inUser = true; }
-                if (isTeam(x.n) && inOfc && inUser) pAp += db.pts.r32;
-            }
-            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td>';
-            if(!isOfc) html += '<td style="font-weight:bold; color:var(--text);">' + pAp + '</td>'; html += '</tr>';
+            var x = st.t[g][n];
+            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td></tr>';
         }
         html += '</tbody></table></div>'; d.innerHTML += html;
     }
@@ -666,7 +873,7 @@ function geraLinha(j, e, val, pt, isOfc, showGroup) {
     } else {
         var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
         if(j.f==='G') inp = '<input type="tel" maxlength="2" class="ipt-gol" value="'+vA+'" oninput="savP('+j.id+',\'a\',this.value)"'+disabledAttr+'> x <input type="tel" maxlength="2" class="ipt-gol" value="'+vB+'" oninput="savP('+j.id+',\'b\',this.value)"'+disabledAttr+'>';
-        else inp = '<select class="ipt-combo" onchange="savP('+j.id+',\'w\',this.value)"'+disabledAttr+'><option value="">-</option><option value="'+e.A+'" '+(vW===e.A?'selected':'')+'>'+e.A+'</option><option value="'+e.B+'" '+(vW===e.B?'selected':'')+'>'+e.B+'</option></select>';
+        else inp = ''; // No Palpite Mata Mata, a renderização mudou
     }
     
     var cidName = j.cid || j.c;
@@ -684,7 +891,7 @@ function geraLinha(j, e, val, pt, isOfc, showGroup) {
 }
 
 function renderPal() {
-    var hG = '', hGData = '', hE = ''; var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    var hG = '', hGData = ''; var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
     for(var g=0; g<grupos.length; g++) {
         var groupMatches = '';
         for(var i=0; i<db.j.length; i++) {
@@ -693,9 +900,8 @@ function renderPal() {
         if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
     }
     for(var i=0; i<db.j.length; i++) { var j = db.j[i]; if(j.f === 'G') { var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_'); hGData += geraLinha(j, eq, p, ptoCalc(cU.id, j), false, true); } }
-    var tAt = '';
-    for(var i=0; i<db.j.length; i++) { var j = db.j[i]; if(j.f === 'E') { if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; } var p = db.p[cU.id+'_'+j.id]||{a:'',b:'',w:''}, eq = reqEquipe(j, db.p, cU.id+'_'); db.p[cU.id+'_'+j.id] = db.p[cU.id+'_'+j.id] || {}; db.p[cU.id+'_'+j.id].nA=eq.A; db.p[cU.id+'_'+j.id].nB=eq.B; hE += geraLinha(j, eq, p, ptoCalc(cU.id, j), false, false); } }
-    document.getElementById('pal-grp').innerHTML = hG; document.getElementById('pal-grp-data').innerHTML = hGData; document.getElementById('pal-elm').innerHTML = hE;
+    
+    document.getElementById('pal-grp').innerHTML = hG; document.getElementById('pal-grp-data').innerHTML = hGData; 
 }
 
 function renderRes() {
@@ -737,14 +943,22 @@ function renderPontuacoes() {
     if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="4" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; return; }
     var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; } if(!liga) return;
     var usersLiga = []; for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
-    var oficiais32 = getPtsFase('m','Rodada de 32'), r32j = []; for(var i=0; i<db.j.length; i++){ if(db.j[i].t==='Rodada de 32') r32j.push(db.j[i]); }
+    
     var rk = [];
     for(var i=0; i<usersLiga.length; i++){
-        var u = usersLiga[i], t=0; for(var k=0; k<db.j.length; k++) t += ptoCalc(u.id, db.j[k]).pt;
-        for(var teamIdx=0; teamIdx<oficiais32.length; teamIdx++){
-            var team = oficiais32[teamIdx];
-            if(isTeam(team)) { var r32u=[]; for(var m=0; m<r32j.length; m++){ var re = reqEquipe(r32j[m], db.p, u.id+'_'); r32u.push(re.A); r32u.push(re.B); } var hasTeam = false; for(var m=0; m<r32u.length; m++){ if(r32u[m]===team) hasTeam = true; } if(hasTeam) t += db.pts.r32; }
+        var u = usersLiga[i], t=0; 
+        for(var k=0; k<db.j.length; k++) {
+            if(db.j[k].f === 'G') t += ptoCalc(u.id, db.j[k]).pt; // Apenas calcula os pontos dos Jogos na Fase de Grupos
         }
+        
+        // Adiciona pontos das equipas classificadas (Checklists)
+        t += getPtsFaseChecklist(u.id, 'r32', db.pts.r32);
+        t += getPtsFaseChecklist(u.id, 'Oitavas de Final', db.pts.r16);
+        t += getPtsFaseChecklist(u.id, 'Quartas de Final', db.pts.r8);
+        t += getPtsFaseChecklist(u.id, 'Semifinal', db.pts.r4);
+        t += getPtsFaseChecklist(u.id, 'Final', db.pts.r2);
+        t += getPtsFaseChecklist(u.id, 'Campeao', db.pts.w);
+
         rk.push({ n: u.nome, to: t });
     }
     rk.sort(function(a,b){ return b.to - a.to; });
