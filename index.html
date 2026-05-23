@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Fallback para fontes parecidas com Google Sans usando a nativa Product Sans/Open Sans */
         :root {
             --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
             --muted: #666666; --danger: #dc3545; --accent: #000000;
@@ -15,7 +14,6 @@
         * { box-sizing: border-box; font-family: 'Google Sans', 'Open Sans', 'Segoe UI', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
         
-        /* CABEÇALHO BRANCO COM LETRAS PRETAS - ALINHADO VERTICALMENTE */
         header { 
             display: none; background: #ffffff; color: #000000; 
             padding: 12px 15px; 
@@ -77,21 +75,17 @@
         .res-ofc { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-right: 12px; }
         .pts-badge { font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; }
         
-        /* Nota de Critérios de Desempate */
         .nota-desempate { font-size: 0.75rem; color: var(--muted); margin: -10px 0 15px 0; line-height: 1.4; padding: 0 5px; }
 
-        /* Tabela com scroll horizontal e coluna congelada */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 0; text-align: left; }
         th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); font-weight: 600; background: var(--light); }
         .t-left { text-align: left; padding-left: 10px; }
         
-        /* Colunas de largura reduzida */
         .col-num { width: 50px; text-align: center; } 
         .col-pos { width: 45px; text-align: center; }
 
-        /* Tabela Específica de Classificação (com min-width e colunas congeladas) */
         table.tabela-classificacao { min-width: 650px; table-layout: fixed; }
         .tabela-classificacao th.col-eq { position: sticky; left: 0; background: var(--light); z-index: 2; border-right: 1px solid var(--border); width: 210px; }
         .tabela-classificacao td.col-eq { position: sticky; left: 0; background: var(--bg); z-index: 1; border-right: 1px solid var(--border); width: 210px; }
@@ -101,21 +95,16 @@
         @media (max-width: 650px) { 
             .grid-cfg { grid-template-columns: 1fr; } 
             .jogo-linha { flex-wrap: wrap; position: relative; padding: 6px 0; justify-content: center; gap: 2px; } 
-            
             .jogo-meta { width: 100%; text-align: center; margin-bottom: 0px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 2px; }
-            
             .equipe { width: 35%; flex-direction: column; text-align: center !important; justify-content: flex-start; gap: 4px; font-size: 0.8rem; align-items: center !important; }
             .eq-esq { flex-direction: column-reverse; } 
             .palpite-area { width: 25%; justify-content: center; }
             .ipt-combo { font-size: 0.75rem; padding: 4px; height: 36px; }
             .flag { width: 26px; height: 26px; }
-            
             .pts-container { width: 100%; justify-content: center; margin-top: 4px; background: #e8f5e9; padding: 4px; border-radius: 4px; gap: 14px; }
             .res-ofc { margin-right: 0; color: var(--muted); }
             .pts-badge { width: auto; margin-top: 0; background: transparent; padding: 0; }
-
             .nota-desempate { font-size: 0.7rem; }
-
             table { font-size: 0.8rem; }
             th, td { padding: 10px 4px; }
             .col-num { width: 40px; }
@@ -358,9 +347,8 @@
 <script>
 window.onerror = function(msg, url, line) { console.error("Erro na linha " + line + ": " + msg); };
 
-// --- CONFIGURAÇÃO DO BANCO DE DADOS SUPABASE ---
 const SUPABASE_URL = "https://ozpuevnlfcjgfrizvpfy.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc2Nob21lZ2VhbF9mZ2ZzIiwiZ2ltI6Im96cHVldm5sZmNqZ2ZyaXp2cHlmNms5ZmNqZ2ZyaXp2cHkuYW5vbiIsImV4cCI6MjFlNDhGSb"; // Insira sua chave anônima completa obtida no painel
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc2Nob21lZ2VhbF9mZ2ZzIiwiZ2ltI6Im96cHVldm5sZmNqZ2ZyaXp2cHlmNms5ZmNqZ2ZyaXp2cHkuYW5vbiIsImV4cCI6MjFlNDhGSb"; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function safeGet(key) { try { return window.localStorage ? window.localStorage.getItem(key) : null; } catch(e) { return null; } }
@@ -370,7 +358,6 @@ var SCHEDULE_CSV = [{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun',
 var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
 var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}];
 
-// Estado unificado da aplicação na memória
 var db = { u: [], t: TEAMS_DATA, j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [] };
 var cU = null; 
 
@@ -395,17 +382,14 @@ function construtorDeTorneio() {
 }
 construtorDeTorneio();
 
-// --- COMUNICAÇÃO CENTRAL COM O SUPABASE ---
 async function carregarBanco() {
     try {
-        // Carrega Usuários
         let { data: users } = await _supabase.from('apostadores').select('*');
         db.u = users || [];
 
-        // Carrega Configurações, Palpites, Resultados e Ligas de tabelas de metadados genéricas
         let { data: metadata } = await _supabase.from('sistema_dados').select('*');
         
-        if (metadata) {
+        if (metadata && metadata.length > 0) {
             metadata.forEach(item => {
                 if (item.chave === 'fwc_c') db.c = item.valor;
                 if (item.chave === 'fwc_pts') db.pts = item.valor;
@@ -414,7 +398,6 @@ async function carregarBanco() {
                 if (item.chave === 'fwc_p') db.p = item.valor;
             });
         } else {
-            // Inicialização padrão no primeiro uso do banco
             await sincronizarChave('fwc_c', db.c);
             await sincronizarChave('fwc_pts', db.pts);
             await sincronizarChave('fwc_l', db.l);
@@ -422,7 +405,6 @@ async function carregarBanco() {
             await sincronizarChave('fwc_p', db.p);
         }
 
-        // Recupera sessão ativa no navegador
         var _cuid = safeGet('fwc_cuid');
         if(_cuid) { for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; } }
 
@@ -438,7 +420,6 @@ async function sincronizarChave(chave, valor) {
 }
 
 async function salvar() {
-    // Sincroniza estados de configurações e arrays globais estruturados
     await sincronizarChave('fwc_c', db.c);
     await sincronizarChave('fwc_pts', db.pts);
     await sincronizarChave('fwc_l', db.l);
@@ -555,7 +536,6 @@ async function registrar() {
         
         var novoUsuario = {id:'u'+new Date().getTime(), nome:n, senha:s, mae:m, isM:db.u.length===0};
         
-        // Salva na tabela dedicada do Supabase
         let { error } = await _supabase.from('apostadores').insert([novoUsuario]);
         if(error) { alert('Erro ao salvar registro no banco de dados!'); return; }
         
@@ -783,7 +763,6 @@ function renderRnkJogo() {
 
 async function toggleMaster(uid, isMasterChecked) { 
     for(var i=0; i<db.u.length; i++) { if(db.u[i].id === uid) db.u[i].isM = isMasterChecked; } 
-    // Atualiza o valor correspondente na tabela do Supabase
     await _supabase.from('apostadores').update({ isM: isMasterChecked }).eq('id', uid);
 }
 
@@ -839,7 +818,6 @@ async function apagarLiga(lid) {
     }
 }
 
-// INICIALIZAÇÃO DA APLICAÇÃO CONECTADA
 carregarBanco();
 
 </script>
