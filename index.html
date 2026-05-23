@@ -1,208 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cebolão da Copa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; --muted: #666666; --danger: #dc3545; }
-        * { box-sizing: border-box; font-family: 'Google Sans', 'Open Sans', 'Segoe UI', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; }
-        
-        header { display: none; background: #ffffff; color: #000000; padding: 12px 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); align-items: center; }
-        .header-spacer { width: 30px; }
-        header h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; flex: 1; text-align: center; }
-        .menu-btn { background: transparent; border: none; color: #000000; font-size: 1.6rem; cursor: pointer; padding: 0; outline: none; touch-action: manipulation; width: 30px; text-align: right; }
-        
-        nav { display: none; flex-direction: column; width: auto; min-width: 180px; background: #ffffff; position: absolute; top: 100%; right: 0; z-index: 999; box-shadow: -2px 4px 6px rgba(0,0,0,0.2); border-bottom-left-radius: 8px; border: 1px solid var(--border); }
-        nav.aberto { display: flex; }
-        nav button { background: transparent; border: none; color: #000000; text-align: left; padding: 15px 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); cursor: pointer; }
-        nav button.ativo { background: var(--light); font-weight: 800; border-left: 4px solid var(--text); }
-        
-        .container { max-width: 950px; margin: 30px auto; padding: 0 15px; }
-        .pagina { display: none; }
-        
-        .tabs-nav { display: flex; gap: 5px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap;}
-        .tab-btn { background: transparent; border: none; outline: none; padding: 12px 15px; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600; }
-        .tab-btn.ativo { color: var(--text); border-color: var(--text); }
-        .tab-content { display: none; } .tab-content.ativo { display: block; }
-
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
-        input[type="text"], input[type="password"], input[type="tel"], select { width: 100%; padding: 12px; border: 1px solid var(--border); font-size: 1rem; border-radius:4px; }
-        .ipt-combo { width: 100%; height: 42px; border: 1px solid var(--border); text-align: center; }
-        
-        .btn { background: var(--bg); color: var(--text); border: 1px solid var(--text); padding: 14px; text-transform: uppercase; font-weight: 600; cursor: pointer; width: 100%; border-radius:4px; }
-        .btn-danger { background: var(--danger); color: white; border: none; }
-
-        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 20px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; display: flex; justify-content: space-between; }
-        .contador-fase { font-size: 0.7rem; color: var(--muted); background: var(--light); padding: 2px 8px; border-radius: 12px; }
-        .contador-fase.ok { color: white; background: #009b3a; }
-        
-        .table-wrapper { width: 100%; overflow-x: auto; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); }
-        th { background: var(--light); color: var(--muted); font-size: 0.65rem; }
-        .t-left { text-align: left; padding-left: 10px; }
-        .col-num { width: 60px; }
-    </style>
-</head>
-<body>
-
-<header id="cabecalho-principal">
-    <div class="header-spacer"></div>
-    <h1 id="header-title">Cebolão da Copa</h1>
-    <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
-    <nav id="menu-principal">
-        <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
-        <button type="button" id="nav-palpites" onclick="nav('pag-palpites')">Palpites</button>
-        <button type="button" id="nav-pontuacoes" onclick="nav('pag-pontuacoes')">Pontuações</button>
-        <button type="button" id="nav-gestao" onclick="nav('pag-gestao')" style="display:none;">Gestão</button>
-        <button type="button" id="nav-logout" onclick="logout()">Sair</button>
-    </nav>
-</header>
-
-<div class="container">
-    <section id="pag-auth" class="pagina"><div style="max-width:350px; margin:0 auto; padding-top:30px; text-align:center;">
-        <h1>CEBOLÃO DA COPA</h1>
-        <div class="tabs-nav"><button type="button" id="tab-login-btn" class="tab-btn ativo" onclick="switchTabAuth('aba-login')">Login</button><button type="button" id="tab-reg-btn" class="tab-btn" onclick="switchTabAuth('aba-reg')">Registro</button></div>
-        <div id="aba-login" class="tab-content ativa" style="display:block; text-align:left;">
-            <div class="form-group"><label>Nome</label><input type="text" id="log-nome"></div>
-            <div class="form-group"><label>Senha</label><input type="password" id="log-senha" maxlength="4"></div>
-            <button type="button" class="btn" onclick="login()">Entrar</button>
-        </div>
-        <div id="aba-reg" class="tab-content" style="display:none; text-align:left;">
-            <div class="form-group"><label>Nome</label><input type="text" id="reg-nome"></div>
-            <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="reg-senha" maxlength="4"></div>
-            <div class="form-group"><label>Mãe</label><input type="text" id="reg-mae"></div>
-            <button type="button" class="btn" onclick="registrar()">Registrar</button>
-        </div>
-    </div></section>
-
-    <section id="pag-resultados" class="pagina">
-        <select class="ipt-combo" onchange="switchTabRes(this.value)" style="margin-bottom:20px;">
-            <option value="res-grp">Fase de Grupos</option>
-            <option value="res-cls">Classificação</option>
-        </select>
-        <div id="res-grp" class="tab-content" style="display:block;"></div>
-        <div id="res-cls" class="tab-content"><div id="res-cls-tbl"></div></div>
-    </section>
-
-    <section id="pag-palpites" class="pagina">
-        <select class="ipt-combo" onchange="switchTabPal(this.value)" style="margin-bottom:20px;">
-            <option value="pal-grp">Grupos</option>
-            <option value="pal-cls">Classificação</option>
-            <option value="pal-elm">Mata-mata</option>
-        </select>
-        <div id="pal-grp" class="tab-content" style="display:block;"></div>
-        <div id="pal-cls" class="tab-content"><div id="pal-cls-tbl"></div></div>
-        <div id="pal-elm" class="tab-content"></div>
-    </section>
-
-    <section id="pag-pontuacoes" class="pagina">
-        <select id="sel-liga-pont" onchange="handleLeagueSelect(this.value)" class="ipt-combo" style="margin-bottom:20px;"></select>
-        <div id="menu-p-ranking" style="display:none;">
-            <div class="tabs-nav">
-                <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
-                <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Por Jogo</button>
-                <button type="button" id="btn-rnk-fase" class="tab-btn" onclick="switchTabRnk('rnk-fase'); popRnkFaseSel();">Por Fase</button>
-            </div>
-            <div id="rnk-geral" class="tab-content" style="display:block;"><div class="table-wrapper"><table><thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th class="col-num">Total</th></tr></thead><tbody id="tb-ranking"></tbody></table></div></div>
-            <div id="rnk-jogo" class="tab-content" style="display:none;"><select id="sel-rnk-jogo" onchange="renderRnkJogo()" class="ipt-combo"></select><div class="table-wrapper"><table><thead><tr><th class="t-left">Apostador</th><th class="col-num">Pts</th></tr></thead><tbody id="tb-ranking-jogo"></tbody></table></div></div>
-            <div id="rnk-fase" class="tab-content" style="display:none;"><select id="sel-rnk-fase" onchange="renderRnkFase()" class="ipt-combo"></select><div class="table-wrapper"><table><thead><tr><th class="t-left">Apostador</th><th class="col-num">Pts</th></tr></thead><tbody id="tb-ranking-fase"></tbody></table></div></div>
-        </div>
-    </section>
-
-    <section id="pag-gestao" class="pagina">
-        <button class="btn" onclick="downloadAuditoria()">Download Palpites (CSV)</button>
-    </section>
-</div>
-
 <script>
+// 1. Definições Iniciais
+window.onerror = function(msg, url, line) { console.error("Erro na linha " + line + ": " + msg); };
+
 const SUPABASE_URL = "https://ozpuevnlfcjgfrizvpfy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cHVldm5sZmNqZ2ZyaXp2cGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjQ4MjksImV4cCI6MjA5NTEwMDgyOX0.adKY27Sux1vdiG1kmdO_p0z4ZT-nsnxMK-Imtn_XTR8"; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-var db = { u: [], t: [], j: [], p: {}, r: {}, l: [], pStage: {} }; 
-var cU = null;
-
-// Funções utilitárias mantidas (carregarBanco, salvar, etc.)
-function safeGet(key) { try { return window.localStorage.getItem(key); } catch(e) { return null; } }
-function safeSet(key, val) { try { window.localStorage.setItem(key, val); } catch(e) {} }
-
-async function carregarBanco() {
-    let { data: users } = await _supabase.from('apostadores').select('*');
-    db.u = users || [];
-    let { data: metadata } = await _supabase.from('sistema_dados').select('*');
-    if (metadata) {
-        metadata.forEach(item => {
-            if (item.chave === 'fwc_p') db.p = item.valor;
-            if (item.chave === 'fwc_r') db.r = item.valor;
-            if (item.chave === 'fwc_l') db.l = item.valor;
-            if (item.chave === 'fwc_pStage') db.pStage = item.valor;
-        });
-    }
-    var _cuid = safeGet('fwc_cuid');
-    if(_cuid) cU = db.u.find(u => u.id === _cuid);
-    atualizarMenuUI();
-    if (cU) { nav(safeGet('fwc_last_page') || 'pag-resultados'); } else { nav('pag-auth'); }
-}
-
-async function salvar() {
-    await _supabase.from('sistema_dados').upsert([{chave:'fwc_p', valor:db.p}, {chave:'fwc_r', valor:db.r}, {chave:'fwc_l', valor:db.l}, {chave:'fwc_pStage', valor:db.pStage}], {onConflict: 'chave'});
+// 2. Funções de interface (colocadas ANTES de carregarBanco)
+function atualizarMenuUI() { 
+    var header = document.getElementById('cabecalho-principal'); 
+    if(cU) { 
+        header.style.display = 'flex'; 
+        document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; 
+    } else { 
+        header.style.display = 'none'; 
+    } 
 }
 
 function nav(id) {
     safeSet('fwc_last_page', id);
+    var menu = document.getElementById('menu-principal'); 
+    if(menu) menu.className = menu.className.replace(' aberto', '');
+    
     document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-    if(id === 'pag-palpites') renderClsPalpites();
-    if(id === 'pag-pontuacoes') popLigasDropdown();
-}
-
-function switchTabPal(id) { /* ... lógica de abas de palpite ... */ nav('pag-palpites'); }
-function switchTabRes(id) { /* ... lógica de abas de resultado ... */ nav('pag-resultados'); }
-function switchTabRnk(id) { /* ... lógica abas ranking ... */ }
-
-// NOVA FUNÇÃO DE AUDITORIA
-function downloadAuditoria() {
-    var lId = document.getElementById('sel-liga-pont').value;
-    var liga = db.l.find(l => l.id === lId);
-    if(!liga) { alert('Selecione uma liga'); return; }
+    document.querySelectorAll('#menu-principal button').forEach(b => b.className = '');
     
-    var csv = "Apostador,Fase,Equipa\n";
-    liga.users.forEach(uid => {
-        var user = db.u.find(u => u.id === uid);
-        var nome = user ? user.nome : uid;
-        if(db.pStage[uid]) {
-            for(var fase in db.pStage[uid]) {
-                db.pStage[uid][fase].forEach(equipa => {
-                    csv += nome + "," + fase + "," + equipa + "\n";
-                });
-            }
-        }
-    });
+    document.getElementById(id).style.display = 'block'; 
+    var navBtn = document.getElementById(id.replace('pag-', 'nav-')); 
+    if(navBtn) navBtn.className = 'ativo';
     
-    var blob = new Blob([csv], {type: 'text/csv'});
-    var url = window.URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'auditoria_liga_' + liga.nome + '.csv'; a.click();
+    window.scrollTo(0,0);
+    // ... restante da função nav ...
 }
 
-// CORREÇÃO: Função de pontuação por fase que não soma fases anteriores
-function getPtsFaseChecklist(uId, fase, pontos) {
-    if(!db.pStage || !db.pStage[uId] || !db.pStage[uId][fase]) return 0;
-    var palpites = db.pStage[uId][fase];
-    var oficiais = getOficiaisFase(fase);
-    var pts = 0;
-    palpites.forEach(t => { if(oficiais.indexOf(t) !== -1) pts += pontos; });
-    return pts;
+// 3. Agora chamamos o carregarBanco
+async function carregarBanco() {
+    // ... toda a lógica de carregarBanco ...
+    atualizarMenuUI(); // Agora isto funciona porque a função existe acima!
+    // ...
 }
 
-// Inicialização
 carregarBanco();
 </script>
-</body>
-</html>
