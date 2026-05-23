@@ -235,7 +235,8 @@
         <div id="menu-p-ranking" style="display:block;">
             <div class="tabs-nav">
                 <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
-                <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Último Jogo</button>
+                <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Por Jogo</button>
+                <button type="button" id="btn-rnk-fase" class="tab-btn" onclick="switchTabRnk('rnk-fase'); popRnkFaseSel();">Por Fase</button>
                 <button type="button" id="btn-rnk-regras" class="tab-btn" onclick="switchTabRnk('rnk-regras'); renderizarValoresDePontos();">Regras</button>
             </div>
 
@@ -249,12 +250,25 @@
             </div>
             
             <div id="rnk-jogo" class="tab-content" style="display:none;">
-                <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select></div>
+                <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo (Fase de Grupos)</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select></div>
                 <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
                 <div class="table-wrapper">
                     <table>
                         <thead><tr><th class="t-left">Apostador</th><th style="width:80px;">Palpite</th><th class="col-num">Pts</th></tr></thead>
                         <tbody id="tb-ranking-jogo"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="rnk-fase" class="tab-content" style="display:none;">
+                <div style="max-width:450px; margin: 0 auto 20px;">
+                    <label>Selecione a Fase (Mata-mata)</label>
+                    <select id="sel-rnk-fase" onchange="renderRnkFase()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Apostador</th><th class="col-num">Pts na Fase</th></tr></thead>
+                        <tbody id="tb-ranking-fase"></tbody>
                     </table>
                 </div>
             </div>
@@ -518,7 +532,19 @@ function switchTabPal(id) {
 }
 
 function switchTabRes(id) { document.getElementById('res-grp').style.display = 'none'; document.getElementById('res-grp-data').style.display = 'none'; document.getElementById('res-cls').style.display = 'none'; document.getElementById('res-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
-function switchTabRnk(id) { document.getElementById('rnk-geral').style.display = 'none'; document.getElementById('rnk-jogo').style.display = 'none'; document.getElementById('rnk-regras').style.display = 'none'; document.getElementById('btn-rnk-geral').className = 'tab-btn'; document.getElementById('btn-rnk-jogo').className = 'tab-btn'; document.getElementById('btn-rnk-regras').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; }
+
+function switchTabRnk(id) { 
+    document.getElementById('rnk-geral').style.display = 'none'; 
+    document.getElementById('rnk-jogo').style.display = 'none'; 
+    document.getElementById('rnk-fase').style.display = 'none'; 
+    document.getElementById('rnk-regras').style.display = 'none'; 
+    document.getElementById('btn-rnk-geral').className = 'tab-btn'; 
+    document.getElementById('btn-rnk-jogo').className = 'tab-btn'; 
+    document.getElementById('btn-rnk-fase').className = 'tab-btn'; 
+    document.getElementById('btn-rnk-regras').className = 'tab-btn'; 
+    document.getElementById(id).style.display = 'block'; 
+    document.getElementById('btn-' + id).className = 'tab-btn ativo'; 
+}
 
 function nav(id) {
     safeSet('fwc_last_page', id);
@@ -647,12 +673,6 @@ function ptoCalc(uId, j) {
             if((gaP>gbP && gaR>gbR) || (gaP<gbP && gaR<gbR) || (gaP===gbP && gaR===gbR)) pts += db.pts.v; 
             if((gaP-gbP) === (gaR-gbR)) pts += db.pts.d; 
             if(gaP===gaR && gbP===gbR) pts += db.pts.p; 
-        }
-    } else {
-        if (p.w && isTeam(p.w)) {
-            var officialChampion = db.r['R_'+j.id] ? db.r['R_'+j.id].w : null; 
-            if(j.t === 'Final' && officialChampion && officialChampion === p.w) pts += db.pts.w; 
-            if(j.t === 'Terceiro Lugar' && officialChampion && officialChampion === p.w) pts += (db.pts.t3 || 0); 
         }
     }
     return { pt: pts };
@@ -897,7 +917,12 @@ function handleLeagueSelect(val) {
     document.getElementById('menu-p-criar').style.display = 'none'; document.getElementById('menu-p-entrar').style.display = 'none'; document.getElementById('menu-p-ranking').style.display = 'none';
     if(val === 'CREATE') { document.getElementById('menu-p-criar').style.display = 'block'; } 
     else if (val === 'JOIN') { document.getElementById('menu-p-entrar').style.display = 'block'; } 
-    else if (val !== '') { document.getElementById('menu-p-ranking').style.display = 'block'; renderPontuacoes(); renderRnkJogo(); }
+    else if (val !== '') { 
+        document.getElementById('menu-p-ranking').style.display = 'block'; 
+        renderPontuacoes(); 
+        renderRnkJogo(); 
+        renderRnkFase();
+    }
 }
 
 function popLigasDropdown() {
@@ -943,8 +968,52 @@ function renderPontuacoes() {
 
 function popRnkSel() {
     var sel = document.getElementById('sel-rnk-jogo'), atual = sel.value, opts = '<option value="">-- Jogo --</option>';
-    for(var i=0; i<db.j.length; i++) { var j = db.j[i]; var re = reqEquipe(j,db.r,'R_'); opts += '<option value="' + j.id + '">J' + j.id + ' - ' + re.A + ' x ' + re.B + '</option>'; }
+    for(var i=0; i<db.j.length; i++) { 
+        var j = db.j[i]; 
+        if(j.f === 'G') {
+            var re = reqEquipe(j,db.r,'R_'); 
+            opts += '<option value="' + j.id + '">J' + j.id + ' - ' + re.A + ' x ' + re.B + '</option>'; 
+        }
+    }
     sel.innerHTML = opts; if(atual) sel.value = atual;
+}
+
+function popRnkFaseSel() {
+    var sel = document.getElementById('sel-rnk-fase'), atual = sel.value;
+    var opts = '<option value="">-- Selecione a Fase --</option>';
+    opts += '<option value="r32">Rodada de 32</option>';
+    opts += '<option value="Oitavas de Final">Oitavas de Final</option>';
+    opts += '<option value="Quartas de Final">Quartas de Final</option>';
+    opts += '<option value="Semifinal">Semifinal</option>';
+    opts += '<option value="Final">Final</option>';
+    opts += '<option value="Campeao">Campeão</option>';
+    sel.innerHTML = opts; if(atual) sel.value = atual;
+}
+
+function renderRnkFase() {
+    var lId = document.getElementById('sel-liga-pont').value, faseId = document.getElementById('sel-rnk-fase').value;
+    if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking-fase').innerHTML = '<tr><td colspan="2">Selecione uma liga primeiro.</td></tr>'; return; }
+    if(!faseId) { document.getElementById('tb-ranking-fase').innerHTML = ''; return; }
+    
+    var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
+    var usersLiga = []; for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
+    
+    var ptMap = {'r32': db.pts.r32, 'Oitavas de Final': db.pts.r16, 'Quartas de Final': db.pts.r8, 'Semifinal': db.pts.r4, 'Final': db.pts.r2, 'Campeao': db.pts.w };
+    var pontosDaFase = ptMap[faseId] || 0;
+    
+    var lista = [];
+    for(var i=0; i<usersLiga.length; i++){ 
+        var u = usersLiga[i];
+        var pts = getPtsFaseChecklist(u.id, faseId, pontosDaFase);
+        lista.push({ n: u.nome, pts: pts }); 
+    }
+    lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
+    
+    var html = ''; 
+    for(var i=0; i<lista.length; i++) {
+        html += '<tr><td class="t-left">' + lista[i].n + '</td><td class="col-num"><b>' + lista[i].pts + '</b></td></tr>';
+    }
+    document.getElementById('tb-ranking-fase').innerHTML = html;
 }
 
 function renderRnkJogo() {
