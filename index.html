@@ -409,7 +409,18 @@ async function carregarBanco() {
         if(_cuid) { for(var i=0; i<db.u.length; i++) { if(db.u[i].id === _cuid) cU = db.u[i]; } }
 
         atualizarMenuUI(); 
-        if (cU) { nav('pag-resultados'); } else { nav('pag-auth'); }
+        
+        // RECUPERA A ÚLTIMA PÁGINA ACEDIDA
+        if (cU) { 
+            var lastPage = safeGet('fwc_last_page');
+            if (lastPage && document.getElementById(lastPage)) {
+                nav(lastPage);
+            } else {
+                nav('pag-resultados');
+            }
+        } else { 
+            nav('pag-auth'); 
+        }
     } catch (err) {
         console.error("Erro ao inicializar o Supabase:", err);
     }
@@ -495,6 +506,9 @@ function switchTabRes(id) { document.getElementById('res-grp').style.display = '
 function switchTabRnk(id) { document.getElementById('rnk-geral').style.display = 'none'; document.getElementById('rnk-jogo').style.display = 'none'; document.getElementById('rnk-regras').style.display = 'none'; document.getElementById('btn-rnk-geral').className = 'tab-btn'; document.getElementById('btn-rnk-jogo').className = 'tab-btn'; document.getElementById('btn-rnk-regras').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; }
 
 function nav(id) {
+    // SALVA A PÁGINA ATUAL
+    safeSet('fwc_last_page', id);
+    
     var menu = document.getElementById('menu-principal'); if(menu) menu.className = menu.className.replace(' aberto', '');
     var pags = document.querySelectorAll('.pagina'); for(var i=0; i<pags.length; i++) pags[i].style.display = 'none';
     var btns = document.querySelectorAll('#menu-principal button'); for(var k=0; k<btns.length; k++) btns[k].className = '';
@@ -546,7 +560,7 @@ async function registrar() {
     } else { alert('Preencha todos os campos e certifique-se que a senha tem 4 dígitos numéricos.'); }
 }
 
-function logout() { cU = null; safeSet('fwc_cuid', ''); atualizarMenuUI(); nav('pag-auth'); }
+function logout() { cU = null; safeSet('fwc_cuid', ''); safeSet('fwc_last_page', ''); atualizarMenuUI(); nav('pag-auth'); }
 function eqNome(pos) { for(var i=0; i<db.t.length; i++) { if(db.t[i].pos === pos) return db.t[i].n; } return pos; }
 function isGrd(dd, px, g) { for(var i=0; i<db.j.length; i++) { if(db.j[i].grp === g) { var val = dd[px+db.j[i].id]; if(!val || val.a === undefined || val.a === '') return false; } } return true; }
 
