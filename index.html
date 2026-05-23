@@ -348,7 +348,7 @@
 window.onerror = function(msg, url, line) { console.error("Erro na linha " + line + ": " + msg); };
 
 const SUPABASE_URL = "https://ozpuevnlfcjgfrizvpfy.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc2Nob21lZ2VhbF9mZ2ZzIiwiZ2ltI6Im96cHVldm5sZmNqZ2ZyaXp2cHlmNms5ZmNqZ2ZyaXp2cHkuYW5vbiIsImV4cCI6MjFlNDhGSb"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cHVldm5sZmNqZ2ZyaXp2cGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjQ4MjksImV4cCI6MjA5NTEwMDgyOX0.adKY27Sux1vdiG1kmdO_p0z4ZT-nsnxMK-Imtn_XTR8"; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function safeGet(key) { try { return window.localStorage ? window.localStorage.getItem(key) : null; } catch(e) { return null; } }
