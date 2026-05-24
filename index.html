@@ -397,7 +397,15 @@ var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2
 var db = { u: [], t: TEAMS_DATA, j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [], pStage: {} };
 var cU = null; 
 
-function atualizarMenuUI() { var header = document.getElementById('cabecalho-principal'); if(cU) { header.style.display = 'flex'; document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; } else { header.style.display = 'none'; } }
+function atualizarMenuUI() { 
+    var header = document.getElementById('cabecalho-principal'); 
+    if(cU) { 
+        header.style.display = 'flex'; 
+        document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; 
+    } else { 
+        header.style.display = 'none'; 
+    } 
+}
 
 function construtorDeTorneio() {
     db.j = []; 
@@ -418,7 +426,6 @@ function construtorDeTorneio() {
     db.j.push({ id: 103, f: 'E', t: 'Terceiro Lugar', d: SCHEDULE_CSV[102].d, cid: SCHEDULE_CSV[102].c, r: { t:'p', jA: 101, jB: 102 } });
     db.j.push({ id: 104, f: 'E', t: 'Final', d: SCHEDULE_CSV[103].d, cid: SCHEDULE_CSV[103].c, r: { t:'v', jA: 101, jB: 102 } });
 }
-construtorDeTorneio();
 
 function nav(id) {
     safeSet('fwc_last_page', id);
