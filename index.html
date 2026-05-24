@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cebolão da Copa</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         :root {
             --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
@@ -130,8 +130,8 @@
     <h1 id="header-title">Cebolão da Copa</h1>
     <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
     <nav id="menu-principal">
-        <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
         <button type="button" id="nav-palpites" onclick="nav('pag-palpites')">Palpites</button>
+        <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
         <button type="button" id="nav-pontuacoes" onclick="nav('pag-pontuacoes')">Pontuações</button>
         <button type="button" id="nav-gestao" onclick="nav('pag-gestao')" style="display:none;">Gestão</button>
         <button type="button" id="nav-logout" onclick="logout()">Sair da Conta</button>
@@ -175,25 +175,9 @@
         </div>
     </section>
 
-    <section id="pag-resultados" class="pagina">
-        <select class="ipt-combo" onchange="switchTabRes(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
-            <option value="res-grp">Fase de Grupos - Por Grupo</option>
-            <option value="res-grp-data">Fase de Grupos - Por Data</option>
-            <option value="res-cls">Classificação</option>
-            <option value="res-elm">Mata-mata</option>
-        </select>
-        <div id="res-grp" class="tab-content" style="display:block;"></div>
-        <div id="res-grp-data" class="tab-content" style="display:none;"></div>
-        <div id="res-cls" class="tab-content" style="display:none;">
-            <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
-            <div id="res-cls-tbl"></div>
-        </div>
-        <div id="res-elm" class="tab-content" style="display:none;"></div>
-    </section>
-
     <section id="pag-palpites" class="pagina">
         <div id="pal-conteudo">
-            <select class="ipt-combo" onchange="switchTabPal(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+            <select class="ipt-combo" id="sel-aba-palpite" onchange="switchTabPal(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
                 <option value="pal-grp">Fase de Grupos - Por Grupo</option>
                 <option value="pal-grp-data">Fase de Grupos - Por Data</option>
                 <option value="pal-cls">Classificação</option>
@@ -206,6 +190,22 @@
             </div>
             <div id="pal-elm" class="tab-content" style="display:none;"></div>
         </div>
+    </section>
+
+    <section id="pag-resultados" class="pagina">
+        <select class="ipt-combo" id="sel-aba-resultado" onchange="switchTabRes(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+            <option value="res-grp">Fase de Grupos - Por Grupo</option>
+            <option value="res-grp-data">Fase de Grupos - Por Data</option>
+            <option value="res-cls">Classificação</option>
+            <option value="res-elm">Mata-mata</option>
+        </select>
+        <div id="res-grp" class="tab-content" style="display:block;"></div>
+        <div id="res-grp-data" class="tab-content" style="display:none;"></div>
+        <div id="res-cls" class="tab-content" style="display:none;">
+            <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
+            <div id="res-cls-tbl"></div>
+        </div>
+        <div id="res-elm" class="tab-content" style="display:none;"></div>
     </section>
 
     <section id="pag-pontuacoes" class="pagina">
@@ -262,7 +262,7 @@
 
             <div id="rnk-fase" class="tab-content" style="display:none;">
                 <div style="max-width:450px; margin: 0 auto 20px;">
-                    <label>Selecione a Fase (Mata-mata)</label>
+                    <label>Selecione a Fase</label>
                     <select id="sel-rnk-fase" onchange="renderRnkFase()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select>
                 </div>
                 <div class="table-wrapper">
@@ -303,6 +303,7 @@
             <button type="button" id="btn-adm-ctrl" class="tab-btn" onclick="switchTabAdm('adm-ctrl')">Controles</button>
             <button type="button" id="btn-adm-ligas" class="tab-btn" onclick="switchTabAdm('adm-ligas')">Ligas</button>
             <button type="button" id="btn-adm-sys" class="tab-btn" onclick="switchTabAdm('adm-sys')">Sincronização</button>
+            <button type="button" id="btn-adm-audit" class="tab-btn" onclick="switchTabAdm('adm-audit')">Auditoria</button>
         </div>
         
         <div id="adm-users" class="tab-content ativo" style="display:block;">
@@ -364,6 +365,27 @@
                 <button type="button" class="btn btn-danger" onclick="limparDados()">Apagar Todos os Dados do Sistema</button>
             </div>
         </div>
+
+        <div id="adm-audit" class="tab-content" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd; max-width:450px; margin:0 auto;">
+                <h3 style="margin-top:0;">Download de Palpites (Auditoria)</h3>
+                
+                <div class="form-group">
+                    <label>Selecione a Liga para exportar</label>
+                    <select id="adm-sel-audit-liga" class="ipt-combo"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Qual tipo de palpite?</label>
+                    <select id="adm-sel-audit-tipo" class="ipt-combo">
+                        <option value="grupos">FASE DE GRUPOS (Jogos e Placares)</option>
+                        <option value="matamata">MATA-MATA (Equipes Classificadas)</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn" onclick="downloadAuditoria()">Baixar Arquivo CSV</button>
+            </div>
+        </div>
     </section>
 
 </div>
@@ -379,11 +401,21 @@ function safeGet(key) { try { return window.localStorage ? window.localStorage.g
 function safeSet(key, val) { try { if(window.localStorage) window.localStorage.setItem(key, val); } catch(e) {} }
 
 var SCHEDULE_CSV = [{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun', c:'Guadalajara'},{id:3, d:'12/jun', c:'Toronto'},{id:4, d:'12/jun', c:'Los Angeles'},{id:5, d:'13/jun', c:'Vancouver'},{id:6, d:'13/jun', c:'São Francisco'},{id:7, d:'13/jun', c:'Nova York'},{id:8, d:'13/jun', c:'Boston'},{id:9, d:'14/jun', c:'Houston'},{id:10, d:'14/jun', c:'Dallas'},{id:11, d:'14/jun', c:'Filadélfia'},{id:12, d:'14/jun', c:'Monterrey'},{id:13, d:'15/jun', c:'Atlanta'},{id:14, d:'15/jun', c:'Seattle'},{id:15, d:'15/jun', c:'Miami'},{id:16, d:'15/jun', c:'Los Angeles'},{id:17, d:'16/jun', c:'Nova York'},{id:18, d:'16/jun', c:'Boston'},{id:19, d:'16/jun', c:'Kansas City'},{id:20, d:'16/jun', c:'São Francisco'},{id:21, d:'17/jun', c:'Houston'},{id:22, d:'17/jun', c:'Dallas'},{id:23, d:'17/jun', c:'Toronto'},{id:24, d:'17/jun', c:'Cidade do México'},{id:25, d:'18/jun', c:'Atlanta'},{id:26, d:'18/jun', c:'Los Angeles'},{id:27, d:'18/jun', c:'Vancouver'},{id:28, d:'18/jun', c:'Guadalajara'},{id:29, d:'19/jun', c:'São Francisco'},{id:30, d:'19/jun', c:'Seattle'},{id:31, d:'19/jun', c:'Boston'},{id:32, d:'19/jun', c:'Filadélfia'},{id:33, d:'20/jun', c:'Houston'},{id:34, d:'20/jun', c:'Toronto'},{id:35, d:'20/jun', c:'Kansas City'},{id:36, d:'20/jun', c:'Monterrey'},{id:37, d:'21/jun', c:'Atlanta'},{id:38, d:'21/jun', c:'Los Angeles'},{id:39, d:'21/jun', c:'Miami'},{id:40, d:'21/jun', c:'Vancouver'},{id:41, d:'22/jun', c:'Dallas'},{id:42, d:'22/jun', c:'Filadélfia'},{id:43, d:'22/jun', c:'Nova York'},{id:44, d:'22/jun', c:'São Francisco'},{id:45, d:'23/jun', c:'Houston'},{id:46, d:'23/jun', c:'Boston'},{id:47, d:'23/jun', c:'Toronto'},{id:48, d:'23/jun', c:'Guadalajara'},{id:49, d:'24/jun', c:'Vancouver'},{id:50, d:'24/jun', c:'Seattle'},{id:51, d:'24/jun', c:'Miami'},{id:52, d:'24/jun', c:'Atlanta'},{id:53, d:'24/jun', c:'Cidade do México'},{id:54, d:'24/jun', c:'Monterrey'},{id:55, d:'25/jun', c:'Nova York'},{id:56, d:'25/jun', c:'Filadélfia'},{id:57, d:'25/jun', c:'Dallas'},{id:58, d:'25/jun', c:'Kansas City'},{id:59, d:'25/jun', c:'Los Angeles'},{id:60, d:'25/jun', c:'São Francisco'},{id:61, d:'26/jun', c:'Boston'},{id:62, d:'26/jun', c:'Toronto'},{id:63, d:'26/jun', c:'Guadalajara'},{id:64, d:'26/jun', c:'Houston'},{id:65, d:'26/jun', c:'Seattle'},{id:66, d:'26/jun', c:'Vancouver'},{id:67, d:'27/jun', c:'Nova York'},{id:68, d:'27/jun', c:'Filadélfia'},{id:69, d:'27/jun', c:'Miami'},{id:70, d:'27/jun', c:'Atlanta'},{id:71, d:'27/jun', c:'Dallas'},{id:72, d:'27/jun', c:'Kansas City'},{id:73, d:'28/jun', c:'Los Angeles'},{id:74, d:'29/jun', c:'Boston'},{id:75, d:'29/jun', c:'Monterrey'},{id:76, d:'29/jun', c:'Houston'},{id:77, d:'30/jun', c:'Nova York'},{id:78, d:'30/jun', c:'Dallas'},{id:79, d:'30/jun', c:'Cidade do México'},{id:80, d:'01/jul', c:'Atlanta'},{id:81, d:'01/jul', c:'São Francisco'},{id:82, d:'01/jul', c:'Seattle'},{id:83, d:'02/jul', c:'Toronto'},{id:84, d:'02/jul', c:'Los Angeles'},{id:85, d:'02/jul', c:'Vancouver'},{id:86, d:'03/jul', c:'Miami'},{id:87, d:'03/jul', c:'Kansas City'},{id:88, d:'03/jul', c:'Dallas'},{id:89, d:'04/jul', c:'Filadélfia'},{id:90, d:'04/jul', c:'Houston'},{id:91, d:'05/jul', c:'Nova York'},{id:92, d:'05/jul', c:'Cidade do México'},{id:93, d:'06/jul', c:'Dallas'},{id:94, d:'06/jul', c:'Seattle'},{id:95, d:'08/jul', c:'Atlanta'},{id:96, d:'08/jul', c:'Vancouver'},{id:97, d:'09/jul', c:'Boston'},{id:98, d:'10/jul', c:'Los Angeles'},{id:99, d:'11/jul', c:'Miami'},{id:100, d:'11/jul', c:'Kansas City'},{id:101, d:'14/jul', c:'Dallas'},{id:102, d:'15/jul', c:'Atlanta'},{id:103, d:'18/jul', c:'Miami'},{id:104, d:'19/jul', c:'Nova York'}];
-var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'República Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia e Herzegovina'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'Costa do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
+var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'Rep. Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'C. do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
 var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}];
 
 var db = { u: [], t: TEAMS_DATA, j: [], p: {}, r: {}, c: { bReg: false, bPal: false, bLig: false }, pts: { v:2, p:1, d:1, r32:1, r16:2, r8:3, r4:4, r2:5, w:8, t3:3 }, l: [], pStage: {} };
 var cU = null; 
+
+function atualizarMenuUI() { 
+    var header = document.getElementById('cabecalho-principal'); 
+    if(cU) { 
+        header.style.display = 'flex'; 
+        document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; 
+    } else { 
+        header.style.display = 'none'; 
+    } 
+}
 
 function construtorDeTorneio() {
     db.j = []; 
@@ -405,6 +437,36 @@ function construtorDeTorneio() {
     db.j.push({ id: 104, f: 'E', t: 'Final', d: SCHEDULE_CSV[103].d, cid: SCHEDULE_CSV[103].c, r: { t:'v', jA: 101, jB: 102 } });
 }
 construtorDeTorneio();
+
+function nav(id) {
+    safeSet('fwc_last_page', id);
+    var menu = document.getElementById('menu-principal'); if(menu) menu.className = menu.className.replace(' aberto', '');
+    var pags = document.querySelectorAll('.pagina'); for(var i=0; i<pags.length; i++) pags[i].style.display = 'none';
+    var btns = document.querySelectorAll('#menu-principal button'); for(var k=0; k<btns.length; k++) btns[k].className = '';
+    document.getElementById(id).style.display = 'block'; var navBtn = document.getElementById(id.replace('pag-', 'nav-')); if(navBtn) navBtn.className = 'ativo';
+    var hTitle = document.getElementById('header-title');
+    if(hTitle) {
+        if(id === 'pag-resultados') hTitle.innerText = 'Resultados';
+        else if(id === 'pag-palpites') hTitle.innerText = 'Palpites';
+        else if(id === 'pag-pontuacoes') hTitle.innerText = 'Pontuações';
+        else if(id === 'pag-gestao') hTitle.innerText = 'Gestão do Sistema';
+        else if(id === 'pag-auth') hTitle.innerText = 'Cebolão da Copa';
+    }
+    window.scrollTo(0,0);
+    
+    if(id==='pag-palpites') { 
+        var palAba = safeGet('fwc_last_pal_aba') || 'pal-grp';
+        document.getElementById('sel-aba-palpite').value = palAba;
+        switchTabPal(palAba);
+    }
+    if(id==='pag-resultados') { 
+        var resAba = safeGet('fwc_last_res_aba') || 'res-grp';
+        document.getElementById('sel-aba-resultado').value = resAba;
+        switchTabRes(resAba);
+    }
+    if(id==='pag-pontuacoes') { popLigasDropdown(); renderizarValoresDePontos(); }
+    if(id==='pag-gestao') { renderAdm(); renderizarValoresDePontos(); renderControles(); popAdmLigas(); popAdmAudit(); }
+}
 
 async function carregarBanco() {
     try {
@@ -437,7 +499,7 @@ async function carregarBanco() {
         atualizarMenuUI(); 
         if (cU) { 
             var lastPage = safeGet('fwc_last_page');
-            if (lastPage && document.getElementById(lastPage)) { nav(lastPage); } else { nav('pag-resultados'); }
+            if (lastPage && document.getElementById(lastPage)) { nav(lastPage); } else { nav('pag-palpites'); }
         } else { nav('pag-auth'); }
     } catch (err) { console.error("Erro ao inicializar o Supabase:", err); }
 }
@@ -464,7 +526,7 @@ async function limparDados() {
     } 
 }
 
-var ISO_MAP = {'eua':'us', 'estados unidos':'us', 'colômbia':'co', 'itália':'it', 'austrália':'au', 'canadá':'ca', 'japão':'jp', 'suécia':'se', 'nigéria':'ng', 'méxico':'mx', 'camarões':'cm', 'croácia':'hr', 'coreia do sul':'kr', 'brasil':'br', 'gana':'gh', 'sérvia':'rs', 'irã':'ir', 'argentina':'ar', 'marrocos':'ma', 'dinamarca':'dk', 'catar':'qa', 'espanha':'es', 'senegal':'sn', 'equador':'ec', 'arábia saudita':'sa', 'frança':'fr', 'argélia':'dz', 'uruguai':'uy', 'iraque':'iq', 'inglaterra':'gb-eng', 'egito':'eg', 'chile':'cl', 'eau':'ae', 'alemanha':'de', 'mali':'ml', 'peru':'pe', 'uzbequistão':'uz', 'portugal':'pt', 'c. marfim':'ci', 'costa do marfim':'ci', 'venezuela':'ve', 'china':'cn', 'bélgica':'be', 'áf. sul':'za', 'áfrica do sul':'za', 'paraguai':'py', 'n. zelândia':'nz', 'nova zelândia':'nz', 'holanda':'nl', 'tunísia':'tn', 'bolívia':'bo', 'honduras':'hn', 'república tcheca':'cz', 'bósnia e herzegovina':'ba', 'suíça':'ch', 'haiti':'ht', 'escócia':'gb-sct', 'turquia':'tr', 'curaçao':'cw', 'cabo verde':'cv', 'noruega':'no', 'áustria':'at', 'austria':'at', 'jordânia':'jo', 'jordania':'jo', 'rd congo':'cd', 'república democrática do congo':'cd', 'panamá':'pa', 'panama':'pa'};
+var ISO_MAP = {'eua':'us', 'estados unidos':'us', 'colômbia':'co', 'itália':'it', 'austrália':'au', 'canadá':'ca', 'japão':'jp', 'suécia':'se', 'nigéria':'ng', 'méxico':'mx', 'camarões':'cm', 'croácia':'hr', 'coreia do sul':'kr', 'brasil':'br', 'gana':'gh', 'sérvia':'rs', 'irã':'ir', 'argentina':'ar', 'marrocos':'ma', 'dinamarca':'dk', 'catar':'qa', 'espanha':'es', 'senegal':'sn', 'equador':'ec', 'arábia saudita':'sa', 'frança':'fr', 'argélia':'dz', 'uruguai':'uy', 'iraque':'iq', 'inglaterra':'gb-eng', 'egito':'eg', 'chile':'cl', 'eau':'ae', 'alemanha':'de', 'mali':'ml', 'peru':'pe', 'uzbequistão':'uz', 'portugal':'pt', 'c. marfim':'ci', 'costa do marfim':'ci', 'venezuela':'ve', 'china':'cn', 'bélgica':'be', 'áf. sul':'za', 'áfrica do sul':'za', 'paraguai':'py', 'n. zelândia':'nz', 'nova zelândia':'nz', 'holanda':'nl', 'tunísia':'tn', 'bolívia':'bo', 'honduras':'hn', 'república tcheca':'cz', 'rep. tcheca':'cz', 'bósnia e herzegovina':'ba', 'bósnia':'ba', 'suíça':'ch', 'haiti':'ht', 'escócia':'gb-sct', 'turquia':'tr', 'curaçao':'cw', 'cabo verde':'cv', 'noruega':'no', 'áustria':'at', 'austria':'at', 'jordânia':'jo', 'jordania':'jo', 'rd congo':'cd', 'república democrática do congo':'cd', 'panamá':'pa', 'panama':'pa'};
 
 function getImg(n) { var iso = n ? ISO_MAP[n.toLowerCase().trim()] : null; return iso ? '<img src="https://flagcdn.com/w40/' + iso + '.png" class="flag">' : '<div class="flag" style="display:none;"></div>'; }
 function isTeam(n) { for(var i=0; i<db.t.length; i++) { if(db.t[i].n === n) return true; } return false; }
@@ -514,12 +576,11 @@ function toggleEsqueciSenha() {
     if(grpS.style.display !== 'none') { grpS.style.display = 'none'; grpM.style.display = 'block'; lnkE.innerText = 'Lembrei a senha'; } else { grpS.style.display = 'block'; grpM.style.display = 'none'; lnkE.innerText = 'Esqueci a senha'; }
 }
 
-function atualizarMenuUI() { var header = document.getElementById('cabecalho-principal'); if(cU) { header.style.display = 'flex'; document.getElementById('nav-gestao').style.display = cU.isM ? 'block' : 'none'; } else { header.style.display = 'none'; } }
-
 function switchTabAuth(id) { document.getElementById('aba-login').style.display = 'none'; document.getElementById('aba-reg').style.display = 'none'; document.getElementById('tab-login-btn').className = 'tab-btn'; document.getElementById('tab-reg-btn').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; if(id === 'aba-login') document.getElementById('tab-login-btn').className = 'tab-btn ativo'; if(id === 'aba-reg') document.getElementById('tab-reg-btn').className = 'tab-btn ativo'; }
-function switchTabAdm(id) { document.getElementById('adm-users').style.display = 'none'; document.getElementById('adm-pts').style.display = 'none'; document.getElementById('adm-ctrl').style.display = 'none'; document.getElementById('adm-ligas').style.display = 'none'; document.getElementById('adm-sys').style.display = 'none'; document.getElementById('btn-adm-users').className = 'tab-btn'; document.getElementById('btn-adm-pts').className = 'tab-btn'; document.getElementById('btn-adm-ctrl').className = 'tab-btn'; document.getElementById('btn-adm-ligas').className = 'tab-btn'; document.getElementById('btn-adm-sys').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; if(id === 'adm-ligas') popAdmLigas(); }
+function switchTabAdm(id) { document.getElementById('adm-users').style.display = 'none'; document.getElementById('adm-pts').style.display = 'none'; document.getElementById('adm-ctrl').style.display = 'none'; document.getElementById('adm-ligas').style.display = 'none'; document.getElementById('adm-sys').style.display = 'none'; document.getElementById('adm-audit').style.display = 'none'; document.getElementById('btn-adm-users').className = 'tab-btn'; document.getElementById('btn-adm-pts').className = 'tab-btn'; document.getElementById('btn-adm-ctrl').className = 'tab-btn'; document.getElementById('btn-adm-ligas').className = 'tab-btn'; document.getElementById('btn-adm-sys').className = 'tab-btn'; document.getElementById('btn-adm-audit').className = 'tab-btn'; document.getElementById(id).style.display = 'block'; document.getElementById('btn-' + id).className = 'tab-btn ativo'; if(id === 'adm-ligas') popAdmLigas(); if(id === 'adm-audit') popAdmAudit(); }
 
 function switchTabPal(id) { 
+    safeSet('fwc_last_pal_aba', id);
     document.getElementById('pal-grp').style.display = 'none'; 
     document.getElementById('pal-grp-data').style.display = 'none'; 
     document.getElementById('pal-cls').style.display = 'none'; 
@@ -531,7 +592,17 @@ function switchTabPal(id) {
     if(id === 'pal-cls') { renderClsPalpites(); }
 }
 
-function switchTabRes(id) { document.getElementById('res-grp').style.display = 'none'; document.getElementById('res-grp-data').style.display = 'none'; document.getElementById('res-cls').style.display = 'none'; document.getElementById('res-elm').style.display = 'none'; document.getElementById(id).style.display = 'block'; if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
+function switchTabRes(id) { 
+    safeSet('fwc_last_res_aba', id);
+    document.getElementById('res-grp').style.display = 'none'; 
+    document.getElementById('res-grp-data').style.display = 'none'; 
+    document.getElementById('res-cls').style.display = 'none'; 
+    document.getElementById('res-elm').style.display = 'none'; 
+    document.getElementById(id).style.display = 'block'; 
+    
+    if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); 
+    if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); 
+}
 
 function switchTabRnk(id) { 
     document.getElementById('rnk-geral').style.display = 'none'; 
@@ -546,31 +617,6 @@ function switchTabRnk(id) {
     document.getElementById('btn-' + id).className = 'tab-btn ativo'; 
 }
 
-function nav(id) {
-    safeSet('fwc_last_page', id);
-    var menu = document.getElementById('menu-principal'); if(menu) menu.className = menu.className.replace(' aberto', '');
-    var pags = document.querySelectorAll('.pagina'); for(var i=0; i<pags.length; i++) pags[i].style.display = 'none';
-    var btns = document.querySelectorAll('#menu-principal button'); for(var k=0; k<btns.length; k++) btns[k].className = '';
-    document.getElementById(id).style.display = 'block'; var navBtn = document.getElementById(id.replace('pag-', 'nav-')); if(navBtn) navBtn.className = 'ativo';
-    var hTitle = document.getElementById('header-title');
-    if(hTitle) {
-        if(id === 'pag-resultados') hTitle.innerText = 'Resultados';
-        else if(id === 'pag-palpites') hTitle.innerText = 'Palpites';
-        else if(id === 'pag-pontuacoes') hTitle.innerText = 'Pontuações';
-        else if(id === 'pag-gestao') hTitle.innerText = 'Gestão do Sistema';
-        else if(id === 'pag-auth') hTitle.innerText = 'Cebolão da Copa';
-    }
-    window.scrollTo(0,0);
-    if(id==='pag-palpites') { 
-        if(document.getElementById('pal-grp').style.display === 'block' || document.getElementById('pal-grp-data').style.display === 'block') renderPal();
-        if(document.getElementById('pal-cls').style.display === 'block') renderClsPalpites();
-        if(document.getElementById('pal-elm').style.display === 'block') renderMataMataPalpites();
-    }
-    if(id==='pag-resultados') { renderRes(); if(document.getElementById('res-cls').style.display === 'block') renderTbCls('res-cls-tbl', db.r, 'R_', true); }
-    if(id==='pag-pontuacoes') { popLigasDropdown(); renderizarValoresDePontos(); }
-    if(id==='pag-gestao') { renderAdm(); renderizarValoresDePontos(); renderControles(); popAdmLigas(); }
-}
-
 function login() {
     var isEsqueci = document.getElementById('grp-mae').style.display === 'block', n = document.getElementById('log-nome').value.trim(), s = document.getElementById('log-senha').value, m = document.getElementById('log-mae').value.trim(), uName = null, u = null;
     for(var i=0; i<db.u.length; i++) {
@@ -579,7 +625,7 @@ function login() {
         else { if(db.u[i].nome.toLowerCase() === n.toLowerCase() && db.u[i].senha === s) u = db.u[i]; }
     }
     if(!uName) { alert('Apostador não registrado. Verifique os dados ou registre-se.'); return; }
-    if(u) { cU = u; safeSet('fwc_cuid', cU.id); atualizarMenuUI(); nav('pag-resultados'); } 
+    if(u) { cU = u; safeSet('fwc_cuid', cU.id); atualizarMenuUI(); nav('pag-palpites'); } 
     else { if(isEsqueci) alert('Nome de solteira da mãe incorreto.'); else alert('Senha incorreta.'); }
 }
 
@@ -603,7 +649,7 @@ async function registrar() {
     } else { alert('Preencha todos os campos e certifique-se que a senha tem 4 dígitos numéricos.'); }
 }
 
-function logout() { cU = null; safeSet('fwc_cuid', ''); safeSet('fwc_last_page', ''); atualizarMenuUI(); nav('pag-auth'); }
+function logout() { cU = null; safeSet('fwc_cuid', ''); safeSet('fwc_last_page', ''); safeSet('fwc_last_pal_aba', ''); safeSet('fwc_last_res_aba', ''); atualizarMenuUI(); nav('pag-auth'); }
 function eqNome(pos) { for(var i=0; i<db.t.length; i++) { if(db.t[i].pos === pos) return db.t[i].n; } return pos; }
 function isGrd(dd, px, g) { for(var i=0; i<db.j.length; i++) { if(db.j[i].grp === g) { var val = dd[px+db.j[i].id]; if(!val || val.a === undefined || val.a === '') return false; } } return true; }
 
@@ -679,21 +725,26 @@ function ptoCalc(uId, j) {
 }
 
 function getPtsFaseChecklist(uId, fase, pontos) {
-    if(!db.pStage || !db.pStage[uId]) return 0;
-    var palpitesNaFase = db.pStage[uId][fase] || [];
-    var oficiaisNaFase = getOficiaisFase(fase);
+    if(!db.pStage || !db.pStage[uId] || !db.pStage[uId][fase]) return 0;
+    var palpites = db.pStage[uId][fase];
     var pts = 0;
     
     if (fase === 'Campeao') {
         var resFinal = db.r['R_104'];
-        if(resFinal && resFinal.w && palpitesNaFase[0] === resFinal.w) pts += pontos;
+        if(resFinal && resFinal.w && palpites[0] === resFinal.w) pts += pontos;
         return pts;
     }
 
-    for (var i = 0; i < palpitesNaFase.length; i++) {
-        var teamP = palpitesNaFase[i];
-        if (isTeam(teamP) && oficiaisNaFase.indexOf(teamP) !== -1) { pts += pontos; }
-    }
+    var ofcStageName = '';
+    if(fase === 'r32') ofcStageName = 'Rodada de 32';
+    else if(fase === 'Oitavas de Final') ofcStageName = 'Oitavas de Final';
+    else if(fase === 'Quartas de Final') ofcStageName = 'Quartas de Final';
+    else if(fase === 'Semifinal') ofcStageName = 'Semifinal';
+    else if(fase === 'Final') ofcStageName = 'Final';
+    
+    var oficiais = getOficiaisFase(ofcStageName);
+
+    palpites.forEach(t => { if(oficiais.indexOf(t) !== -1) pts += pontos; });
     return pts;
 }
 
@@ -707,27 +758,36 @@ async function savPStage(fase, maxTeams, team, isChecked, domElement) {
     
     var currentList = db.pStage[uId][fase];
     
-    if (isChecked) {
-        if (currentList.length >= maxTeams) {
-            alert('Você já selecionou o limite máximo de ' + maxTeams + ' equipas para esta fase.');
-            domElement.checked = false;
-            return;
+    // Na fase "Campeão" temos de limpar o último se for um checkbox a agir como radio (ou forçar array de 1)
+    if(fase === 'Campeao') {
+        if(isChecked) {
+            db.pStage[uId][fase] = [team];
+        } else {
+            db.pStage[uId][fase] = [];
         }
-        if (currentList.indexOf(team) === -1) { currentList.push(team); }
     } else {
-        var idx = currentList.indexOf(team);
-        if (idx !== -1) { currentList.splice(idx, 1); }
-    }
-    
-    if (!isChecked) {
-        var cascadeStages = ['r32', 'Oitavas de Final', 'Quartas de Final', 'Semifinal', 'Final', 'Campeao'];
-        var startIndex = cascadeStages.indexOf(fase);
-        if (startIndex !== -1) {
-            for(var k = startIndex + 1; k < cascadeStages.length; k++) {
-                var nextStage = cascadeStages[k];
-                if (db.pStage[uId][nextStage]) {
-                    var nIdx = db.pStage[uId][nextStage].indexOf(team);
-                    if (nIdx !== -1) db.pStage[uId][nextStage].splice(nIdx, 1);
+        if (isChecked) {
+            if (currentList.length >= maxTeams) {
+                alert('Você já selecionou o limite máximo de ' + maxTeams + ' equipas para esta fase.');
+                domElement.checked = false;
+                return;
+            }
+            if (currentList.indexOf(team) === -1) { currentList.push(team); }
+        } else {
+            var idx = currentList.indexOf(team);
+            if (idx !== -1) { currentList.splice(idx, 1); }
+        }
+        
+        if (!isChecked) {
+            var cascadeStages = ['r32', 'Oitavas de Final', 'Quartas de Final', 'Semifinal', 'Final', 'Campeao'];
+            var startIndex = cascadeStages.indexOf(fase);
+            if (startIndex !== -1) {
+                for(var k = startIndex + 1; k < cascadeStages.length; k++) {
+                    var nextStage = cascadeStages[k];
+                    if (db.pStage[uId][nextStage]) {
+                        var nIdx = db.pStage[uId][nextStage].indexOf(team);
+                        if (nIdx !== -1) db.pStage[uId][nextStage].splice(nIdx, 1);
+                    }
                 }
             }
         }
@@ -760,7 +820,7 @@ function renderClsPalpites() {
         var equipasNoGrupo = st.t[g]; 
         if(!equipasNoGrupo || equipasNoGrupo.length === 0) continue;
         
-        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pts Extra</th></tr></thead><tbody>';
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pontos</th></tr></thead><tbody>';
         
         for(var n=0; n<equipasNoGrupo.length; n++) {
             var x = equipasNoGrupo[n];
@@ -813,7 +873,7 @@ function renderMataMataPalpites() {
             continue;
         }
 
-        html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pts Extra</th></tr></thead><tbody>';
+        html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pontos</th></tr></thead><tbody>';
         
         for (var k = 0; k < availableTeams.length; k++) {
             var tName = availableTeams[k];
@@ -831,9 +891,8 @@ function renderMataMataPalpites() {
             }
 
             var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
-            var inputType = stage.saveId === 'Campeao' ? 'radio' : 'checkbox';
-            var nameAttr = stage.saveId === 'Campeao' ? 'name="rad_campeao"' : '';
-            var chkBox = '<input type="' + inputType + '" class="ipt-chk" ' + nameAttr + ' onchange="savPStage(\'' + stage.saveId + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
+            var inputType = stage.saveId === 'Campeao' ? 'checkbox' : 'checkbox'; // Mantendo checkbox porem limitando a 1 via script
+            var chkBox = '<input type="' + inputType + '" class="ipt-chk" onchange="savPStage(\'' + stage.saveId + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
             
             html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
         }
@@ -981,12 +1040,12 @@ function popRnkSel() {
 function popRnkFaseSel() {
     var sel = document.getElementById('sel-rnk-fase'), atual = sel.value;
     var opts = '<option value="">-- Selecione a Fase --</option>';
-    opts += '<option value="r32">Rodada de 32</option>';
+    opts += '<option value="Fase de Grupos">Fase de Grupos</option>';
+    opts += '<option value="Rodada de 32">Rodada de 32</option>';
     opts += '<option value="Oitavas de Final">Oitavas de Final</option>';
     opts += '<option value="Quartas de Final">Quartas de Final</option>';
     opts += '<option value="Semifinal">Semifinal</option>';
     opts += '<option value="Final">Final</option>';
-    opts += '<option value="Campeao">Campeão</option>';
     sel.innerHTML = opts; if(atual) sel.value = atual;
 }
 
@@ -998,13 +1057,23 @@ function renderRnkFase() {
     var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
     var usersLiga = []; for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
     
-    var ptMap = {'r32': db.pts.r32, 'Oitavas de Final': db.pts.r16, 'Quartas de Final': db.pts.r8, 'Semifinal': db.pts.r4, 'Final': db.pts.r2, 'Campeao': db.pts.w };
-    var pontosDaFase = ptMap[faseId] || 0;
-    
     var lista = [];
     for(var i=0; i<usersLiga.length; i++){ 
         var u = usersLiga[i];
-        var pts = getPtsFaseChecklist(u.id, faseId, pontosDaFase);
+        var pts = 0;
+        
+        if (faseId === 'Fase de Grupos') {
+            for(var k=0; k<db.j.length; k++) {
+                if(db.j[k].f === 'G') pts += ptoCalc(u.id, db.j[k]).pt;
+            }
+            pts += getPtsFaseChecklist(u.id, 'r32', db.pts.r32);
+        } else {
+            var map = {'Rodada de 32': {c:'Oitavas de Final', pt:db.pts.r16}, 'Oitavas de Final': {c:'Quartas de Final', pt:db.pts.r8}, 'Quartas de Final': {c:'Semifinal', pt:db.pts.r4}, 'Semifinal': {c:'Final', pt:db.pts.r2}, 'Final': {c:'Campeao', pt:db.pts.w} };
+            if(map[faseId]) {
+                 pts = getPtsFaseChecklist(u.id, map[faseId].c, map[faseId].pt);
+            }
+        }
+        
         lista.push({ n: u.nome, pts: pts }); 
     }
     lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
@@ -1088,6 +1157,68 @@ async function apagarLiga(lid) {
         var novasLigas = []; for(var i=0; i<db.l.length; i++) { if(db.l[i].id !== lid) novasLigas.push(db.l[i]); }
         db.l = novasLigas; await salvar(); popAdmLigas(); alert('Liga apagada com sucesso.');
     }
+}
+
+function popAdmAudit() {
+    var sel = document.getElementById('adm-sel-audit-liga'); if(!sel) return;
+    var html = '<option value="">-- Selecione a Liga --</option>'; 
+    for(var i=0; i<db.l.length; i++) html += '<option value="'+db.l[i].id+'">'+db.l[i].nome+'</option>';
+    sel.innerHTML = html;
+}
+
+function downloadAuditoria() {
+    var lId = document.getElementById('adm-sel-audit-liga').value;
+    var tId = document.getElementById('adm-sel-audit-tipo').value;
+    
+    var liga = db.l.find(l => l.id === lId);
+    if(!liga) { alert('Selecione uma liga'); return; }
+    
+    var csv = "";
+    
+    if (tId === 'grupos') {
+        csv += "Apostador,Jogo,Primeira Equipe,Gols Primeira Equipe,Segunda Equipe,Gols Segunda Equipe\n";
+        
+        liga.users.forEach(uid => {
+            var user = db.u.find(u => u.id === uid);
+            var nome = user ? user.nome : uid;
+            
+            for(var i=0; i<db.j.length; i++) {
+                var jogo = db.j[i];
+                if (jogo.f === 'G') {
+                    var palpite = db.p[uid + '_' + jogo.id];
+                    var golsA = palpite && palpite.a !== undefined ? palpite.a : "";
+                    var golsB = palpite && palpite.b !== undefined ? palpite.b : "";
+                    var eq = reqEquipe(jogo, db.p, uid+'_');
+                    csv += `"${nome}","${jogo.id}","${eq.A}","${golsA}","${eq.B}","${golsB}"\n`;
+                }
+            }
+        });
+        
+    } else if (tId === 'matamata') {
+        csv += "Apostador,Fase,Equipe Selecionada\n";
+        
+        liga.users.forEach(uid => {
+            var user = db.u.find(u => u.id === uid);
+            var nome = user ? user.nome : uid;
+            
+            if(db.pStage[uid]) {
+                for(var fase in db.pStage[uid]) {
+                    db.pStage[uid][fase].forEach(equipa => {
+                        var displayFase = fase;
+                        if(fase === 'r32') displayFase = 'Selecao Rodada de 32';
+                        csv += `"${nome}","${displayFase}","${equipa}"\n`;
+                    });
+                }
+            }
+        });
+    }
+    
+    // Adiciona BOM para que o Excel abra o CSV com acentos corretamente (UTF-8)
+    var blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = `auditoria_${tId}_${liga.nome.replace(/\s+/g, '_')}.csv`; 
+    a.click();
 }
 
 carregarBanco();
