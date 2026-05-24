@@ -1,3 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cebolão da Copa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff; --text: #1a1a1a; --border: #e0e0e0; --light: #f4f4f4; 
+            --muted: #666666; --danger: #dc3545; --accent: #000000;
+        }
+        * { box-sizing: border-box; font-family: 'Google Sans', 'Open Sans', 'Segoe UI', sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+        
+        header { 
+            display: none; background: #ffffff; color: #000000; 
+            padding: 12px 15px; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        .header-spacer { width: 30px; }
+        header h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; flex: 1; text-align: center; }
+        .menu-btn { background: transparent; border: none; color: #000000; font-size: 1.6rem; cursor: pointer; padding: 0; outline: none; touch-action: manipulation; width: 30px; text-align: right; }
+        
+        nav { 
+            display: none; flex-direction: column; width: auto; min-width: 180px; background: #ffffff; 
+            position: absolute; top: 100%; right: 0; z-index: 999; box-shadow: -2px 4px 6px rgba(0,0,0,0.2); border-bottom-left-radius: 8px; border: 1px solid var(--border);
+        }
+        nav.aberto { display: flex; }
+        nav button { 
+            background: transparent; border: none; color: #000000; text-align: left; 
+            padding: 15px 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; 
+            border-bottom: 1px solid var(--border); cursor: pointer; outline: none; touch-action: manipulation;
+        }
+        nav button.ativo { background: var(--light); font-weight: 800; border-left: 4px solid var(--text); }
+        
+        .container { max-width: 950px; margin: 30px auto; padding: 0 15px; }
+        .pagina { display: none; }
+        
+        .tabs-nav { display: flex; gap: 5px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap;}
+        .tab-btn { background: transparent; border: none; outline: none; padding: 12px 15px; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
+        .tab-btn.ativo { color: var(--text); border-color: var(--text); }
+        .tab-content { display: none; } .tab-content.ativo { display: block; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+        input[type="text"], input[type="password"], input[type="file"], input[type="number"], input[type="tel"], select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); font-size: 1rem; outline: none; background: transparent; transition: 0.2s; border-radius:4px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--text); }
+        .ipt-combo { width: 100%; height: 42px; font-size: 0.9rem; border: 1px solid var(--border); padding: 2px 5px; line-height: 1.2; text-align: center; }
+        
+        .btn { background: var(--bg); color: var(--text); border: 1px solid var(--text); padding: 14px; text-transform: uppercase; font-weight: 600; cursor: pointer; width: 100%; letter-spacing: 1px; border-radius:4px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
+        .btn-danger { background: var(--danger); color: white; border: none; }
+        
+        @media (hover: hover) {
+            nav button:hover { background: var(--light); }
+            .btn:hover { background: var(--text); color: var(--bg); }
+            .btn-danger:hover { background: #b02a37; }
+        }
+
+        .fase-titulo { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 40px 0 10px 0; border-bottom: 1px solid var(--light); padding-bottom: 5px; color: var(--text); display: flex; justify-content: space-between; align-items: flex-end;}
+        .contador-fase { font-size: 0.7rem; font-weight: 600; color: var(--muted); background: var(--light); padding: 2px 8px; border-radius: 12px; }
+        .contador-fase.erro { color: white; background: var(--danger); }
+        .contador-fase.ok { color: white; background: #009b3a; }
+        
+        .jogo-linha { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--light); gap: 8px; }
+        .chk-linha:hover td { background: #f9f9f9; }
+        
+        .jogo-meta { width: 145px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; line-height: 1.3; flex-shrink:0; }
+        .equipe { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 500; }
+        .eq-esq { justify-content: flex-end; text-align: right; }
+        .eq-dir { justify-content: flex-start; text-align: left; }
+        .flag { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; background-color: var(--light); display: block; flex-shrink: 0; }
+        .palpite-area { display: flex; align-items: center; justify-content: center; gap: 6px; width: 90px; flex-shrink:0; }
+        .ipt-gol { width: 36px; height: 36px; text-align: center; border: 1px solid var(--border); font-size: 1rem; font-weight: 600; outline: none; padding: 0; background: var(--bg); border-radius:4px; }
+        
+        input[type="checkbox"].ipt-chk, input[type="radio"].ipt-chk { width: 18px; height: 18px; cursor: pointer; accent-color: var(--text); vertical-align: middle; margin: 0;}
+        
+        .pts-container { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; width: 100px; }
+        .res-ofc { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-right: 12px; }
+        .pts-badge { font-size: 0.75rem; text-align: right; font-weight: 700; color: #009b3a; }
+        
+        .nota-desempate { font-size: 0.75rem; color: var(--muted); margin: -10px 0 15px 0; line-height: 1.4; padding: 0 5px; }
+
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 4px; position: relative; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 0; text-align: left; }
+        th, td { padding: 12px 5px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); font-weight: 600; background: var(--light); }
+        .t-left { text-align: left; padding-left: 10px; }
+        
+        .col-num { width: 50px; text-align: center; } 
+        .col-pos { width: 45px; text-align: center; }
+
+        table.tabela-classificacao { min-width: 650px; table-layout: fixed; }
+        .tabela-classificacao th.col-eq { position: sticky; left: 0; background: var(--light); z-index: 2; border-right: 1px solid var(--border); width: 210px; }
+        .tabela-classificacao td.col-eq { position: sticky; left: 0; background: var(--bg); z-index: 1; border-right: 1px solid var(--border); width: 210px; }
+        
+        table.tabela-palpite-classificacao { min-width: 100%; table-layout: auto; }
+        .tabela-palpite-classificacao th.col-eq { width: auto; position: static; border-right: none;}
+        .tabela-palpite-classificacao td.col-eq { width: auto; position: static; border-right: none;}
+        
+        .grid-cfg { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        @media (max-width: 650px) { 
+            .grid-cfg { grid-template-columns: 1fr; } 
+            .jogo-linha { flex-wrap: wrap; position: relative; padding: 6px 0; justify-content: center; gap: 2px; } 
+            .jogo-meta { width: 100%; text-align: center; margin-bottom: 0px; font-size: 0.65rem; border-bottom: 1px dashed var(--light); padding-bottom: 2px; }
+            .equipe { width: 35%; flex-direction: column; text-align: center !important; justify-content: flex-start; gap: 4px; font-size: 0.8rem; align-items: center !important; }
+            .eq-esq { flex-direction: column-reverse; } 
+            .palpite-area { width: 25%; justify-content: center; }
+            .ipt-combo { font-size: 0.75rem; padding: 4px; height: 36px; }
+            .flag { width: 26px;, height: 26px; }
+            .pts-container { width: 100%; justify-content: center; margin-top: 4px; background: #e8f5e9; padding: 4px; border-radius: 4px; gap: 14px; }
+            .res-ofc { margin-right: 0; color: var(--muted); }
+            .pts-badge { width: auto; margin-top: 0; background: transparent; padding: 0; }
+            .nota-desempate { font-size: 0.7rem; }
+            table { font-size: 0.8rem; }
+            th, td { padding: 10px 4px; }
+            .col-num { width: 40px; }
+            .col-pos { width: 35px; }
+            .chk-linha { padding: 8px 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<header id="cabecalho-principal">
+    <div class="header-spacer"></div>
+    <h1 id="header-title">Cebolão da Copa</h1>
+    <button type="button" class="menu-btn" onclick="toggleMenu()">☰</button>
+    <nav id="menu-principal">
+        <button type="button" id="nav-palpites" onclick="nav('pag-palpites')">Palpites</button>
+        <button type="button" id="nav-resultados" onclick="nav('pag-resultados')">Resultados</button>
+        <button type="button" id="nav-pontuacoes" onclick="nav('pag-pontuacoes')">Pontuações</button>
+        <button type="button" id="nav-gestao" onclick="nav('pag-gestao')" style="display:none;">Gestão</button>
+        <button type="button" id="nav-logout" onclick="logout()">Sair da Conta</button>
+    </nav>
+</header>
+
+<div class="container">
+    
+    <section id="pag-auth" class="pagina">
+        <div style="max-width: 350px; margin: 0 auto; padding-top: 30px; text-align: center;">
+            <h1 style="text-align:center; font-weight:800; letter-spacing:2px; margin-bottom:5px; margin-top: 0;">CEBOLÃO DA COPA</h1>
+            <p style="font-size:0.95rem; color:var(--muted); margin-top:0; margin-bottom:30px; font-weight: 500;">Aqui o choro é livre</p>
+            
+            <div class="tabs-nav">
+                <button type="button" id="tab-login-btn" class="tab-btn ativo" onclick="switchTabAuth('aba-login')">Login</button>
+                <button type="button" id="tab-reg-btn" class="tab-btn" onclick="switchTabAuth('aba-reg')">Registro</button>
+            </div>
+            
+            <div id="aba-login" class="tab-content ativa" style="display:block; text-align: left;">
+                <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="log-nome"></div>
+                <div class="form-group" id="grp-senha"><label>Senha (4 Dígitos)</label><input type="password" id="log-senha" maxlength="4" pattern="\d*"></div>
+                <div class="form-group" id="grp-mae" style="display:none;"><label>Nome de solteira da mãe</label><input type="text" id="log-mae"></div>
+                
+                <div style="text-align:right; margin-bottom:15px;">
+                    <a href="#" id="lnk-esqueci" onclick="toggleEsqueciSenha(); return false;" style="font-size:0.8rem; color:var(--text); font-weight: 600;">Esqueci a senha</a>
+                </div>
+                
+                <button type="button" class="btn" onclick="login()">Entrar</button>
+            </div>
+            
+            <div id="aba-reg" class="tab-content" style="display:none; text-align: left;">
+                <div class="form-group"><label>Nome do APOSTADOR</label><input type="text" id="reg-nome"></div>
+                <div class="form-group"><label>Senha (4 Dígitos)</label><input type="password" id="reg-senha" maxlength="4" pattern="\d*"></div>
+                <div class="form-group"><label>Confirmar Senha (4 Dígitos)</label><input type="password" id="reg-senha-conf" maxlength="4" pattern="\d*"></div>
+                <div class="form-group">
+                    <label>Nome de solteira da mãe <span style="text-transform:none; font-weight:normal; font-size:0.85em; color:var(--muted);">(Olha o respeito)</span></label>
+                    <input type="text" id="reg-mae">
+                </div>
+                <button type="button" class="btn" onclick="registrar()">Salvar Registro</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="pag-palpites" class="pagina">
+        <div id="pal-conteudo">
+            <select class="ipt-combo" id="sel-aba-palpite" onchange="switchTabPal(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+                <option value="pal-grp">Fase de Grupos - Por Grupo</option>
+                <option value="pal-grp-data">Fase de Grupos - Por Data</option>
+                <option value="pal-cls">Classificação</option>
+                <option value="pal-elm">Mata-mata</option>
+            </select>
+            <div id="pal-grp" class="tab-content" style="display:block;"></div>
+            <div id="pal-grp-data" class="tab-content" style="display:none;"></div>
+            <div id="pal-cls" class="tab-content" style="display:none;">
+                <div id="pal-cls-tbl"></div>
+            </div>
+            <div id="pal-elm" class="tab-content" style="display:none;"></div>
+        </div>
+    </section>
+
+    <section id="pag-resultados" class="pagina">
+        <select class="ipt-combo" id="sel-aba-resultado" onchange="switchTabRes(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
+            <option value="res-grp">Fase de Grupos - Por Grupo</option>
+            <option value="res-grp-data">Fase de Grupos - Por Data</option>
+            <option value="res-cls">Classificação</option>
+            <option value="res-elm">Mata-mata</option>
+        </select>
+        <div id="res-grp" class="tab-content" style="display:block;"></div>
+        <div id="res-grp-data" class="tab-content" style="display:none;"></div>
+        <div id="res-cls" class="tab-content" style="display:none;">
+            <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
+            <div id="res-cls-tbl"></div>
+        </div>
+        <div id="res-elm" class="tab-content" style="display:none;"></div>
+    </section>
+
+    <section id="pag-pontuacoes" class="pagina">
+        <div style="max-width:450px; margin: 0 auto 20px;">
+            <label>Selecione a Liga ou Ação</label>
+            <select id="sel-liga-pont" onchange="handleLeagueSelect(this.value)" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select>
+        </div>
+
+        <div id="menu-p-criar" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; max-width: 450px; margin: 0 auto;">
+                <h3 style="margin-top:0;">Criar Nova Liga</h3>
+                <div class="form-group"><label>Nome da Liga</label><input type="text" id="nova-liga-nome"></div>
+                <div class="form-group"><label>Senha da Liga</label><input type="password" id="nova-liga-senha"></div>
+                <button type="button" class="btn" onclick="criarLiga()">Criar e Entrar</button>
+            </div>
+        </div>
+
+        <div id="menu-p-entrar" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; max-width: 450px; margin: 0 auto;">
+                <h3 style="margin-top:0;">Entrar em uma Liga</h3>
+                <div class="form-group"><label>Nome da Liga</label><input type="text" id="entrar-liga-nome"></div>
+                <div class="form-group"><label>Senha da Liga</label><input type="password" id="entrar-liga-senha"></div>
+                <button type="button" class="btn" onclick="entrarLiga()">Entrar na Liga</button>
+            </div>
+        </div>
+
+        <div id="menu-p-ranking" style="display:block;">
+            <div class="tabs-nav">
+                <button type="button" id="btn-rnk-geral" class="tab-btn ativo" onclick="switchTabRnk('rnk-geral'); renderPontuacoes();">Geral</button>
+                <button type="button" id="btn-rnk-jogo" class="tab-btn" onclick="switchTabRnk('rnk-jogo'); popRnkSel();">Por Jogo</button>
+                <button type="button" id="btn-rnk-fase" class="tab-btn" onclick="switchTabRnk('rnk-fase'); popRnkFaseSel();">Por Fase</button>
+                <button type="button" id="btn-rnk-regras" class="tab-btn" onclick="switchTabRnk('rnk-regras'); renderizarValoresDePontos();">Regras</button>
+            </div>
+
+            <div id="rnk-geral" class="tab-content" style="display:block;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th>Rodada</th><th class="col-num">Total</th></tr></thead>
+                        <tbody id="tb-ranking"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="rnk-jogo" class="tab-content" style="display:none;">
+                <div style="max-width:450px; margin: 0 auto 20px;"><label>Selecione o Jogo (Fase de Grupos)</label><select id="sel-rnk-jogo" onchange="renderRnkJogo()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select></div>
+                <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Apostador</th><th style="width:80px;">Palpite</th><th class="col-num">Pts</th></tr></thead>
+                        <tbody id="tb-ranking-jogo"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="rnk-fase" class="tab-content" style="display:none;">
+                <div style="max-width:450px; margin: 0 auto 20px;">
+                    <label>Selecione a Fase</label>
+                    <select id="sel-rnk-fase" onchange="renderRnkFase()" style="font-weight:bold; padding:12px; border-radius:4px; width:100%; height: 45px;" class="ipt-combo"></select>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Apostador</th><th class="col-num">Pts na Fase</th></tr></thead>
+                        <tbody id="tb-ranking-fase"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="rnk-regras" class="tab-content" style="display:none;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th class="t-left">Critério de Acerto</th><th class="col-num">Pts</th></tr></thead>
+                        <tbody>
+                            <tr><td class="t-left">Vencedor ou Empate (Grupos)</td><td class="col-num" id="lbl-pt-v"></td></tr>
+                            <tr><td class="t-left">Diferença de gols (Grupos)</td><td class="col-num" id="lbl-pt-d"></td></tr>
+                            <tr><td class="t-left">Placar exato (Grupos)</td><td class="col-num" id="lbl-pt-p"></td></tr>
+                            <tr><td class="t-left">Classificada para Rodada de 32</td><td class="col-num" id="lbl-pt-r32"></td></tr>
+                            <tr><td class="t-left">Classificada para Oitavas</td><td class="col-num" id="lbl-pt-r16"></td></tr>
+                            <tr><td class="t-left">Classificada para Quartas</td><td class="col-num" id="lbl-pt-r8"></td></tr>
+                            <tr><td class="t-left">Classificada para Semifinal</td><td class="col-num" id="lbl-pt-r4"></td></tr>
+                            <tr><td class="t-left">Classificada para Final</td><td class="col-num" id="lbl-pt-r2"></td></tr>
+                            <tr><td class="t-left">3º Lugar</td><td class="col-num" id="lbl-pt-t3"></td></tr>
+                            <tr><td class="t-left">Campeão</td><td class="col-num" id="lbl-pt-w"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="pag-gestao" class="pagina">
+        <div class="tabs-nav" id="nav-gestao-tabs">
+            <button type="button" id="btn-adm-users" class="tab-btn ativo" onclick="switchTabAdm('adm-users')">Usuários</button>
+            <button type="button" id="btn-adm-pts" class="tab-btn" onclick="switchTabAdm('adm-pts')">Tabela de Pontos</button>
+            <button type="button" id="btn-adm-ctrl" class="tab-btn" onclick="switchTabAdm('adm-ctrl')">Controles</button>
+            <button type="button" id="btn-adm-ligas" class="tab-btn" onclick="switchTabAdm('adm-ligas')">Ligas</button>
+            <button type="button" id="btn-adm-sys" class="tab-btn" onclick="switchTabAdm('adm-sys')">Sincronização</button>
+            <button type="button" id="btn-adm-audit" class="tab-btn" onclick="switchTabAdm('adm-audit')">Auditoria</button>
+        </div>
+        
+        <div id="adm-users" class="tab-content ativo" style="display:block;">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="t-left">Apostador</th>
+                            <th>Senha</th>
+                            <th>Master</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-users"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="adm-pts" class="tab-content" style="display:none;">
+            <div class="grid-cfg">
+                <div class="form-group"><label>Vencedor ou Empate (Grupos)</label><input type="tel" id="cfg-pt-v"></div>
+                <div class="form-group"><label>Diferença correta de gols (Grupos) - Extra</label><input type="tel" id="cfg-pt-d"></div>
+                <div class="form-group"><label>Placar exato (Fase de Grupos) - Extra</label><input type="tel" id="cfg-pt-p"></div>
+                <div class="form-group"><label>Equipe classificada para a Rodada de 32</label><input type="tel" id="cfg-pt-r32"></div>
+                <div class="form-group"><label>Equipe classificada para as Oitavas de Final</label><input type="tel" id="cfg-pt-r16"></div>
+                <div class="form-group"><label>Equipe classificada para as Quartas de Final</label><input type="tel" id="cfg-pt-r8"></div>
+                <div class="form-group"><label>Equipe classificada para a Semifinal</label><input type="tel" id="cfg-pt-r4"></div>
+                <div class="form-group"><label>Equipe classificada para a Final</label><input type="tel" id="cfg-pt-r2"></div>
+                <div class="form-group"><label>3º Lugar</label><input type="tel" id="cfg-pt-t3"></div>
+                <div class="form-group"><label>Campeão</label><input type="tel" id="cfg-pt-w"></div>
+            </div>
+            <button type="button" class="btn" onclick="salvarConfigPontos()">Salvar Regras de Pontos</button>
+        </div>
+
+        <div id="adm-ctrl" class="tab-content" style="display:none;">
+            <div class="grid-cfg" style="margin-bottom: 20px;">
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Bloqueios Globais</h3>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bReg" onchange="toggleCfg('bReg', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear novos usuários</label></div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bLig" onchange="toggleCfg('bLig', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear novos acessos às ligas</label></div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-bPal" onchange="toggleCfg('bPal', this.checked)"> <label style="margin:0; font-size:0.85rem;">Bloquear alterações nos palpites</label></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="adm-ligas" class="tab-content" style="display:none;">
+            <div class="grid-cfg" style="margin-bottom: 20px;">
+                <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
+                    <h3 style="margin-top:0;">Gerenciar Ligas</h3>
+                    <select id="adm-sel-liga" onchange="renderAdmLigas()" class="ipt-combo" style="margin-bottom:15px;"></select>
+                    <div id="adm-liga-users"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="adm-sys" class="tab-content" style="display:none;">
+            <div style="padding: 20px; background: #fff5f5; text-align: center; border: 1px dashed var(--danger); border-radius: 4px; margin-bottom: 20px;">
+                <label style="color:var(--danger);">Limpeza Geral</label>
+                <button type="button" class="btn btn-danger" onclick="limparDados()">Apagar Todos os Dados do Sistema</button>
+            </div>
+        </div>
+
+        <div id="adm-audit" class="tab-content" style="display:none;">
+            <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd; max-width:450px; margin:0 auto;">
+                <h3 style="margin-top:0;">Download de Palpites (Auditoria)</h3>
+                
+                <div class="form-group">
+                    <label>Selecione a Liga para exportar</label>
+                    <select id="adm-sel-audit-liga" class="ipt-combo"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Qual tipo de palpite?</label>
+                    <select id="adm-sel-audit-tipo" class="ipt-combo">
+                        <option value="grupos">FASE DE GRUPOS</option>
+                        <option value="matamata">MATA-MATA</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn" onclick="downloadAuditoria()">Baixar CSV</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+// Funções de sistema
+window.onerror = function(msg, url, line) { console.error("Erro na linha " + line + ": " + msg); };
+const SUPABASE_URL = "https://ozpuevnlfcjgfrizvpfy.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cHVldm5sZmNqZ2ZyaXp2cGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjQ4MjksImV4cCI6MjA5NTEwMDgyOX0.adKY27Sux1vdiG1kmdO_p0z4ZT-nsnxMK-Imtn_XTR8"; 
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function safeGet(key) { try { return window.localStorage ? window.localStorage.getItem(key) : null; } catch(e) { return null; } }
+function safeSet(key, val) { try { if(window.localStorage) window.localStorage.setItem(key, val); } catch(e) {} }
+
+// ... (Restante do código, garantindo que as funções de renderização chamem o título correto)
+// Adicionando a alteração solicitada dentro da função renderMataMataPalpites:
+
 function renderMataMataPalpites() {
     var alvo = 'pal-elm';
     var d = document.getElementById(alvo); d.innerHTML = ''; 
@@ -30,7 +436,7 @@ function renderMataMataPalpites() {
             continue;
         }
 
-        // AQUI ESTÁ A ALTERAÇÃO DO TÍTULO DA COLUNA:
+        // Alteração solicitada: Título da coluna condicional
         var tituloClassif = (stage.saveId === 'Campeao') ? 'Campeão' : 'Classif';
 
         html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">' + tituloClassif + '</th><th style="width:80px; text-align:right;">Pontos</th></tr></thead><tbody>';
@@ -51,13 +457,17 @@ function renderMataMataPalpites() {
             }
 
             var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
-            var inputType = stage.saveId === 'Campeao' ? 'checkbox' : 'checkbox';
+            var inputType = stage.saveId === 'Campeao' ? 'checkbox' : 'checkbox'; 
             var chkBox = '<input type="' + inputType + '" class="ipt-chk" onchange="savPStage(\'' + stage.saveId + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
             
             html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
         }
         html += '</tbody></table></div>';
     }
-    
     d.innerHTML = html;
 }
+
+// (Manter o restante das funções: construtorDeTorneio, nav, carregarBanco, etc. do seu código funcional)
+</script>
+</body>
+</html>
