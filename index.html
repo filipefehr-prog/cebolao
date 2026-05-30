@@ -355,6 +355,15 @@
                 <div style="border: 1px solid var(--border); padding: 15px; border-radius:4px; background: #fdfdfd;">
                     <h3 style="margin-top:0;">Gerenciar Ligas</h3>
                     <select id="adm-sel-liga" onchange="renderAdmLigas()" class="ipt-combo" style="margin-bottom:15px;"></select>
+                    
+                    <div id="div-adicionar-usuario-liga" style="display:none; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+                        <label>Incluir Usuário na Liga</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="adm-sel-novo-usuario" class="ipt-combo"></select>
+                            <button type="button" class="btn" style="width: auto; padding: 0 15px;" onclick="adicionarUsuarioLiga()">Incluir</button>
+                        </div>
+                    </div>
+
                     <div id="adm-liga-users"></div>
                 </div>
             </div>
@@ -380,7 +389,7 @@
                     <label>Qual tipo de palpite?</label>
                     <select id="adm-sel-audit-tipo" class="ipt-combo">
                         <option value="grupos">Fase de Grupos (Jogos e Placares)</option>
-                        <option value="matamata">Mata-mata (Equipes Classificadas)</option>
+                        <option value="matamata">Mata-Mata (Equipes Classificadas)</option>
                     </select>
                 </div>
                 
@@ -393,6 +402,7 @@
 
 <script>
 window.onerror = function(msg, url, line) { console.error("Erro na linha " + line + ": " + msg); };
+
 const SUPABASE_URL = "https://ozpuevnlfcjgfrizvpfy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cHVldm5sZmNqZ2ZyaXp2cGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjQ4MjksImV4cCI6MjA5NTEwMDgyOX0.adKY27Sux1vdiG1kmdO_p0z4ZT-nsnxMK-Imtn_XTR8"; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1135,8 +1145,29 @@ function popAdmLigas() {
 }
 
 function renderAdmLigas() {
-    var lid = document.getElementById('adm-sel-liga').value, d = document.getElementById('adm-liga-users'); if(!lid) { d.innerHTML = ''; return; }
+    var lid = document.getElementById('adm-sel-liga').value;
+    var d = document.getElementById('adm-liga-users');
+    var dIncluir = document.getElementById('div-adicionar-usuario-liga');
+    var sUser = document.getElementById('adm-sel-novo-usuario');
+    
+    if(!lid) { 
+        d.innerHTML = ''; 
+        dIncluir.style.display = 'none'; 
+        return; 
+    }
+    
     var liga = null; for(var i=0;i<db.l.length;i++) if(db.l[i].id===lid) liga=db.l[i];
+    
+    // Popula o select de usuários para adicionar (só os que não estão na liga)
+    var optsUser = '<option value="">-- Selecione o Usuário --</option>';
+    for(var i=0; i<db.u.length; i++) {
+        if(liga.users.indexOf(db.u[i].id) === -1) {
+            optsUser += '<option value="' + db.u[i].id + '">' + db.u[i].nome + '</option>';
+        }
+    }
+    sUser.innerHTML = optsUser;
+    dIncluir.style.display = 'block';
+
     var html = '<div style="background:var(--light); padding:10px; border-radius:4px; margin-bottom:15px;"><strong>Senha da Liga: </strong><span style="font-size:1.1rem; color:var(--text); font-family:monospace;">' + liga.senha + '</span></div><table style="margin-top:10px;">';
     for(var i=0; i<liga.users.length; i++) {
         var uid = liga.users[i], u = null; for(var k=0; k<db.u.length; k++){ if(db.u[k].id===uid) u=db.u[k]; } var unome = u ? u.nome : uid;
@@ -1145,6 +1176,26 @@ function renderAdmLigas() {
     html += '</table>'; if(liga.users.length === 0) { html += '<p style="font-size:0.8rem; color:var(--muted);">Liga vazia.</p>'; }
     html += '<div style="margin-top: 15px; text-align: center; border-top: 1px dashed var(--border); padding-top: 15px;"><button class="btn btn-danger" style="padding: 10px;" onclick="apagarLiga(\''+lid+'\')">Apagar Liga Permanentemente</button></div>';
     d.innerHTML = html;
+}
+
+async function adicionarUsuarioLiga() {
+    var lid = document.getElementById('adm-sel-liga').value;
+    var uid = document.getElementById('adm-sel-novo-usuario').value;
+    
+    if(!lid || !uid) { alert('Selecione uma liga e um usuário.'); return; }
+    
+    for(var i=0; i<db.l.length; i++) { 
+        if(db.l[i].id === lid) { 
+            if(db.l[i].users.indexOf(uid) === -1) {
+                db.l[i].users.push(uid); 
+            } else {
+                alert('Usuário já está na liga.'); return;
+            }
+        } 
+    }
+    await salvar(); 
+    renderAdmLigas(); 
+    alert('Apostador incluído na liga com sucesso!');
 }
 
 async function remUserLiga(lid, uid) {
