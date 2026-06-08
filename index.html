@@ -244,7 +244,7 @@
             <div id="rnk-geral" class="tab-content" style="display:block;">
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th>Rodada</th><th class="col-num">Total</th></tr></thead>
+                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th class="col-num">Total</th></tr></thead>
                         <tbody id="tb-ranking"></tbody>
                     </table>
                 </div>
@@ -255,7 +255,7 @@
                 <div id="rnk-jogo-res" style="margin-bottom: 20px; font-weight: bold; text-align: center; background: var(--light); padding: 15px; border-radius: 4px;"></div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th class="t-left">Apostador</th><th style="width:80px;">Palpite</th><th class="col-num">Pts</th></tr></thead>
+                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th style="width:80px;">Palpite</th><th class="col-num">Pts</th></tr></thead>
                         <tbody id="tb-ranking-jogo"></tbody>
                     </table>
                 </div>
@@ -268,7 +268,7 @@
                 </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th class="t-left">Apostador</th><th class="col-num">Pts na Fase</th></tr></thead>
+                        <thead><tr><th class="col-pos">Pos</th><th class="t-left">Apostador</th><th class="col-num">Pts</th></tr></thead>
                         <tbody id="tb-ranking-fase"></tbody>
                     </table>
                 </div>
@@ -749,6 +749,18 @@ function getPtsFaseChecklist(uId, fase, pontos) {
     return pts;
 }
 
+function getTieBreakers(uid) {
+    var pGrp = 0, pExato = 0;
+    for(var k=0; k<db.j.length; k++) {
+        if(db.j[k].f === 'G') {
+            var ptoDetails = ptoCalc(uid, db.j[k]);
+            pGrp += ptoDetails.pt;
+            pExato += ptoDetails.exato;
+        }
+    }
+    return { pGrp: pGrp, pExato: pExato };
+}
+
 async function savPStage(fase, maxTeams, team, isChecked, domElement) {
     if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); domElement.checked = !isChecked; return; }
     
@@ -1003,19 +1015,17 @@ function popLigasDropdown() {
 
 function renderPontuacoes() {
     var lId = document.getElementById('sel-liga-pont').value; 
-    if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="4" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; return; }
+    if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking').innerHTML = '<tr><td colspan="3" class="t-left">Selecione uma liga para ver as pontuações.</td></tr>'; return; }
     var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; } if(!liga) return;
     var usersLiga = []; for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
     
     var rk = [];
     for(var i=0; i<usersLiga.length; i++){
-        var u = usersLiga[i], t=0, pGrp=0, pExato=0; 
+        var u = usersLiga[i], t=0; 
         for(var k=0; k<db.j.length; k++) {
             if(db.j[k].f === 'G') {
                 var ptoDetails = ptoCalc(u.id, db.j[k]);
                 t += ptoDetails.pt;
-                pGrp += ptoDetails.pt;
-                pExato += ptoDetails.exato;
             }
         }
         
@@ -1026,7 +1036,8 @@ function renderPontuacoes() {
         t += getPtsFaseChecklist(u.id, 'Final', db.pts.r2);
         t += getPtsFaseChecklist(u.id, 'Campeao', db.pts.w);
 
-        rk.push({ n: u.nome, to: t, pGrp: pGrp, pExato: pExato });
+        var ties = getTieBreakers(u.id);
+        rk.push({ n: u.nome, to: t, pGrp: ties.pGrp, pExato: ties.pExato });
     }
     
     rk.sort(function(a,b){
@@ -1035,7 +1046,7 @@ function renderPontuacoes() {
         return b.pExato - a.pExato;
     });
 
-    var html = ''; for(var i=0; i<rk.length; i++) html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td>-</td><td class="col-num">' + rk[i].to + '</td></tr>';
+    var html = ''; for(var i=0; i<rk.length; i++) html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td class="col-num">' + rk[i].to + '</td></tr>';
     document.getElementById('tb-ranking').innerHTML = html;
 }
 
@@ -1066,7 +1077,7 @@ function popRnkFaseSel() {
 
 function renderRnkFase() {
     var lId = document.getElementById('sel-liga-pont').value, faseId = document.getElementById('sel-rnk-fase').value;
-    if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking-fase').innerHTML = '<tr><td colspan="2">Selecione uma liga primeiro.</td></tr>'; return; }
+    if(!lId || lId === 'CREATE' || lId === 'JOIN') { document.getElementById('tb-ranking-fase').innerHTML = '<tr><td colspan="3">Selecione uma liga primeiro.</td></tr>'; return; }
     if(!faseId) { document.getElementById('tb-ranking-fase').innerHTML = ''; return; }
     
     var liga = null; for(var i=0; i<db.l.length; i++){ if(db.l[i].id===lId) liga = db.l[i]; }
@@ -1090,13 +1101,20 @@ function renderRnkFase() {
             }
         }
         
-        lista.push({ n: u.nome, pts: pts }); 
+        var ties = getTieBreakers(u.id);
+        lista.push({ n: u.nome, pts: pts, pGrp: ties.pGrp, pExato: ties.pExato }); 
     }
-    lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
+    
+    lista.sort(function(a,b){ 
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.pGrp !== a.pGrp) return b.pGrp - a.pGrp;
+        if (b.pExato !== a.pExato) return b.pExato - a.pExato;
+        return a.n.localeCompare(b.n); 
+    });
     
     var html = ''; 
     for(var i=0; i<lista.length; i++) {
-        html += '<tr><td class="t-left">' + lista[i].n + '</td><td class="col-num"><b>' + lista[i].pts + '</b></td></tr>';
+        html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + lista[i].n + '</td><td class="col-num"><b>' + lista[i].pts + '</b></td></tr>';
     }
     document.getElementById('tb-ranking-fase').innerHTML = html;
 }
@@ -1111,10 +1129,25 @@ function renderRnkJogo() {
     if(res) { var eq = reqEquipe(j, db.r, 'R_'); if(j.f === 'G' && res.a !== '' && res.b !== '') resTxt = eq.A + ' ' + res.a + ' x ' + res.b + ' ' + eq.B; else if (j.f !== 'G' && res.w) resTxt = 'Vencedor: ' + res.w; }
     document.getElementById('rnk-jogo-res').innerHTML = 'Resultado Oficial: <br><span style="font-size:1.3rem; color:var(--text);">' + resTxt + '</span>';
     var usersLiga = []; for(var i=0; i<db.u.length; i++){ for(var k=0; k<liga.users.length; k++){ if(liga.users[k]===db.u[i].id) usersLiga.push(db.u[i]); } }
+    
     var lista = [];
-    for(var i=0; i<usersLiga.length; i++){ var u = usersLiga[i], p = db.p[u.id+'_'+jId], pTxt = p ? (j.f==='G' ? (p.a!=='' ? p.a+'x'+p.b : '-') : (p.w||'-')) : '-'; lista.push({ n: u.nome, pal: pTxt, pts: ptoCalc(u.id,j).pt }); }
-    lista.sort(function(a,b){ return b.pts - a.pts || a.n.localeCompare(b.n); });
-    var html = ''; for(var i=0; i<lista.length; i++) html += '<tr><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td class="col-num">' + lista[i].pts + '</td></tr>';
+    for(var i=0; i<usersLiga.length; i++){ 
+        var u = usersLiga[i], p = db.p[u.id+'_'+jId], pTxt = p ? (j.f==='G' ? (p.a!=='' ? p.a+'x'+p.b : '-') : (p.w||'-')) : '-'; 
+        var ties = getTieBreakers(u.id);
+        lista.push({ n: u.nome, pal: pTxt, pts: ptoCalc(u.id,j).pt, pGrp: ties.pGrp, pExato: ties.pExato }); 
+    }
+    
+    lista.sort(function(a,b){ 
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.pGrp !== a.pGrp) return b.pGrp - a.pGrp;
+        if (b.pExato !== a.pExato) return b.pExato - a.pExato;
+        return a.n.localeCompare(b.n); 
+    });
+    
+    var html = ''; 
+    for(var i=0; i<lista.length; i++) {
+        html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td class="col-num">' + lista[i].pts + '</td></tr>';
+    }
     document.getElementById('tb-ranking-jogo').innerHTML = html;
 }
 
