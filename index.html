@@ -400,7 +400,61 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function safeGet(key) { try { return window.localStorage ? window.localStorage.getItem(key) : null; } catch(e) { return null; } }
 function safeSet(key, val) { try { if(window.localStorage) window.localStorage.setItem(key, val); } catch(e) {} }
 
-var SCHEDULE_CSV = [{id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun', c:'Guadalajara'},{id:3, d:'12/jun', c:'Toronto'},{id:4, d:'12/jun', c:'Los Angeles'},{id:5, d:'13/jun', c:'Vancouver'},{id:6, d:'13/jun', c:'São Francisco'},{id:7, d:'13/jun', c:'Nova York'},{id:8, d:'13/jun', c:'Boston'},{id:9, d:'14/jun', c:'Houston'},{id:10, d:'14/jun', c:'Dallas'},{id:11, d:'14/jun', c:'Filadélfia'},{id:12, d:'14/jun', c:'Monterrey'},{id:13, d:'15/jun', c:'Atlanta'},{id:14, d:'15/jun', c:'Seattle'},{id:15, d:'15/jun', c:'Miami'},{id:16, d:'15/jun', c:'Los Angeles'},{id:17, d:'16/jun', c:'Nova York'},{id:18, d:'16/jun', c:'Boston'},{id:19, d:'16/jun', c:'Kansas City'},{id:20, d:'16/jun', c:'São Francisco'},{id:21, d:'17/jun', c:'Houston'},{id:22, d:'17/jun', c:'Dallas'},{id:23, d:'17/jun', c:'Toronto'},{id:24, d:'17/jun', c:'Cidade do México'},{id:25, d:'18/jun', c:'Atlanta'},{id:26, d:'18/jun', c:'Los Angeles'},{id:27, d:'18/jun', c:'Vancouver'},{id:28, d:'18/jun', c:'Guadalajara'},{id:29, d:'19/jun', c:'São Francisco'},{id:30, d:'19/jun', c:'Seattle'},{id:31, d:'19/jun', c:'Boston'},{id:32, d:'19/jun', c:'Filadélfia'},{id:33, d:'20/jun', c:'Houston'},{id:34, d:'20/jun', c:'Toronto'},{id:35, d:'20/jun', c:'Kansas City'},{id:36, d:'20/jun', c:'Monterrey'},{id:37, d:'21/jun', c:'Atlanta'},{id:38, d:'21/jun', c:'Los Angeles'},{id:39, d:'21/jun', c:'Miami'},{id:40, d:'21/jun', c:'Vancouver'},{id:41, d:'22/jun', c:'Dallas'},{id:42, d:'22/jun', c:'Filadélfia'},{id:43, d:'22/jun', c:'Nova York'},{id:44, d:'22/jun', c:'São Francisco'},{id:45, d:'23/jun', c:'Houston'},{id:46, d:'23/jun', c:'Boston'},{id:47, d:'23/jun', c:'Toronto'},{id:48, d:'23/jun', c:'Guadalajara'},{id:49, d:'24/jun', c:'Vancouver'},{id:50, d:'24/jun', c:'Seattle'},{id:51, d:'24/jun', c:'Miami'},{id:52, d:'24/jun', c:'Atlanta'},{id:53, d:'24/jun', c:'Cidade do México'},{id:54, d:'24/jun', c:'Monterrey'},{id:55, d:'25/jun', c:'Nova York'},{id:56, d:'25/jun', c:'Filadélfia'},{id:57, d:'25/jun', c:'Dallas'},{id:58, d:'25/jun', c:'Kansas City'},{id:59, d:'25/jun', c:'Los Angeles'},{id:60, d:'25/jun', c:'São Francisco'},{id:61, d:'26/jun', c:'Boston'},{id:62, d:'26/jun', c:'Toronto'},{id:63, d:'26/jun', c:'Guadalajara'},{id:64, d:'26/jun', c:'Houston'},{id:65, d:'26/jun', c:'Seattle'},{id:66, d:'26/jun', c:'Vancouver'},{id:67, d:'27/jun', c:'Nova York'},{id:68, d:'27/jun', c:'Filadélfia'},{id:69, d:'27/jun', c:'Miami'},{id:70, d:'27/jun', c:'Atlanta'},{id:71, d:'27/jun', c:'Dallas'},{id:72, d:'27/jun', c:'Kansas City'},{id:73, d:'28/jun', c:'Los Angeles'},{id:74, d:'29/jun', c:'Boston'},{id:75, d:'29/jun', c:'Monterrey'},{id:76, d:'29/jun', c:'Houston'},{id:77, d:'30/jun', c:'Nova York'},{id:78, d:'30/jun', c:'Dallas'},{id:79, d:'30/jun', c:'Cidade do México'},{id:80, d:'01/jul', c:'Atlanta'},{id:81, d:'01/jul', c:'São Francisco'},{id:82, d:'01/jul', c:'Seattle'},{id:83, d:'02/jul', c:'Toronto'},{id:84, d:'02/jul', c:'Los Angeles'},{id:85, d:'02/jul', c:'Vancouver'},{id:86, d:'03/jul', c:'Miami'},{id:87, d:'03/jul', c:'Kansas City'},{id:88, d:'03/jul', c:'Dallas'},{id:89, d:'04/jul', c:'Filadélfia'},{id:90, d:'04/jul', c:'Houston'},{id:91, d:'05/jul', c:'Nova York'},{id:92, d:'05/jul', c:'Cidade do México'},{id:93, d:'06/jul', c:'Dallas'},{id:94, d:'06/jul', c:'Seattle'},{id:95, d:'08/jul', c:'Atlanta'},{id:96, d:'08/jul', c:'Vancouver'},{id:97, d:'09/jul', c:'Boston'},{id:98, d:'10/jul', c:'Los Angeles'},{id:99, d:'11/jul', c:'Miami'},{id:100, d:'11/jul', c:'Kansas City'},{id:101, d:'14/jul', c:'Dallas'},{id:102, d:'15/jul', c:'Atlanta'},{id:103, d:'18/jul', c:'Miami'},{id:104, d:'19/jul', c:'Nova York'}];
+var SCHEDULE_CSV = [
+    {id:1, d:'11/jun', c:'Cidade do México'},{id:2, d:'11/jun', c:'Guadalajara'},
+    {id:3, d:'12/jun', c:'Toronto'},{id:4, d:'12/jun', c:'Los Angeles'},
+    {id:5, d:'13/jun', c:'São Francisco'},{id:6, d:'13/jun', c:'Nova York'},
+    {id:7, d:'13/jun', c:'Boston'},{id:8, d:'13/jun', c:'Vancouver'},
+    {id:9, d:'14/jun', c:'Houston'},{id:10, d:'14/jun', c:'Dallas'},
+    {id:11, d:'14/jun', c:'Filadélfia'},{id:12, d:'14/jun', c:'Monterrey'},
+    {id:13, d:'15/jun', c:'Atlanta'},{id:14, d:'15/jun', c:'Seattle'},
+    {id:15, d:'15/jun', c:'Miami'},{id:16, d:'15/jun', c:'Los Angeles'},
+    {id:17, d:'16/jun', c:'Nova York'},{id:18, d:'16/jun', c:'Boston'},
+    {id:19, d:'16/jun', c:'Kansas City'},{id:20, d:'16/jun', c:'São Francisco'},
+    {id:21, d:'17/jun', c:'Dallas'},{id:22, d:'17/jun', c:'Toronto'},
+    {id:23, d:'17/jun', c:'Houston'},{id:24, d:'17/jun', c:'Cidade do México'},
+    {id:25, d:'18/jun', c:'Atlanta'},{id:26, d:'18/jun', c:'Los Angeles'},
+    {id:27, d:'18/jun', c:'Vancouver'},{id:28, d:'18/jun', c:'Guadalajara'},
+    {id:29, d:'19/jun', c:'Seattle'},{id:30, d:'19/jun', c:'Boston'},
+    {id:31, d:'19/jun', c:'Filadélfia'},{id:32, d:'19/jun', c:'São Francisco'},
+    {id:33, d:'20/jun', c:'Houston'},{id:34, d:'20/jun', c:'Toronto'},
+    {id:35, d:'20/jun', c:'Kansas City'},{id:36, d:'20/jun', c:'Monterrey'},
+    {id:37, d:'21/jun', c:'Atlanta'},{id:38, d:'21/jun', c:'Los Angeles'},
+    {id:39, d:'21/jun', c:'Miami'},{id:40, d:'21/jun', c:'Vancouver'},
+    {id:41, d:'22/jun', c:'Filadélfia'},{id:42, d:'22/jun', c:'Dallas'},
+    {id:43, d:'22/jun', c:'Nova York'},{id:44, d:'22/jun', c:'São Francisco'},
+    {id:45, d:'23/jun', c:'Boston'},{id:46, d:'23/jun', c:'Houston'},
+    {id:47, d:'23/jun', c:'Toronto'},{id:48, d:'23/jun', c:'Guadalajara'},
+    {id:49, d:'24/jun', c:'Miami'},{id:50, d:'24/jun', c:'Atlanta'},
+    {id:51, d:'24/jun', c:'Vancouver'},{id:52, d:'24/jun', c:'Seattle'},
+    {id:53, d:'24/jun', c:'Cidade do México'},{id:54, d:'24/jun', c:'Monterrey'},
+    {id:55, d:'25/jun', c:'Nova York'},{id:56, d:'25/jun', c:'Filadélfia'},
+    {id:57, d:'25/jun', c:'Kansas City'},{id:58, d:'25/jun', c:'Dallas'},
+    {id:59, d:'25/jun', c:'Los Angeles'},{id:60, d:'25/jun', c:'São Francisco'},
+    {id:61, d:'26/jun', c:'Nova York'},{id:62, d:'26/jun', c:'Boston'},
+    {id:63, d:'26/jun', c:'Miami'},{id:64, d:'26/jun', c:'Atlanta'},
+    {id:65, d:'26/jun', c:'Vancouver'},{id:66, d:'26/jun', c:'Los Angeles'},
+    {id:67, d:'27/jun', c:'Boston'},{id:68, d:'27/jun', c:'Toronto'},
+    {id:69, d:'27/jun', c:'Houston'},{id:70, d:'27/jun', c:'Guadalajara'},
+    {id:71, d:'27/jun', c:'Kansas City'},{id:72, d:'27/jun', c:'São Francisco'},
+    {id:73, d:'28/jun', c:'Los Angeles'},{id:74, d:'29/jun', c:'Boston'},
+    {id:75, d:'29/jun', c:'Monterrey'},{id:76, d:'29/jun', c:'Houston'},
+    {id:77, d:'30/jun', c:'Nova York'},{id:78, d:'30/jun', c:'Dallas'},
+    {id:79, d:'30/jun', c:'Cidade do México'},{id:80, d:'01/jul', c:'Atlanta'},
+    {id:81, d:'01/jul', c:'São Francisco'},{id:82, d:'01/jul', c:'Seattle'},
+    {id:83, d:'02/jul', c:'Toronto'},{id:84, d:'02/jul', c:'Los Angeles'},
+    {id:85, d:'02/jul', c:'Vancouver'},{id:86, d:'03/jul', c:'Miami'},
+    {id:87, d:'03/jul', c:'Kansas City'},{id:88, d:'03/jul', c:'Dallas'},
+    {id:89, d:'04/jul', c:'Filadélfia'},{id:90, d:'04/jul', c:'Houston'},
+    {id:91, d:'05/jul', c:'Nova York'},{id:92, d:'05/jul', c:'Cidade do México'},
+    {id:93, d:'06/jul', c:'Dallas'},{id:94, d:'06/jul', c:'Seattle'},
+    {id:95, d:'08/jul', c:'Atlanta'},{id:96, d:'08/jul', c:'Vancouver'},
+    {id:97, d:'09/jul', c:'Boston'},{id:98, d:'10/jul', c:'Los Angeles'},
+    {id:99, d:'11/jul', c:'Miami'},{id:100, d:'11/jul', c:'Kansas City'},
+    {id:101, d:'14/jul', c:'Dallas'},{id:102, d:'15/jul', c:'Atlanta'},
+    {id:103, d:'18/jul', c:'Miami'},{id:104, d:'19/jul', c:'Nova York'}
+];
+
 var TEAMS_DATA = [{'grp':'A', 'pos':'A1', 'n':'México'},{'grp':'A', 'pos':'A2', 'n':'África do Sul'},{'grp':'A', 'pos':'A3', 'n':'Coreia do Sul'},{'grp':'A', 'pos':'A4', 'n':'Rep. Tcheca'},{'grp':'B', 'pos':'B1', 'n':'Canadá'},{'grp':'B', 'pos':'B2', 'n':'Bósnia'},{'grp':'B', 'pos':'B3', 'n':'Catar'},{'grp':'B', 'pos':'B4', 'n':'Suíça'},{'grp':'C', 'pos':'C1', 'n':'Brasil'},{'grp':'C', 'pos':'C2', 'n':'Marrocos'},{'grp':'C', 'pos':'C3', 'n':'Haiti'},{'grp':'C', 'pos':'C4', 'n':'Escócia'},{'grp':'D', 'pos':'D1', 'n':'Estados Unidos'},{'grp':'D', 'pos':'D2', 'n':'Paraguai'},{'grp':'D', 'pos':'D3', 'n':'Austrália'},{'grp':'D', 'pos':'D4', 'n':'Turquia'},{'grp':'E', 'pos':'E1', 'n':'Alemanha'},{'grp':'E', 'pos':'E2', 'n':'Curaçao'},{'grp':'E', 'pos':'E3', 'n':'C. do Marfim'},{'grp':'E', 'pos':'E4', 'n':'Equador'},{'grp':'F', 'pos':'F1', 'n':'Holanda'},{'grp':'F', 'pos':'F2', 'n':'Japão'},{'grp':'F', 'pos':'F3', 'n':'Suécia'},{'grp':'F', 'pos':'F4', 'n':'Tunísia'},{'grp':'G', 'pos':'G1', 'n':'Bélgica'},{'grp':'G', 'pos':'G2', 'n':'Egito'},{'grp':'G', 'pos':'G3', 'n':'Irã'},{'grp':'G', 'pos':'G4', 'n':'Nova Zelândia'},{'grp':'H', 'pos':'H1', 'n':'Espanha'},{'grp':'H', 'pos':'H2', 'n':'Cabo Verde'},{'grp':'H', 'pos':'H3', 'n':'Arábia Saudita'},{'grp':'H', 'pos':'H4', 'n':'Uruguai'},{'grp':'I', 'pos':'I1', 'n':'França'},{'grp':'I', 'pos':'I2', 'n':'Senegal'},{'grp':'I', 'pos':'I3', 'n':'Iraque'},{'grp':'I', 'pos':'I4', 'n':'Noruega'},{'grp':'J', 'pos':'J1', 'n':'Argentina'},{'grp':'J', 'pos':'J2', 'n':'Argélia'},{'grp':'J', 'pos':'J3', 'n':'Áustria'},{'grp':'J', 'pos':'J4', 'n':'Jordânia'},{'grp':'K', 'pos':'K1', 'n':'Portugal'},{'grp':'K', 'pos':'K2', 'n':'RD Congo'},{'grp':'K', 'pos':'K3', 'n':'Uzbequistão'},{'grp':'K', 'pos':'K4', 'n':'Colômbia'},{'grp':'L', 'pos':'L1', 'n':'Inglaterra'},{'grp':'L', 'pos':'L2', 'n':'Croácia'},{'grp':'L', 'pos':'L3', 'n':'Gana'},{'grp':'L', 'pos':'L4', 'n':'Panamá'}];
 var GS_MAP = [{'g':'A','a':1,'b':2}, {'g':'A','a':3,'b':4}, {'g':'B','a':1,'b':2}, {'g':'D','a':1,'b':2}, {'g':'B','a':3,'b':4}, {'g':'C','a':1,'b':2}, {'g':'C','a':3,'b':4}, {'g':'D','a':3,'b':4}, {'g':'E','a':1,'b':2}, {'g':'F','a':1,'b':2}, {'g':'E','a':3,'b':4}, {'g':'F','a':3,'b':4}, {'g':'H','a':1,'b':2}, {'g':'G','a':1,'b':2}, {'g':'H','a':3,'b':4}, {'g':'G','a':3,'b':4}, {'g':'I','a':1,'b':2}, {'g':'I','a':3,'b':4}, {'g':'J','a':1,'b':2}, {'g':'J','a':3,'b':4}, {'g':'L','a':1,'b':2}, {'g':'L','a':3,'b':4}, {'g':'K','a':1,'b':2}, {'g':'K','a':3,'b':4}, {'g':'A','a':4,'b':2}, {'g':'B','a':4,'b':2}, {'g':'B','a':1,'b':3}, {'g':'A','a':1,'b':3}, {'g':'D','a':1,'b':3}, {'g':'C','a':4,'b':2}, {'g':'C','a':1,'b':3}, {'g':'D','a':4,'b':2}, {'g':'F','a':1,'b':3}, {'g':'E','a':1,'b':3}, {'g':'E','a':4,'b':2}, {'g':'F','a':4,'b':2}, {'g':'H','a':1,'b':3}, {'g':'G','a':1,'b':3}, {'g':'H','a':4,'b':2}, {'g':'G','a':4,'b':2}, {'g':'I','a':1,'b':3}, {'g':'J','a':1,'b':3}, {'g':'I','a':4,'b':2}, {'g':'J','a':4,'b':2}, {'g':'L','a':1,'b':3}, {'g':'K','a':1,'b':3}, {'g':'L','a':4,'b':2}, {'g':'K','a':4,'b':2}, {'g':'C','a':4,'b':1}, {'g':'C','a':2,'b':3}, {'g':'B','a':4,'b':1}, {'g':'B','a':2,'b':3}, {'g':'A','a':4,'b':1}, {'g':'A','a':2,'b':3}, {'g':'E','a':4,'b':1}, {'g':'E','a':2,'b':3}, {'g':'F','a':4,'b':1}, {'g':'F','a':2,'b':3}, {'g':'D','a':4,'b':1}, {'g':'D','a':2,'b':3}, {'g':'I','a':4,'b':1}, {'g':'I','a':2,'b':3}, {'g':'G','a':4,'b':1}, {'g':'G','a':2,'b':3}, {'g':'H','a':4,'b':1}, {'g':'H','a':2,'b':3}, {'g':'L','a':4,'b':1}, {'g':'L','a':2,'b':3}, {'g':'J','a':4,'b':1}, {'g':'J','a':2,'b':3}, {'g':'K','a':4,'b':1}, {'g':'K','a':2,'b':3}];
 
