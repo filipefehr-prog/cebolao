@@ -1043,10 +1043,22 @@ function renderPontuacoes() {
     rk.sort(function(a,b){
         if (b.to !== a.to) return b.to - a.to;
         if (b.pGrp !== a.pGrp) return b.pGrp - a.pGrp;
-        return b.pExato - a.pExato;
+        if (b.pExato !== a.pExato) return b.pExato - a.pExato;
+        return a.n.localeCompare(b.n);
     });
 
-    var html = ''; for(var i=0; i<rk.length; i++) html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + rk[i].n + '</td><td class="col-num">' + rk[i].to + '</td></tr>';
+    var html = ''; 
+    var currentRank = 1;
+    for(var i=0; i<rk.length; i++) {
+        if (i > 0) {
+            var prev = rk[i-1];
+            var curr = rk[i];
+            if (curr.to !== prev.to || curr.pGrp !== prev.pGrp || curr.pExato !== prev.pExato) {
+                currentRank = i + 1;
+            }
+        }
+        html += '<tr><td class="col-pos">' + currentRank + 'º</td><td class="t-left">' + rk[i].n + '</td><td class="col-num">' + rk[i].to + '</td></tr>';
+    }
     document.getElementById('tb-ranking').innerHTML = html;
 }
 
@@ -1113,8 +1125,16 @@ function renderRnkFase() {
     });
     
     var html = ''; 
+    var currentRank = 1;
     for(var i=0; i<lista.length; i++) {
-        html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + lista[i].n + '</td><td class="col-num"><b>' + lista[i].pts + '</b></td></tr>';
+        if (i > 0) {
+            var prev = lista[i-1];
+            var curr = lista[i];
+            if (curr.pts !== prev.pts || curr.pGrp !== prev.pGrp || curr.pExato !== prev.pExato) {
+                currentRank = i + 1;
+            }
+        }
+        html += '<tr><td class="col-pos">' + currentRank + 'º</td><td class="t-left">' + lista[i].n + '</td><td class="col-num"><b>' + lista[i].pts + '</b></td></tr>';
     }
     document.getElementById('tb-ranking-fase').innerHTML = html;
 }
@@ -1145,8 +1165,16 @@ function renderRnkJogo() {
     });
     
     var html = ''; 
+    var currentRank = 1;
     for(var i=0; i<lista.length; i++) {
-        html += '<tr><td class="col-pos">' + (i+1) + 'º</td><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td class="col-num">' + lista[i].pts + '</td></tr>';
+        if (i > 0) {
+            var prev = lista[i-1];
+            var curr = lista[i];
+            if (curr.pts !== prev.pts || curr.pGrp !== prev.pGrp || curr.pExato !== prev.pExato) {
+                currentRank = i + 1;
+            }
+        }
+        html += '<tr><td class="col-pos">' + currentRank + 'º</td><td class="t-left">' + lista[i].n + '</td><td style="font-weight:bold;">' + lista[i].pal + '</td><td class="col-num">' + lista[i].pts + '</td></tr>';
     }
     document.getElementById('tb-ranking-jogo').innerHTML = html;
 }
