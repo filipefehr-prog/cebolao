@@ -203,7 +203,6 @@
         <div id="res-grp" class="tab-content" style="display:block;"></div>
         <div id="res-grp-data" class="tab-content" style="display:none;"></div>
         <div id="res-cls" class="tab-content" style="display:none;">
-            <p class="nota-desempate">Critérios de desempate oficiais: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
             <div id="res-cls-tbl"></div>
         </div>
         <div id="res-elm" class="tab-content" style="display:none;"></div>
@@ -874,7 +873,7 @@ function renderClsViews(isOfc) {
         if(!equipasNoGrupo || equipasNoGrupo.length === 0) continue;
         
         var colsHtml = isOfc
-            ? '<tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th></tr>'
+            ? '<tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th></tr>'
             : '<tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pontos</th></tr>';
 
         var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead>' + colsHtml + '</thead><tbody>';
@@ -893,7 +892,7 @@ function renderClsViews(isOfc) {
             var chkBox = '<input type="checkbox" class="ipt-chk" onchange="savPStage(\'r32\', 32, \'' + x.n + '\', this.checked, this, ' + isOfc + ')" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
             
             if (isOfc) {
-                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td>'+x.j+'</td><td>'+x.v+'</td><td>'+x.e+'</td><td>'+x.d+'</td><td>'+x.sg+'</td><td><b>' + x.p + '</b></td><td>' + chkBox + '</td></tr>';
+                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td><b>' + x.p + '</b></td><td>' + chkBox + '</td></tr>';
             } else {
                 var pontosObtidos = 0;
                 if (isChecked) {
