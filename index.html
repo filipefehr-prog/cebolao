@@ -197,13 +197,13 @@
         <select class="ipt-combo" id="sel-aba-resultado" onchange="switchTabRes(this.value)" style="margin-bottom: 20px; font-weight: bold; font-size: 1rem; padding: 10px; height: 45px;">
             <option value="res-grp">Fase de Grupos - Por Grupo</option>
             <option value="res-grp-data">Fase de Grupos - Por Data</option>
-            <option value="res-cls">Classificação</option>
-            <option value="res-elm">Mata-mata</option>
+            <option value="res-cls">Classificação Oficial</option>
+            <option value="res-elm">Mata-mata Oficial</option>
         </select>
         <div id="res-grp" class="tab-content" style="display:block;"></div>
         <div id="res-grp-data" class="tab-content" style="display:none;"></div>
         <div id="res-cls" class="tab-content" style="display:none;">
-            <p class="nota-desempate">Critérios de desempate: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
+            <p class="nota-desempate">Critérios de desempate oficiais: 1. Saldo de gols 2. Gols marcados 3. Fair play 4. Ranking</p>
             <div id="res-cls-tbl"></div>
         </div>
         <div id="res-elm" class="tab-content" style="display:none;"></div>
@@ -642,8 +642,8 @@ function switchTabPal(id) {
     document.getElementById(id).style.display = 'block'; 
     
     if(id === 'pal-grp' || id === 'pal-grp-data') { renderPal(); }
-    if(id === 'pal-elm') { renderMataMataPalpites(); }
-    if(id === 'pal-cls') { renderClsPalpites(); }
+    if(id === 'pal-elm') { renderMataMataViews(false); }
+    if(id === 'pal-cls') { renderClsViews(false); }
 }
 
 function switchTabRes(id) { 
@@ -654,8 +654,9 @@ function switchTabRes(id) {
     document.getElementById('res-elm').style.display = 'none'; 
     document.getElementById(id).style.display = 'block'; 
     
-    if(id === 'res-grp' || id === 'res-grp-data' || id === 'res-elm') renderRes(); 
-    if(id === 'res-cls') renderTbCls('res-cls-tbl', db.r, 'R_', true); 
+    if(id === 'res-grp' || id === 'res-grp-data') renderRes(); 
+    if(id === 'res-cls') renderClsViews(true); 
+    if(id === 'res-elm') renderMataMataViews(true); 
 }
 
 function switchTabRnk(id) { 
@@ -754,17 +755,6 @@ function reqEquipe(j, dd, px) {
     if(j.r.t === 'p') { var getL = function(jId, obj) { var eq = null; for(var i=0; i<db.j.length; i++){ if(db.j[i].id === jId) eq = reqEquipe(db.j[i], dd, px); } if(!eq) return 'Perd J'+jId; return (obj && obj.w) ? (obj.w===eq.A ? eq.B : eq.A) : 'Perd J'+jId; }; return { A: getL(j.r.jA, dd[px+j.r.jA]), B: getL(j.r.jB, dd[px+j.r.jB]) }; }
 }
 
-function getOficiaisFase(fase) {
-    var ls = []; 
-    for(var i=0; i<db.j.length; i++) { 
-        if(db.j[i].t === fase) { 
-            var e = reqEquipe(db.j[i], db.r, 'R_'); 
-            ls.push(e.A); ls.push(e.B); 
-        } 
-    } 
-    return ls; 
-}
-
 function ptoCalc(uId, j) {
     var p = db.p[uId+'_'+j.id] || {a:'', b:'', w:''}, res = db.r['R_'+j.id], pts = 0;
     var exato = 0;
@@ -782,22 +772,13 @@ function ptoCalc(uId, j) {
 function getPtsFaseChecklist(uId, fase, pontos) {
     if(!db.pStage || !db.pStage[uId] || !db.pStage[uId][fase]) return 0;
     var palpites = db.pStage[uId][fase];
+    var oficiais = (db.pStage['OFFICIAL'] && db.pStage['OFFICIAL'][fase]) ? db.pStage['OFFICIAL'][fase] : [];
     var pts = 0;
     
     if (fase === 'Campeao') {
-        var resFinal = db.r['R_104'];
-        if(resFinal && resFinal.w && palpites[0] === resFinal.w) pts += pontos;
+        if(oficiais.length > 0 && palpites[0] === oficiais[0]) pts += pontos;
         return pts;
     }
-
-    var ofcStageName = '';
-    if(fase === 'r32') ofcStageName = 'Rodada de 32';
-    else if(fase === 'Oitavas de Final') ofcStageName = 'Oitavas de Final';
-    else if(fase === 'Quartas de Final') ofcStageName = 'Quartas de Final';
-    else if(fase === 'Semifinal') ofcStageName = 'Semifinal';
-    else if(fase === 'Final') ofcStageName = 'Final';
-    
-    var oficiais = getOficiaisFase(ofcStageName);
 
     palpites.forEach(t => { if(oficiais.indexOf(t) !== -1) pts += pontos; });
     return pts;
@@ -815,10 +796,11 @@ function getTieBreakers(uid) {
     return { pGrp: pGrp, pExato: pExato };
 }
 
-async function savPStage(fase, maxTeams, team, isChecked, domElement) {
-    if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); domElement.checked = !isChecked; return; }
+async function savPStage(fase, maxTeams, team, isChecked, domElement, isOfc) {
+    if(!isOfc && db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); domElement.checked = !isChecked; return; }
+    if(isOfc && (!cU || !cU.isM)) return;
     
-    var uId = cU.id;
+    var uId = isOfc ? 'OFFICIAL' : cU.id;
     if(!db.pStage) db.pStage = {};
     if(!db.pStage[uId]) db.pStage[uId] = {};
     if(!db.pStage[uId][fase]) db.pStage[uId][fase] = [];
@@ -834,7 +816,7 @@ async function savPStage(fase, maxTeams, team, isChecked, domElement) {
     } else {
         if (isChecked) {
             if (currentList.length >= maxTeams) {
-                alert('Você já selecionou o limite máximo de ' + maxTeams + ' equipas para esta fase.');
+                alert('Limite máximo de ' + maxTeams + ' equipas atingido.');
                 domElement.checked = false;
                 return;
             }
@@ -860,13 +842,17 @@ async function savPStage(fase, maxTeams, team, isChecked, domElement) {
     }
     
     await salvar();
-    if (fase === 'r32') { renderClsPalpites(); } else { renderMataMataPalpites(); }
+    if(isOfc) {
+        if (fase === 'r32') renderClsViews(true); else renderMataMataViews(true);
+    } else {
+        if (fase === 'r32') renderClsViews(false); else renderMataMataViews(false);
+    }
 }
 
-function renderClsPalpites() {
-    var alvo = 'pal-cls-tbl';
+function renderClsViews(isOfc) {
+    var alvo = isOfc ? 'res-cls-tbl' : 'pal-cls-tbl';
     var d = document.getElementById(alvo); d.innerHTML = ''; 
-    var uId = cU.id;
+    var uId = isOfc ? 'OFFICIAL' : cU.id;
     
     if(!db.pStage) db.pStage = {};
     if(!db.pStage[uId]) db.pStage[uId] = { r32: [] };
@@ -875,10 +861,11 @@ function renderClsPalpites() {
     var totalSelected = db.pStage[uId]['r32'].length;
     var statusClass = totalSelected === 32 ? 'ok' : 'erro';
     
-    var headerHtml = '<div class="fase-titulo"><span>Seleção para Rodada de 32</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / 32 selecionadas</span></div>';
+    var titleText = isOfc ? 'Classificados Oficiais (Rodada de 32)' : 'Seleção para Rodada de 32';
+    var headerHtml = '<div class="fase-titulo"><span>' + titleText + '</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / 32 selecionadas</span></div>';
     d.innerHTML += headerHtml;
 
-    var st = classificar(db.p, uId+'_');
+    var st = classificar(isOfc ? db.r : db.p, isOfc ? 'R_' : cU.id+'_');
 
     var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
     for(var m=0; m<grupos.length; m++) {
@@ -886,41 +873,54 @@ function renderClsPalpites() {
         var equipasNoGrupo = st.t[g]; 
         if(!equipasNoGrupo || equipasNoGrupo.length === 0) continue;
         
-        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pontos</th></tr></thead><tbody>';
+        var colsHtml = isOfc
+            ? '<tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th></tr>'
+            : '<tr><th class="col-eq t-left">Equipe</th><th style="width:40px;">Pts</th><th style="width:60px;">Classif</th><th style="width:80px; text-align:right;">Pontos</th></tr>';
+
+        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead>' + colsHtml + '</thead><tbody>';
         
         for(var n=0; n<equipasNoGrupo.length; n++) {
             var x = equipasNoGrupo[n];
             var isChecked = db.pStage[uId]['r32'].indexOf(x.n) !== -1;
             
-            var pontosObtidos = 0;
-            if (isChecked) {
-                var ofcR32 = getOficiaisFase('Rodada de 32');
-                if (ofcR32.indexOf(x.n) !== -1) { pontosObtidos = db.pts.r32; }
+            var disabledAttr = '';
+            if (isOfc) {
+                disabledAttr = (!cU.isM) ? ' disabled style="opacity:0.6;"' : '';
+            } else {
+                disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
             }
             
-            var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
-            var chkBox = '<input type="checkbox" class="ipt-chk" onchange="savPStage(\'r32\', 32, \'' + x.n + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
+            var chkBox = '<input type="checkbox" class="ipt-chk" onchange="savPStage(\'r32\', 32, \'' + x.n + '\', this.checked, this, ' + isOfc + ')" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
             
-            html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td><b>' + x.p + '</b></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+            if (isOfc) {
+                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td>'+x.j+'</td><td>'+x.v+'</td><td>'+x.e+'</td><td>'+x.d+'</td><td>'+x.sg+'</td><td><b>' + x.p + '</b></td><td>' + chkBox + '</td></tr>';
+            } else {
+                var pontosObtidos = 0;
+                if (isChecked) {
+                    var ofcTeams = (db.pStage['OFFICIAL'] && db.pStage['OFFICIAL']['r32']) ? db.pStage['OFFICIAL']['r32'] : [];
+                    if (ofcTeams.indexOf(x.n) !== -1) { pontosObtidos = db.pts.r32; }
+                }
+                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal; font-weight:500;">' + x.n + '</span></div></td><td><b>' + x.p + '</b></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+            }
         }
         html += '</tbody></table></div>'; d.innerHTML += html;
     }
 }
 
-function renderMataMataPalpites() {
-    var alvo = 'pal-elm';
+function renderMataMataViews(isOfc) {
+    var alvo = isOfc ? 'res-elm' : 'pal-elm';
     var d = document.getElementById(alvo); d.innerHTML = ''; 
-    var uId = cU.id;
+    var uId = isOfc ? 'OFFICIAL' : cU.id;
     
     if(!db.pStage) db.pStage = {};
     if(!db.pStage[uId]) db.pStage[uId] = {};
 
     var stages = [
-        { saveId: 'Oitavas de Final', sourceId: 'r32', title: 'Rodada de 32', max: 16, pt: db.pts.r16, ptOfcSrc: 'Oitavas de Final' },
-        { saveId: 'Quartas de Final', sourceId: 'Oitavas de Final', title: 'Oitavas de Final', max: 8, pt: db.pts.r8, ptOfcSrc: 'Quartas de Final' },
-        { saveId: 'Semifinal', sourceId: 'Quartas de Final', title: 'Quartas de Final', max: 4, pt: db.pts.r4, ptOfcSrc: 'Semifinal' },
-        { saveId: 'Final', sourceId: 'Semifinal', title: 'Semifinal', max: 2, pt: db.pts.r2, ptOfcSrc: 'Final' },
-        { saveId: 'Campeao', sourceId: 'Final', title: 'Final', max: 1, pt: db.pts.w, ptOfcSrc: 'Campeao' }
+        { saveId: 'Oitavas de Final', sourceId: 'r32', title: 'Rodada de 32', max: 16, pt: db.pts.r16 },
+        { saveId: 'Quartas de Final', sourceId: 'Oitavas de Final', title: 'Oitavas de Final', max: 8, pt: db.pts.r8 },
+        { saveId: 'Semifinal', sourceId: 'Quartas de Final', title: 'Quartas de Final', max: 4, pt: db.pts.r4 },
+        { saveId: 'Final', sourceId: 'Semifinal', title: 'Semifinal', max: 2, pt: db.pts.r2 },
+        { saveId: 'Campeao', sourceId: 'Final', title: 'Final', max: 1, pt: db.pts.w }
     ];
 
     var html = '';
@@ -932,7 +932,8 @@ function renderMataMataPalpites() {
         var totalSelected = db.pStage[uId][stage.saveId].length;
         var statusClass = totalSelected === stage.max ? 'ok' : 'erro';
         
-        html += '<div class="fase-titulo" style="margin-top:30px;"><span>' + stage.title + '</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / ' + stage.max + '</span></div>';
+        var phaseTitle = isOfc ? 'Oficial - ' + stage.title : stage.title;
+        html += '<div class="fase-titulo" style="margin-top:30px;"><span>' + phaseTitle + '</span> <span class="contador-fase ' + statusClass + '">' + totalSelected + ' / ' + stage.max + '</span></div>';
         
         if (availableTeams.length === 0) {
             html += '<div style="padding:15px; text-align:center; color:var(--muted); font-size:0.8rem; background:var(--light); border-radius:4px;">Selecione as equipas na fase anterior para disponibilizá-las aqui.</div>';
@@ -941,29 +942,37 @@ function renderMataMataPalpites() {
 
         var tituloClassif = (stage.saveId === 'Campeao') ? 'Campeão' : 'Classif';
 
-        html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">' + tituloClassif + '</th><th style="width:80px; text-align:right;">Pontos</th></tr></thead><tbody>';
+        var colsHtml = isOfc
+            ? '<tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">' + tituloClassif + '</th></tr>'
+            : '<tr><th class="col-eq t-left">Equipe</th><th style="width:60px;">' + tituloClassif + '</th><th style="width:80px; text-align:right;">Pontos</th></tr>';
+
+        html += '<div class="table-wrapper" style="margin-bottom:15px;"><table class="tabela-palpite-classificacao"><thead>' + colsHtml + '</thead><tbody>';
         
         for (var k = 0; k < availableTeams.length; k++) {
             var tName = availableTeams[k];
             var isChecked = db.pStage[uId][stage.saveId].indexOf(tName) !== -1;
             
-            var pontosObtidos = 0;
-            if (isChecked) {
-                if (stage.saveId === 'Campeao') {
-                    var resFinal = db.r['R_104'];
-                    if (resFinal && resFinal.w && resFinal.w === tName) pontosObtidos = stage.pt;
-                } else {
-                    var ofcTeams = getOficiaisFase(stage.ptOfcSrc);
-                    if (ofcTeams.indexOf(tName) !== -1) { pontosObtidos = stage.pt; }
-                }
+            var disabledAttr = '';
+            if (isOfc) {
+                disabledAttr = (!cU.isM) ? ' disabled style="opacity:0.6;"' : '';
+            } else {
+                disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
             }
 
-            var disabledAttr = db.c.bPal ? ' disabled style="opacity:0.6;"' : '';
             var inputType = stage.saveId === 'Campeao' ? 'radio' : 'checkbox'; 
-            var nameAttr = stage.saveId === 'Campeao' ? 'name="rad_campeao"' : '';
-            var chkBox = '<input type="' + inputType + '" class="ipt-chk" ' + nameAttr + ' onchange="savPStage(\'' + stage.saveId + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this)" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
+            var nameAttr = stage.saveId === 'Campeao' ? 'name="rad_campeao_' + uId + '"' : '';
+            var chkBox = '<input type="' + inputType + '" class="ipt-chk" ' + nameAttr + ' onchange="savPStage(\'' + stage.saveId + '\', ' + stage.max + ', \'' + tName + '\', this.checked, this, ' + isOfc + ')" ' + (isChecked ? 'checked' : '') + disabledAttr + '>';
             
-            html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+            if (isOfc) {
+                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td>' + chkBox + '</td></tr>';
+            } else {
+                var pontosObtidos = 0;
+                if (isChecked) {
+                    var ofcTeams = (db.pStage['OFFICIAL'] && db.pStage['OFFICIAL'][stage.saveId]) ? db.pStage['OFFICIAL'][stage.saveId] : [];
+                    if (ofcTeams.indexOf(tName) !== -1) { pontosObtidos = stage.pt; }
+                }
+                html += '<tr class="chk-linha"><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(tName) + ' <span style="white-space: normal; font-weight:500;">' + tName + '</span></div></td><td>' + chkBox + '</td><td style="text-align:right;"><div class="pts-badge">' + pontosObtidos + ' Pts</div></td></tr>';
+            }
         }
         html += '</tbody></table></div>';
     }
@@ -971,20 +980,24 @@ function renderMataMataPalpites() {
     d.innerHTML = html;
 }
 
-async function savP(j, c, v) { if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; } var k=cU.id+'_'+j; if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; db.p[k][c]=v; await salvar(); if(c==='w') renderPal(); }
-async function savR(j, c, v) { if(!cU.isM) return; var k='R_'+j; if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; db.r[k][c]=v; await salvar(); if(c==='w') renderRes(); }
+async function savP(j, c, v) { 
+    if(db.c.bPal) { alert('As alterações nos palpites estão bloqueadas temporariamente.'); renderPal(); return; } 
+    var k=cU.id+'_'+j; 
+    if(!db.p[k]) db.p[k]={a:'',b:'',w:''}; 
+    if((c === 'a' || c === 'b') && v !== '') { v = v.replace(/^0+(?=\d)/, ''); }
+    db.p[k][c]=v; 
+    await salvar(); 
+    if(c==='w') renderPal(); 
+}
 
-function renderTbCls(alvo, dds, px, isOfc) {
-    var d = document.getElementById(alvo); d.innerHTML = ''; var st = classificar(dds, px); var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-    for(var m=0; m<grupos.length; m++) {
-        var g = grupos[m]; if(!st.t[g] || st.t[g].length===0) continue;
-        var html = '<div class="fase-titulo">Grupo ' + g + '</div><div class="table-wrapper"><table class="tabela-classificacao"><thead><tr><th class="col-eq t-left">Equipe</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>SG</th><th>Pts</th></tr></thead><tbody>';
-        for(var n=0; n<st.t[g].length; n++) {
-            var x = st.t[g][n];
-            html += '<tr><td class="col-eq t-left"><div style="display: flex; align-items: center; gap: 8px;">' + getImg(x.n) + ' <span style="white-space: normal;">' + x.n + '</span></div></td><td>' + x.j + '</td><td>' + x.v + '</td><td>' + x.e + '</td><td>' + x.d + '</td><td>' + x.gm + '</td><td>' + x.gs + '</td><td>' + x.sg + '</td><td><b>' + x.p + '</b></td></tr>';
-        }
-        html += '</tbody></table></div>'; d.innerHTML += html;
-    }
+async function savR(j, c, v) { 
+    if(!cU.isM) return; 
+    var k='R_'+j; 
+    if(!db.r[k]) db.r[k]={a:'',b:'',w:''}; 
+    if((c === 'a' || c === 'b') && v !== '') { v = v.replace(/^0+(?=\d)/, ''); }
+    db.r[k][c]=v; 
+    await salvar(); 
+    if(c==='w') renderRes(); 
 }
 
 function geraLinha(j, e, val, pt, isOfc, showGroup) {
@@ -1029,16 +1042,14 @@ function renderPal() {
 }
 
 function renderRes() {
-    var hG = '', hGData = '', hE = ''; var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    var hG = '', hGData = ''; var grupos = ['A','B','C','D','E','F','G','H','I','J','K','L'];
     for(var g=0; g<grupos.length; g++) {
         var groupMatches = '';
         for(var i=0; i<db.j.length; i++) { var j = db.j[i]; if(j.f === 'G' && j.grp === grupos[g]) { var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id]; groupMatches += geraLinha(j, e, r, {pt:0}, true, false); } }
         if(groupMatches !== '') hG += '<div class="fase-titulo">Grupo ' + grupos[g] + '</div>' + groupMatches;
     }
     for(var i=0; i<db.j.length; i++) { var j = db.j[i]; if(j.f === 'G') { var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id]; hGData += geraLinha(j, e, r, {pt:0}, true, true); } }
-    var tAt = '';
-    for(var i=0; i<db.j.length; i++) { var j = db.j[i]; if(j.f === 'E') { if(j.t !== tAt) { tAt = j.t; hE += '<div class="fase-titulo">' + tAt + '</div>'; } var e = reqEquipe(j, db.r, 'R_'), r = db.r['R_'+j.id]; hE += geraLinha(j, e, r, {pt:0}, true, false); } }
-    document.getElementById('res-grp').innerHTML = hG; document.getElementById('res-grp-data').innerHTML = hGData; document.getElementById('res-elm').innerHTML = hE;
+    document.getElementById('res-grp').innerHTML = hG; document.getElementById('res-grp-data').innerHTML = hGData;
 }
 
 function handleLeagueSelect(val) {
